@@ -1,0 +1,9 @@
+gov/adlnet/xapi/model/Account.class
+gov/adlnet/xapi/model/Score.class
+gov/adlnet/xapi/model/Actor.class
+gov/adlnet/xapi/model/Statement.class
+gov/adlnet/xapi/model/Result.class
+gov/adlnet/xapi/model/Verb.class
+gov/adlnet/xapi/model/Group.class
+gov/adlnet/xapi/model/Context.class
+gov/adlnet/xapi/model/Agent.class
