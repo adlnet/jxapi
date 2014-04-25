@@ -1,0 +1,9 @@
+-------------------------------------------------------------------------------
+Test set: gov.adlnet.xapi.model.AppTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.165 sec <<< FAILURE!
+testApp(gov.adlnet.xapi.model.AppTest)  Time elapsed: 0.151 sec  <<< FAILURE!
+junit.framework.AssertionFailedError: {"id":"49b19262-9602-4295-9ab5-8344aea61803"}
+	at junit.framework.Assert.fail(Assert.java:47)
+	at junit.framework.Assert.assertTrue(Assert.java:20)
+	at gov.adlnet.xapi.model.AppTest.testApp(AppTest.java:43)
