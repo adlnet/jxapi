@@ -12,7 +12,7 @@ public class Context {
 	private String language;
 	private StatementReference statement;
 	private HashMap<String, String> extensions;
-	private HashMap<String, Activity> contextActivities;
+	private ContextActivities contextActivities;	
 	public UUID getRegistration() {
 		return registration;
 	}
@@ -31,4 +31,40 @@ public class Context {
 	public void setTeam(Group team) {
 		this.team = team;
 	}
+	public String getRevision() {
+		return revision;
+	}
+	public void setRevision(String revision) {
+		this.revision = revision;
+	}
+	public String getPlatform() {
+		return platform;
+	}
+	public void setPlatform(String platform) {
+		this.platform = platform;
+	}
+	public String getLanguage() {
+		return language;
+	}
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+	public StatementReference getStatement() {
+		return statement;
+	}
+	public void setStatement(StatementReference statement) {
+		this.statement = statement;
+	}
+	public HashMap<String, String> getExtensions() {
+		return extensions;
+	}
+	public void setExtensions(HashMap<String, String> extensions) {
+		this.extensions = extensions;
+	}
+//	public HashMap<String, Activity> getContextActivities() {
+//		return contextActivities;
+//	}
+//	public void setContextActivities(HashMap<String, Activity> contextActivities) {
+//		this.contextActivities = contextActivities;
+//	}
 }

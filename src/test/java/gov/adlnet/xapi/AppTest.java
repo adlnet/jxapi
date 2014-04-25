@@ -1,9 +1,12 @@
-package gov.adlnet.xapi;
+package gov.adlnet.xapi.model;
+
+import java.util.UUID;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import com.google.gson.*;
 /**
  * Unit test for simple App.
  */
@@ -33,6 +36,10 @@ public class AppTest
      */
     public void testApp()
     {
-        assertTrue( true );
+    	Gson g = new Gson();
+    	Statement statement = new Statement();
+    	statement.setId(UUID.randomUUID());
+    	String s = g.toJson(statement);    	
+        assertTrue( s, false );
     }
 }

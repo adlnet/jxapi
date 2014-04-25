@@ -3,6 +3,8 @@ package gov.adlnet.xapi.model;
 import java.util.UUID;
 
 public class StatementReference {
+	private String objectType;
+	private UUID id;
 	public String getObjectType() {
 		return objectType;
 	}
@@ -15,7 +17,4 @@ public class StatementReference {
 	public void setId(UUID id) {
 		this.id = id;
 	}
-	private String objectType;
-	private UUID id;
-	
 }
