@@ -1,9 +1,8 @@
-package gov.adlnet.xapi.model;
+package gov.adlnet.xapi.model.adapters;
 
 import java.lang.reflect.Type;
-
 import com.google.gson.*;
-
+import gov.adlnet.xapi.model.*;
 public class ActorAdapter implements JsonDeserializer<Actor> {
 	@Override
 	public Actor deserialize(JsonElement json, Type typeOfT,

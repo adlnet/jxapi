@@ -1,43 +1,20 @@
 package gov.adlnet.xapi.model;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-public class Statement {
-	private UUID id;
+public class SubStatement implements IStatementObject {	
 	private Verb verb;
 	private Actor actor;
 	private IStatementObject object;
 	private Result result;
 	private Context context;	
 	private String timestamp;
-	private String stored;
-	private Actor authority;
-	private String version;
 	private ArrayList<Attachment> attachments;	
 	public String getTimestamp() {
 		return timestamp;
 	}
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
-	}
-	public String getStored() {
-		return stored;
-	}
-	public void setStored(String stored) {
-		this.stored = stored;
-	}
-	public Actor getAuthority() {
-		return authority;
-	}
-	public void setAuthority(Actor authority) {
-		this.authority = authority;
-	}
-	public String getVersion() {
-		return version;
-	}
-	public void setVersion(String version) {
-		this.version = version;
 	}
 	public ArrayList<Attachment> getAttachments() {
 		return attachments;
@@ -50,12 +27,6 @@ public class Statement {
 	}
 	public void setContext(Context context) {
 		this.context = context;
-	}
-	public UUID getId() {
-		return id;
-	}
-	public void setId(UUID id) {
-		this.id = id;
 	}
 	public Verb getVerb() {
 		return verb;
@@ -73,6 +44,9 @@ public class Statement {
 		return object;
 	}
 	public void setObject(IStatementObject object) {
+		if (object.getObjectType().toLowerCase().equals("substatement")){
+			throw new IllegalArgumentException("Sub-Statements cannot be nested");
+		}
 		this.object = object;
 	}
 	public Result getResult() {
@@ -80,5 +54,8 @@ public class Statement {
 	}
 	public void setResult(Result result) {
 		this.result = result;
-	}	
+	}
+	public String getObjectType() {
+		return "SubStatement";
+	}
 }

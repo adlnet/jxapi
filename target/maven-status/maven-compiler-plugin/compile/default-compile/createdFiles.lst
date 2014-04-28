@@ -1,9 +1,13 @@
 gov/adlnet/xapi/model/Actor.class
+gov/adlnet/xapi/model/IStatementObject.class
 gov/adlnet/xapi/model/Object.class
+gov/adlnet/xapi/model/InteractionComponent.class
 gov/adlnet/xapi/model/Group.class
 gov/adlnet/xapi/model/Definition.class
 gov/adlnet/xapi/model/Account.class
+gov/adlnet/xapi/model/ActivityDefinition.class
 gov/adlnet/xapi/model/StatementReference.class
+gov/adlnet/xapi/model/adapters/StatenentObjectAdapter.class
 gov/adlnet/xapi/model/Score.class
 gov/adlnet/xapi/model/Activity.class
 gov/adlnet/xapi/model/ContextActivities.class
@@ -12,7 +16,8 @@ gov/adlnet/xapi/model/Attachment.class
 gov/adlnet/xapi/model/GroupingObject.class
 gov/adlnet/xapi/model/Result.class
 gov/adlnet/xapi/model/Verb.class
-gov/adlnet/xapi/model/ActorAdapter.class
+gov/adlnet/xapi/model/adapters/ActorAdapter.class
+gov/adlnet/xapi/model/SubStatement.class
 gov/adlnet/xapi/model/Context.class
 gov/adlnet/xapi/model/StatementCollection.class
 gov/adlnet/xapi/model/Agent.class
