@@ -3,7 +3,9 @@ package gov.adlnet.xapi.model.adapters;
 import java.lang.reflect.Type;
 import com.google.gson.*;
 import gov.adlnet.xapi.model.*;
-public class ActorAdapter implements JsonDeserializer<Actor> {
+
+public class ActorAdapter implements JsonDeserializer<Actor>,
+		JsonSerializer<Actor> {
 	@Override
 	public Actor deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
@@ -19,5 +21,11 @@ public class ActorAdapter implements JsonDeserializer<Actor> {
 			throw new JsonParseException(e.getMessage());
 		}
 		return context.deserialize(json, klass);
+	}
+
+	@Override
+	public JsonElement serialize(Actor a, Type typeofa,
+			JsonSerializationContext context) {
+		return a.serialize();
 	}
 }

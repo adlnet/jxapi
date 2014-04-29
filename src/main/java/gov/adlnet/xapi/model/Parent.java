@@ -1,5 +1,5 @@
 package gov.adlnet.xapi.model;
-
+import com.google.gson.*;
 public class Parent {
 	public String getId() {
 		return id;
@@ -15,4 +15,10 @@ public class Parent {
 	}
 	private String id;
 	private Definition definition;
+	public JsonElement seriailze(){
+		JsonObject obj = new JsonObject();
+		obj.addProperty("id", this.id);
+		obj.add("definition", this.definition.serialize());
+		return obj;
+	}
 }

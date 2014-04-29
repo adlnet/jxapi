@@ -1,6 +1,16 @@
 package gov.adlnet.xapi.model;
 
+import java.util.Map.Entry;
+import com.google.gson.*;
 public class Score {
+	public JsonElement serialize() {
+		JsonObject obj = new JsonObject();
+		obj.addProperty("scaled", this.scaled);
+		obj.addProperty("raw", this.raw);
+		obj.addProperty("min", this.min);
+		obj.addProperty("max", this.max);
+		return obj;
+	}	
 	public float getScaled() {
 		return scaled;
 	}
