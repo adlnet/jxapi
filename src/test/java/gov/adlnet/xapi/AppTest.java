@@ -46,8 +46,15 @@ public class AppTest extends TestCase {
 	 */
 	public void testGetStatements() throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
-		StatementCollection collection = _client.getStatements();
+		StatementResult collection = _client.getStatements();
 		assert !collection.getStatements().isEmpty();
+	}
+
+	public void testGetSingleStatement() throws java.net.URISyntaxException,
+			java.io.UnsupportedEncodingException, java.io.IOException {
+		String statementId = "23d0a261-fede-4548-9431-314389bc1ebd";
+		Statement collection = _client.get(statementId);
+		assert collection.getId().equals(statementId);
 	}
 
 	public void testPublishStatementWithAgent()
@@ -55,7 +62,7 @@ public class AppTest extends TestCase {
 			java.io.UnsupportedEncodingException, java.io.IOException {
 		Statement statement = new Statement();
 		Agent agent = new Agent();
-		Verb verb  = new Verb();
+		Verb verb = new Verb();
 		verb.setId("http://adlnet.gov/expapi/verbs/experienced");
 		agent.setMbox("mailto:test@example.com");
 		agent.setName("Tester McTesterson");
@@ -64,7 +71,7 @@ public class AppTest extends TestCase {
 		statement.setVerb(verb);
 		Activity a = new Activity();
 		a.setId("http://example.com");
-		statement.setObject(a);		
+		statement.setObject(a);
 		ActivityDefinition ad = new ActivityDefinition();
 		ad.setChoices(new ArrayList<InteractionComponent>());
 		InteractionComponent ic = new InteractionComponent();
@@ -75,6 +82,21 @@ public class AppTest extends TestCase {
 		ad.setInteractionType("choice");
 		ad.setMoreInfo("http://example.com");
 		a.setDefinition(ad);
-		assert this._client.publishStatement(statement);
+		String publishedId = this._client.publishStatement(statement);
+		assert publishedId.length() > 0;
+	}
+
+	public void testSettingMultipeInverseFunctionProperties()
+			throws java.net.URISyntaxException,
+			java.io.UnsupportedEncodingException, java.io.IOException {
+
+		Agent agent = new Agent();
+		agent.setMbox("mailto:test@example.com");
+		try {
+			agent.setMbox_sha1sum("test13212113");
+			assert false;
+		} catch (IllegalArgumentException ex) {
+			assert true;
+		}
 	}
 }

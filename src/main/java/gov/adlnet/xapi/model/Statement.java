@@ -5,16 +5,18 @@ import java.util.UUID;
 
 public class Statement {
 	private String id;
+	private String timestamp;
+	private String stored;
+	private String version;
+	
 	private Verb verb;
 	private Actor actor;
 	private IStatementObject object;
 	private Result result;
 	private Context context;	
-	private String timestamp;
-	private String stored;
 	private Actor authority;
-	private String version;
-	private ArrayList<Attachment> attachments;	
+	private ArrayList<Attachment> attachments;
+	
 	public String getTimestamp() {
 		return timestamp;
 	}

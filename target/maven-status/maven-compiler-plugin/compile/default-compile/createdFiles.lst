@@ -12,9 +12,10 @@ gov/adlnet/xapi/model/Statement.class
 gov/adlnet/xapi/model/adapters/ActorAdapter.class
 gov/adlnet/xapi/model/Verb.class
 gov/adlnet/xapi/model/Result.class
-gov/adlnet/xapi/model/StatementCollection.class
 gov/adlnet/xapi/model/Context.class
 gov/adlnet/xapi/model/Agent.class
+gov/adlnet/xapi/model/StatementResult.class
+gov/adlnet/xapi/App.class
 gov/adlnet/xapi/model/IStatementObject.class
 gov/adlnet/xapi/model/Actor.class
 gov/adnlet/xapi/client/Client.class

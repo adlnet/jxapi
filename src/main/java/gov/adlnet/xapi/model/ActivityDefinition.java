@@ -14,7 +14,7 @@ public class ActivityDefinition {
 
 	private ArrayList<String> correctResponsesPattern;
 
-	private HashMap<String, String> extensions;
+	private HashMap<String, JsonElement> extensions;
 	private HashMap<String, String> name;
 	private HashMap<String, String> description;
 
@@ -60,7 +60,11 @@ public class ActivityDefinition {
 			obj.add("correctResponsesPattern", correctResponsesPatterns);
 		}
 		if (this.extensions != null) {
-			obj.add("extensions", this.serializeMap(this.extensions));
+			JsonObject extensions = new JsonObject();
+			obj.add("extensions", extensions);
+			for (Entry<String, JsonElement> item : this.extensions.entrySet()){
+				extensions.add(item.getKey(), item.getValue());
+			}
 		}
 		if (this.name != null) {
 			obj.add("name", this.serializeMap(this.name));
@@ -119,11 +123,11 @@ public class ActivityDefinition {
 		this.moreInfo = moreinfo;
 	}
 
-	public HashMap<String, String> getExtensions() {
+	public HashMap<String, JsonElement> getExtensions() {
 		return extensions;
 	}
 
-	public void setExtensions(HashMap<String, String> extensions) {
+	public void setExtensions(HashMap<String, JsonElement> extensions) {
 		this.extensions = extensions;
 	}
 

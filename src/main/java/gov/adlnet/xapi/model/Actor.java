@@ -1,6 +1,7 @@
 package gov.adlnet.xapi.model;
 
 import java.net.URI;
+
 import com.google.gson.*;
 
 public abstract class Actor {
@@ -9,12 +10,22 @@ public abstract class Actor {
 	private String mbox_sha1sum;
 	private URI openid;
 	private Account account;
+	private boolean inverseFunctionalPropertySet = false;
 
 	public String getMbox() {
 		return mbox;
 	}
 
 	public void setMbox(String mbox) {
+		if (mbox != null) {
+			if (this.inverseFunctionalPropertySet) {
+				throw new IllegalArgumentException(
+						"Only one Inverse Functional Property can be set");
+			}
+			inverseFunctionalPropertySet = true;
+		} else {
+			inverseFunctionalPropertySet = false;
+		}
 		this.mbox = mbox;
 	}
 
@@ -23,6 +34,15 @@ public abstract class Actor {
 	}
 
 	public void setMbox_sha1sum(String mbox_sha1sum) {
+		if (mbox_sha1sum != null) {
+			if (this.inverseFunctionalPropertySet) {
+				throw new IllegalArgumentException(
+						"Only one Inverse Functional Property can be set");
+			}
+			inverseFunctionalPropertySet = true;
+		} else {
+			inverseFunctionalPropertySet = false;
+		}
 		this.mbox_sha1sum = mbox_sha1sum;
 	}
 
@@ -31,6 +51,15 @@ public abstract class Actor {
 	}
 
 	public void setOpenid(URI openid) {
+		if (openid != null) {
+			if (this.inverseFunctionalPropertySet) {
+				throw new IllegalArgumentException(
+						"Only one Inverse Functional Property can be set");
+			}
+			inverseFunctionalPropertySet = true;
+		} else {
+			inverseFunctionalPropertySet = false;
+		}		
 		this.openid = openid;
 	}
 
@@ -39,6 +68,15 @@ public abstract class Actor {
 	}
 
 	public void setAccount(Account account) {
+		if (account != null) {
+			if (this.inverseFunctionalPropertySet) {
+				throw new IllegalArgumentException(
+						"Only one Inverse Functional Property can be set");
+			}
+			inverseFunctionalPropertySet = true;
+		} else {
+			inverseFunctionalPropertySet = false;
+		}		
 		this.account = account;
 	}
 

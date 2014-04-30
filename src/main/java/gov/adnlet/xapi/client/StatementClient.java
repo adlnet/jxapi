@@ -62,14 +62,12 @@ public class StatementClient {
 		return builder.create();
 	}
 
-	public boolean publishStatement(Statement statement)
+	public String publishStatement(Statement statement)
 			throws java.io.UnsupportedEncodingException, java.io.IOException {
-		
+
 		HttpPost post = new HttpPost("/xapi/statements");
-		Gson gson = getDecoder();		
+		Gson gson = getDecoder();
 		String json = gson.toJson(statement);
-		System.out.println("Got Here");
-		System.out.println(json);
 		post.setEntity(new StringEntity(json));
 		post.addHeader("X-Experience-API-Version", "1.0");
 		HttpResponse resp = this._client.execute(this._host, post,
@@ -77,26 +75,27 @@ public class StatementClient {
 		HttpEntity entity = resp.getEntity();
 		InputStreamReader in = new InputStreamReader(entity.getContent());
 		BufferedReader reader = new BufferedReader(in);
-		System.out.println(resp.getStatusLine());
 		try {
 			StringBuilder sb = new StringBuilder();
 			String line = "";
 			while ((line = reader.readLine()) != null) {
 				sb.append(line);
 			}
-			System.out.println(sb);
-			return true;
-		} catch (Exception ex) {
-			System.err.println(ex.getMessage());
-			return false;
+			if (resp.getStatusLine().getStatusCode() < 200 || resp.getStatusLine().getStatusCode() > 205) {
+				throw new IllegalArgumentException(sb.toString());
+			}else{
+				JsonArray result = gson.fromJson(sb.toString(), JsonArray.class);
+				return result.get(0).getAsString();
+			}
 		} finally {
 			in.close();
 			reader.close();
 		}
 	}
 
-	public StatementCollection getStatements() throws java.io.IOException {
-		HttpGet method = new HttpGet("/xapi/statements");
+	public StatementResult getStatements(String more)
+			throws java.io.IOException {
+		HttpGet method = new HttpGet(more);
 		method.addHeader("X-Experience-API-Version", "1.0");
 		HttpResponse resp = this._client.execute(this._host, method,
 				this._context);
@@ -110,11 +109,36 @@ public class StatementClient {
 			while ((line = reader.readLine()) != null) {
 				sb.append(line);
 			}
-			return gson.fromJson(sb.toString(), StatementCollection.class);
+			return gson.fromJson(sb.toString(), StatementResult.class); 
 		} finally {
 			in.close();
 			reader.close();
 		}
+	}
 
+	public StatementResult getStatements() throws java.io.IOException {
+		return getStatements("/xapi/statements");
+	}
+
+	public Statement get(String statementId) throws java.io.IOException {
+		HttpGet method = new HttpGet("/xapi/statements?statementId=" + statementId);
+		method.addHeader("X-Experience-API-Version", "1.0");
+		HttpResponse resp = this._client.execute(this._host, method,
+				this._context);
+		HttpEntity entity = resp.getEntity();
+		Gson gson = this.getDecoder();
+		InputStreamReader in = new InputStreamReader(entity.getContent());
+		BufferedReader reader = new BufferedReader(in);
+		try {
+			StringBuilder sb = new StringBuilder();
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+			return gson.fromJson(sb.toString(), Statement.class); 
+		} finally {
+			in.close();
+			reader.close();
+		}		
 	}
 }
