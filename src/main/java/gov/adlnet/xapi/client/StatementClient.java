@@ -1,4 +1,4 @@
-package gov.adnlet.xapi.client;
+package gov.adlnet.xapi.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
