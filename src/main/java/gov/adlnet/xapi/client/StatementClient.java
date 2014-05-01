@@ -138,6 +138,7 @@ public class StatementClient {
 		if (this.filters != null && !this.filters.isEmpty()) {
 			baseQuery = baseQuery + "?"
 					+ URLEncodedUtils.format(filters, Charset.forName("utf-8"));
+			this.filters.clear();
 		}
 		String result = this.issueRequest(baseQuery);
 		StatementResult r2 = this.getDecoder().fromJson(result, StatementResult.class);
