@@ -1,9 +1,7 @@
 package gov.adlnet.xapi.model;
-
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.Map.Entry;
-import com.google.gson.*;
 import com.google.gson.*;
 
 public class Context {
@@ -17,7 +15,7 @@ public class Context {
 	private StatementReference statement;
 	private ContextActivities contextActivities;
 
-	private HashMap<String, String> extensions;
+	private HashMap<String, JsonElement> extensions;
 
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
@@ -42,8 +40,8 @@ public class Context {
 		if (this.extensions != null) {
 			JsonObject extensionsObj = new JsonObject();
 			obj.add("extensions", extensionsObj);
-			for (Entry<String, String> item : extensions.entrySet()) {
-				extensionsObj.addProperty(item.getKey(), item.getValue());
+			for (Entry<String, JsonElement> item : extensions.entrySet()) {
+				extensionsObj.add(item.getKey(), item.getValue());
 			}
 		}
 		if (this.statement != null) {
@@ -111,11 +109,11 @@ public class Context {
 		this.statement = statement;
 	}
 
-	public HashMap<String, String> getExtensions() {
+	public HashMap<String, JsonElement> getExtensions() {
 		return extensions;
 	}
 
-	public void setExtensions(HashMap<String, String> extensions) {
+	public void setExtensions(HashMap<String, JsonElement> extensions) {
 		this.extensions = extensions;
 	}
 }

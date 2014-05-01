@@ -12,7 +12,7 @@ public class ActorAdapter implements JsonDeserializer<Actor>,
 		JsonObject obj = json.getAsJsonObject();
 		Class<?> klass = null;
 		try {
-			if (obj.get("objectType").toString().toLowerCase() == "agent") {
+			if (!obj.has("objectType") || obj.get("objectType").toString().toLowerCase() == "agent") {
 				klass = Class.forName("gov.adlnet.xapi.model.Agent");
 			} else {
 				klass = Class.forName("gov.adlnet.xapi.model.Group");

@@ -31,8 +31,7 @@ public class StatenentObjectAdapter implements JsonSerializer<IStatementObject>,
 					klass = Class.forName(SubStatement.class.getCanonicalName());
 				}
 			} else {
-				throw new JsonParseException(
-						"Invalid JSON for statement object");
+				klass = Class.forName(Activity.class.getCanonicalName());
 			}
 		} catch (ClassNotFoundException e) {
 			throw new JsonParseException(e.getMessage());

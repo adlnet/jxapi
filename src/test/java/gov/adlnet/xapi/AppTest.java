@@ -42,7 +42,7 @@ public class AppTest extends TestCase {
 	}
 
 	/**
-	 * Rigourous Test :-)
+	 * Rigourous Test ;-)
 	 */
 	public void testGetStatements() throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {

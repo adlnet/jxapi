@@ -75,7 +75,6 @@ public class StatementClient {
 
 	public String publishStatement(Statement statement)
 			throws java.io.UnsupportedEncodingException, java.io.IOException {
-
 		HttpPost post = new HttpPost("/xapi/statements");
 		Gson gson = getDecoder();
 		String json = gson.toJson(statement);
@@ -141,13 +140,18 @@ public class StatementClient {
 			this.filters.clear();
 		}
 		String result = this.issueRequest(baseQuery);
-		StatementResult r2 = this.getDecoder().fromJson(result,
+		return this.getDecoder().fromJson(result,
 				StatementResult.class);
-		return r2;
 	}
 
 	public Statement get(String statementId) throws java.io.IOException {
 		String result = this.issueRequest("/xapi/statements?statementId="
+				+ statementId);
+		return this.getDecoder().fromJson(result, Statement.class);
+	}
+
+	public Statement getVoided(String statementId) throws java.io.IOException {
+		String result = this.issueRequest("/xapi/statements?voidedStatementId="
 				+ statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
@@ -193,27 +197,34 @@ public class StatementClient {
 		else
 			return addFilter("related_agents", "false");
 	}
+
 	public StatementClient includeAttachments(boolean include) {
 		if (include)
 			return addFilter("attachments", "true");
 		else
 			return addFilter("attachments", "false");
 	}
+
 	public StatementClient filterBySince(String timestamp) {
 		return addFilter("since", timestamp);
 	}
+
 	public StatementClient filterByUntil(String timestamp) {
 		return addFilter("until", timestamp);
 	}
+
 	public StatementClient exact() {
 		return addFilter("format", "exact");
 	}
+
 	public StatementClient ids() {
 		return addFilter("format", "ids");
-	}		
+	}
+
 	public StatementClient canonical() {
 		return addFilter("format", "canonical");
-	}	
+	}
+
 	public StatementClient ascending(boolean include) {
 		if (include)
 			return addFilter("ascending", "true");
