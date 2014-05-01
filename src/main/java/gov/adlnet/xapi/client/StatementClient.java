@@ -141,8 +141,9 @@ public class StatementClient {
 			this.filters.clear();
 		}
 		String result = this.issueRequest(baseQuery);
-		StatementResult r2 = this.getDecoder().fromJson(result, StatementResult.class);
-		return r2; 
+		StatementResult r2 = this.getDecoder().fromJson(result,
+				StatementResult.class);
+		return r2;
 	}
 
 	public Statement get(String statementId) throws java.io.IOException {
@@ -163,8 +164,60 @@ public class StatementClient {
 		return addFilter("verb", v.getId());
 	}
 
+	public StatementClient filterByVerb(String verbId) {
+		return addFilter("verb", verbId);
+	}
+
 	public StatementClient filterByActor(Actor a) {
 		return addFilter("agent", getDecoder().toJson(a));
 	}
 
+	public StatementClient filterByActivity(String activityId) {
+		return addFilter("activity", activityId);
+	}
+
+	public StatementClient filterByRegistration(String registrationId) {
+		return addFilter("registration", registrationId);
+	}
+
+	public StatementClient includeRelatedActivities(boolean include) {
+		if (include)
+			return addFilter("related_activities", "true");
+		else
+			return addFilter("related_activities", "false");
+	}
+
+	public StatementClient includeRelatedAgents(boolean include) {
+		if (include)
+			return addFilter("related_agents", "true");
+		else
+			return addFilter("related_agents", "false");
+	}
+	public StatementClient includeAttachments(boolean include) {
+		if (include)
+			return addFilter("attachments", "true");
+		else
+			return addFilter("attachments", "false");
+	}
+	public StatementClient filterBySince(String timestamp) {
+		return addFilter("since", timestamp);
+	}
+	public StatementClient filterByUntil(String timestamp) {
+		return addFilter("until", timestamp);
+	}
+	public StatementClient exact() {
+		return addFilter("format", "exact");
+	}
+	public StatementClient ids() {
+		return addFilter("format", "ids");
+	}		
+	public StatementClient canonical() {
+		return addFilter("format", "canonical");
+	}	
+	public StatementClient ascending(boolean include) {
+		if (include)
+			return addFilter("ascending", "true");
+		else
+			return addFilter("ascending", "false");
+	}
 }

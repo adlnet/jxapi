@@ -139,13 +139,14 @@ public class AppTest extends TestCase {
 		Actor a = new Agent();
 		a.setMbox("mailto:test@example.com");
 		Verb v = Verbs.experienced();
-		StatementResult result = _client.filterByVerb(v).filterByActor(a).getStatements();
+		StatementResult result = _client.filterByVerb(v).filterByActor(a).ids()
+				.getStatements();
 		assertFalse(result.getStatements().isEmpty());
 		for (Statement s : result.getStatements()) {
 			assertNotNull(s.getActor());
 			assertEquals(a.getMbox(), s.getActor().getMbox());
 			assertNotNull(s.getVerb());
-			assertEquals(v.getId(), s.getVerb().getId());			
+			assertEquals(v.getId(), s.getVerb().getId());
 		}
 	}
 }
