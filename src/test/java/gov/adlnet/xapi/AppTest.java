@@ -1,7 +1,7 @@
-package gov.adlnet.xapi.model;
+package gov.adlnet.xapi;
 
 import gov.adlnet.xapi.model.*;
-import gov.adnlet.xapi.client.StatementClient;
+import gov.adlnet.xapi.client.StatementClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,18 +20,18 @@ public class AppTest extends TestCase {
 	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI/";
 	private static final String USERNAME = "Walt Grata";
 	private static final String PASSWORD = "password";
+
 	/**
 	 * Create the test case
 	 * 
 	 * @param testName
 	 *            name of the test case
 	 */
-	private StatementClient _client;
 
 	public AppTest(String testName) throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException {
 		super(testName);
-		_client = new StatementClient(LRS_URI, USERNAME, PASSWORD);
+
 	}
 
 	/**
@@ -46,6 +46,8 @@ public class AppTest extends TestCase {
 	 */
 	public void testGetStatements() throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
 		StatementResult collection = _client.getStatements();
 		assert !collection.getStatements().isEmpty();
 	}
@@ -53,6 +55,8 @@ public class AppTest extends TestCase {
 	public void testGetSingleStatement() throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
 		String statementId = "23d0a261-fede-4548-9431-314389bc1ebd";
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
 		Statement collection = _client.get(statementId);
 		assert collection.getId().equals(statementId);
 	}
@@ -60,6 +64,8 @@ public class AppTest extends TestCase {
 	public void testPublishStatementWithAgent()
 			throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
 		Statement statement = new Statement();
 		Agent agent = new Agent();
 		Verb verb = new Verb();
@@ -82,14 +88,13 @@ public class AppTest extends TestCase {
 		ad.setInteractionType("choice");
 		ad.setMoreInfo("http://example.com");
 		a.setDefinition(ad);
-		String publishedId = this._client.publishStatement(statement);
+		String publishedId = _client.publishStatement(statement);
 		assert publishedId.length() > 0;
 	}
 
 	public void testSettingMultipeInverseFunctionProperties()
 			throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
-
 		Agent agent = new Agent();
 		agent.setMbox("mailto:test@example.com");
 		try {
@@ -97,6 +102,50 @@ public class AppTest extends TestCase {
 			assert false;
 		} catch (IllegalArgumentException ex) {
 			assert true;
+		}
+	}
+
+	public void testQueryByVerb() throws java.net.URISyntaxException,
+			java.io.UnsupportedEncodingException, java.io.IOException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
+		Verb v = Verbs.experienced();
+		StatementResult result = _client.filterByVerb(v).getStatements();
+		assertFalse(result.getStatements().isEmpty());
+		for (Statement s : result.getStatements()) {
+			assertNotNull(s.getVerb());
+			assertEquals(v.getId(), s.getVerb().getId());
+		}
+	}
+
+	public void testQueryByAgent() throws java.net.URISyntaxException,
+			java.io.UnsupportedEncodingException, java.io.IOException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
+		Actor a = new Agent();
+		a.setMbox("mailto:test@example.com");
+		StatementResult result = _client.filterByActor(a).getStatements();
+		assertFalse(result.getStatements().isEmpty());
+		for (Statement s : result.getStatements()) {
+			assertNotNull(s.getActor());
+			assertEquals(a.getMbox(), s.getActor().getMbox());
+		}
+	}
+
+	public void testQueryByAgentAndVerb() throws java.net.URISyntaxException,
+			java.io.UnsupportedEncodingException, java.io.IOException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
+		Actor a = new Agent();
+		a.setMbox("mailto:test@example.com");
+		Verb v = Verbs.experienced();
+		StatementResult result = _client.filterByVerb(v).filterByActor(a).getStatements();
+		assertFalse(result.getStatements().isEmpty());
+		for (Statement s : result.getStatements()) {
+			assertNotNull(s.getActor());
+			assertEquals(a.getMbox(), s.getActor().getMbox());
+			assertNotNull(s.getVerb());
+			assertEquals(v.getId(), s.getVerb().getId());			
 		}
 	}
 }
