@@ -20,7 +20,6 @@ gov/adlnet/xapi/App.class
 gov/adlnet/xapi/model/IStatementObject.class
 gov/adlnet/xapi/model/Actor.class
 gov/adlnet/xapi/client/StatementClient.class
-gov/adlnet/xapi/client/Client.class
 gov/adlnet/xapi/client/StatementClient$1.class
 gov/adlnet/xapi/model/adapters/StatenentObjectAdapter.class
 gov/adlnet/xapi/model/Attachment.class
