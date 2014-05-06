@@ -45,7 +45,6 @@ public class AppTest extends TestCase {
 			Calendar calendar = GregorianCalendar.getInstance();
 			String s = iso8601string.replace("Z", "+00:00");
 			try {
-				System.out.println(s);
 				s = s.substring(0, 22) + s.substring(23); // to get rid of the
 															// ":"
 			} catch (IndexOutOfBoundsException e) {

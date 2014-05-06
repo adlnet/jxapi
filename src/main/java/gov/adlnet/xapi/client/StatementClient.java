@@ -45,7 +45,6 @@ public class StatementClient {
 
 			}
 		});
-
 	}
 
 	private Gson getDecoder() {
