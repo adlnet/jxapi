@@ -21,98 +21,27 @@ import gov.adlnet.xapi.model.*;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
 
-public class StatementClient {
+public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;
-	private Gson gson;
-	private URL _host;
 
 	public StatementClient(String uri, String user, String password)
 			throws java.net.MalformedURLException {
-		init(new URL(uri), user, password);
-	}
-
-	public StatementClient(URL uri, String user, String password) {
-		init(uri, user, password);
-	}
-
-	private void init(URL uri, String user, String password) {
-		this._host = uri;
-		final String username = user;
-		final char[] pwd = password.toCharArray();
-		Authenticator.setDefault(new Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, pwd);
-
-			}
-		});
-	}
-
-	private Gson getDecoder() {
-		if (gson == null) {
-			GsonBuilder builder = new GsonBuilder();
-			builder.registerTypeAdapter(Actor.class, new ActorAdapter());
-			builder.registerTypeAdapter(IStatementObject.class,
-					new StatenentObjectAdapter());
-			gson = builder.create();
-		}
-		return gson;
+		super(new URL(uri), user, password);
 	}
 
 	public String publishStatement(Statement statement)
 			throws java.io.UnsupportedEncodingException, java.io.IOException {
 		Gson gson = getDecoder();
 		String json = gson.toJson(statement);
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(),
-				"/xapi/statements");
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setDoOutput(true);
-		conn.setDoInput(true);
-		conn.addRequestProperty("X-Experience-API-Version", "1.0");
-		conn.setRequestProperty("Content-Type",
-				"application/json; charset=utf8");
-		conn.setRequestMethod("POST");
-		OutputStreamWriter writer = new OutputStreamWriter(
-				conn.getOutputStream());
-		try {
-			writer.write(json);
-		} finally {
-			writer.close();
-		}
-
-		String result = readFromConnection(conn);
+		String result = issuePost("/xapi/statements", json);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		return jsonResult.get(0).getAsString();
 	}
 
-	private String readFromConnection(HttpURLConnection conn)
-			throws java.io.IOException {
-		InputStream in = new BufferedInputStream(conn.getInputStream());
-		StringBuilder sb = new StringBuilder();
-		InputStreamReader reader = new InputStreamReader(in);
-		BufferedReader br = new BufferedReader(reader);
-		String line = "";
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
-		}
-		return sb.toString();
-	}
-
-	private String issueRequest(String path) throws java.io.IOException,
-			java.net.MalformedURLException {
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.addRequestProperty("X-Experience-API-Version", "1.0");
-		try {
-			return readFromConnection(conn);
-		} finally {
-			conn.disconnect();
-		}
-
-	}
 
 	public StatementResult getStatements(String more)
 			throws java.io.IOException {
-		String result = this.issueRequest(more);
+		String result = this.issueGet(more);
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
 
@@ -129,18 +58,18 @@ public class StatementClient {
 			}
 			this.filters.clear();
 		}
-		String result = this.issueRequest(query.toString());
+		String result = this.issueGet(query.toString());
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
 
 	public Statement get(String statementId) throws java.io.IOException {
-		String result = this.issueRequest("/xapi/statements?statementId="
+		String result = this.issueGet("/xapi/statements?statementId="
 				+ statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
 	public Statement getVoided(String statementId) throws java.io.IOException {
-		String result = this.issueRequest("/xapi/statements?voidedStatementId="
+		String result = this.issueGet("/xapi/statements?voidedStatementId="
 				+ statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}

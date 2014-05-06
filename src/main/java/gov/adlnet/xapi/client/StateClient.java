@@ -24,59 +24,16 @@ import gov.adlnet.xapi.model.State;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
 
-public class StateClient {
-	private URL _host;
-	private Gson gson;
-
-	private Gson getDecoder() {
-		if (gson == null) {
-			GsonBuilder builder = new GsonBuilder();
-			builder.registerTypeAdapter(Actor.class, new ActorAdapter());
-			builder.registerTypeAdapter(IStatementObject.class,
-					new StatenentObjectAdapter());
-			gson = builder.create();
-		}
-		return gson;
-	}
-
-	private void init(URL uri, String user, String password) {
-		this._host = uri;
-		final String username = user;
-		final char[] pwd = password.toCharArray();
-		Authenticator.setDefault(new Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, pwd);
-
-			}
-		});
-	}
+public class StateClient extends BaseClient {
 
 	public StateClient(String uri, String username, String password)
 			throws MalformedURLException {
-		init(new URL(uri), username, password);
+		super(new URL(uri), username, password);
 	}
 
 	public StateClient(URL uri, String username, String password)
 			throws MalformedURLException {
-		init(uri, username, password);
-	}
-
-	private String readFromConnection(HttpURLConnection conn)
-			throws java.io.IOException {
-		InputStream in = new BufferedInputStream(conn.getInputStream());
-		StringBuilder sb = new StringBuilder();
-		InputStreamReader reader = new InputStreamReader(in);
-		BufferedReader br = new BufferedReader(reader);
-		try {
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-			return sb.toString();
-		} finally {
-			br.close();
-			reader.close();
-		}
+		super(uri, username, password);
 	}
 
 	private String createStatePath(String activityId, Agent agent,
@@ -96,33 +53,13 @@ public class StateClient {
 		return path.toString();
 	}
 
-	private HttpURLConnection initializeConnection(URL url) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setDoOutput(true);
-		conn.setDoInput(true);
-		conn.addRequestProperty("X-Experience-API-Version", "1.0");
-		conn.setRequestProperty("Content-Type", "application/json");
-		return conn;
-	}
-
 	public boolean publishState(String activityId, Agent agent, String stateId,
 			JsonObject state) throws IOException {
 		Gson gson = getDecoder();
 		String json = gson.toJson(state);
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(),
-				createStatePath(activityId, agent, stateId));
-		HttpURLConnection conn = initializeConnection(url);
-		conn.setRequestMethod("POST");
-		OutputStreamWriter writer = new OutputStreamWriter(
-				conn.getOutputStream());
-		try {
-			writer.write(json);
-			writer.flush();
-		} finally {
-			writer.close();
-		}
-		String response = readFromConnection(conn);
-		return conn.getResponseCode() == 204;
+		String path = createStatePath(activityId, agent, stateId);
+		String result = issuePost(path, json);
+		return result != null;
 	}
 
 	public JsonObject getState(String activityId, Agent agent, String stateId)
