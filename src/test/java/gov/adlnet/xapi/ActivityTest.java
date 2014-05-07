@@ -58,4 +58,9 @@ public class ActivityTest extends TestCase {
 		JsonArray a = _client.getActivities(ACTIVITY_ID, null);
 		assertNotNull(a);		
 	}
+	public void testGetActivitesWithSince() throws IOException {
+		ActivityClient _client = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
+		JsonArray a = _client.getActivities(ACTIVITY_ID, "2014-05-02T17:28:47.00Z");
+		assertNotNull(a);		
+	}
 }

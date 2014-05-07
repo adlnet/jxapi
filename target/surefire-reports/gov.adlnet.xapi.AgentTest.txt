@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: gov.adlnet.xapi.AgentTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.505 sec <<< FAILURE!
+testGetProfile(gov.adlnet.xapi.AgentTest)  Time elapsed: 0.183 sec  <<< ERROR!
+java.io.FileNotFoundException: https://lrs.adlnet.gov/xAPI/agents/profile?agent={"mbox":"mailto:test@example.com","objectType":"Agent"}&profileId=ff29f45d-2ca4-4da9-870d-c5d2a21eb896
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1624)
+	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:254)
+	at gov.adlnet.xapi.client.BaseClient.readFromConnection(BaseClient.java:62)
+	at gov.adlnet.xapi.client.BaseClient.issueGet(BaseClient.java:126)
+	at gov.adlnet.xapi.client.AgentClient.getAgentProfile(AgentClient.java:41)
+	at gov.adlnet.xapi.AgentTest.testGetProfile(AgentTest.java:33)
