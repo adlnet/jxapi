@@ -4,7 +4,7 @@ import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

@@ -3,7 +3,7 @@ package gov.adlnet.xapi.client;
 import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -39,7 +39,7 @@ public class BaseClient {
 			GsonBuilder builder = new GsonBuilder();
 			builder.registerTypeAdapter(Actor.class, new ActorAdapter());
 			builder.registerTypeAdapter(IStatementObject.class,
-					new StatenentObjectAdapter());
+					new StatementObjectAdapter());
 			gson = builder.create();
 		}
 		return gson;

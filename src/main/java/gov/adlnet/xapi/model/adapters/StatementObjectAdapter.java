@@ -6,7 +6,7 @@ import gov.adlnet.xapi.model.*;
 
 import java.lang.reflect.Type;
 
-public class StatenentObjectAdapter implements JsonSerializer<IStatementObject>,
+public class StatementObjectAdapter implements JsonSerializer<IStatementObject>,
 		JsonDeserializer<IStatementObject> {
 	private static final String OBJECT_TYPE = "objectType";
 

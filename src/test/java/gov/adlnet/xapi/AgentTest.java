@@ -1,7 +1,6 @@
 package gov.adlnet.xapi;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.UUID;
 
 import com.google.gson.*;

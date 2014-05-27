@@ -19,7 +19,7 @@ import java.io.*;
 
 import gov.adlnet.xapi.model.*;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;

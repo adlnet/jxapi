@@ -22,7 +22,7 @@ import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.State;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 
 public class StateClient extends BaseClient {
 

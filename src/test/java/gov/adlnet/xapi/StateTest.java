@@ -18,7 +18,7 @@ import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.State;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatenentObjectAdapter;
+import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 import junit.framework.TestCase;
 
 public class StateTest extends TestCase {

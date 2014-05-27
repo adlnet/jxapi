@@ -6,11 +6,10 @@
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Account.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Verbs.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/ContextActivities.java
-/home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/adapters/StatenentObjectAdapter.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Activity.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/SubStatement.java
-/home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/adapters/ActorAdapter.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/ActivityDefinition.java
+/home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/adapters/ActorAdapter.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Group.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/client/StateClient.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Attachment.java
@@ -30,3 +29,4 @@
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Statement.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/client/StatementClient.java
 /home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/Verb.java
+/home/walt/workspace/xapi/src/main/java/gov/adlnet/xapi/model/adapters/StatementObjectAdapter.java
