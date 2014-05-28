@@ -3,9 +3,8 @@ package gov.adlnet.xapi.model;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.joda.time.*;
-
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class Result {
 	public Score getScore() {

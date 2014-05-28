@@ -1,8 +1,7 @@
 package gov.adlnet.xapi.model;
 
-import java.util.UUID;
-
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class StatementReference {
 	public static final String STATEMENT_REFERENCE = "statementRef";

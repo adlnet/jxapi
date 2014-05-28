@@ -1,25 +1,14 @@
 package gov.adlnet.xapi;
 
-import java.io.IOException;
-import java.net.Authenticator;
-import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.URL;
-import java.util.UUID;
+import gov.adlnet.xapi.client.StateClient;
+import gov.adlnet.xapi.model.Agent;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.io.IOException;
+
+import junit.framework.TestCase;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import gov.adlnet.xapi.client.StateClient;
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.Agent;
-import gov.adlnet.xapi.model.IStatementObject;
-import gov.adlnet.xapi.model.State;
-import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
-import junit.framework.TestCase;
 
 public class StateTest extends TestCase {
 	private static final String STATE_ID = "questionState";

@@ -1,7 +1,6 @@
 package gov.adlnet.xapi.model;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class Statement {
 	private String id;

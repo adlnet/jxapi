@@ -1,24 +1,11 @@
 package gov.adlnet.xapi.client;
 
 import gov.adlnet.xapi.model.Activity;
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.IStatementObject;
-import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 

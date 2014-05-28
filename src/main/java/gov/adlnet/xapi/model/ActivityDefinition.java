@@ -1,11 +1,13 @@
 package gov.adlnet.xapi.model;
 
-import com.google.gson.*;
-
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class ActivityDefinition {
 	private String type;

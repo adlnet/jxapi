@@ -1,8 +1,9 @@
 package gov.adlnet.xapi.model;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.Map.Entry;
-import com.google.gson.*;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class Context {
 	private String registration;

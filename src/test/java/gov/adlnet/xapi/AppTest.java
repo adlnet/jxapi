@@ -1,7 +1,15 @@
 package gov.adlnet.xapi;
 
-import gov.adlnet.xapi.model.*;
 import gov.adlnet.xapi.client.StatementClient;
+import gov.adlnet.xapi.model.Activity;
+import gov.adlnet.xapi.model.ActivityDefinition;
+import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.Agent;
+import gov.adlnet.xapi.model.InteractionComponent;
+import gov.adlnet.xapi.model.Statement;
+import gov.adlnet.xapi.model.StatementResult;
+import gov.adlnet.xapi.model.Verb;
+import gov.adlnet.xapi.model.Verbs;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,13 +20,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.print.attribute.standard.MediaSize.ISO;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import com.google.gson.*;
 
 /**
  * Unit test for simple App.

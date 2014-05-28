@@ -1,25 +1,16 @@
 package gov.adlnet.xapi.client;
 
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
-import java.net.URI;
-import java.net.URISyntaxException;
+import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.Statement;
+import gov.adlnet.xapi.model.StatementResult;
+import gov.adlnet.xapi.model.Verb;
+
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.nio.charset.Charset;
 
-import com.google.gson.*;
-
-import java.io.*;
-
-import gov.adlnet.xapi.model.*;
-import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;

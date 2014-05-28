@@ -1,7 +1,7 @@
 package gov.adlnet.xapi.model;
 
-import java.net.URI;
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class Activity implements IStatementObject {
 	public static final String ACTIVITY = "Activity";
