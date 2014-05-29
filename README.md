@@ -79,13 +79,13 @@ filterByUntil
 ```
 These filters can be chained together to created more complex queries, such as
 
-```
+```java
 StatementResult results = client.filterByVerb(verb).filterByActivity(activity).getStatements();
 ```
 
 You can also specify what data is brought back from the LRS, by calling the ```include*``` methods, the available methods are
 
-```
+```java
 includeRelatedActivities
 includeRelatedAgents
 includeAttachments
