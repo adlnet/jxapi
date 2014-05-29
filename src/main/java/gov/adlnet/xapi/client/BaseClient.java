@@ -23,7 +23,8 @@ import com.google.gson.GsonBuilder;
 public class BaseClient {
 	protected URL _host;
 	protected Gson gson;
-
+	protected String username;
+	protected String password;
 	public BaseClient(String uri, String username, String password)
 			throws MalformedURLException {
 		init(new URL(uri), username, password);
@@ -32,8 +33,7 @@ public class BaseClient {
 	public BaseClient(URL uri, String username, String password)
 			throws MalformedURLException {
 		init(uri, username, password);
-	}
-
+	}	
 	protected Gson getDecoder() {
 		if (gson == null) {
 			GsonBuilder builder = new GsonBuilder();
@@ -47,7 +47,8 @@ public class BaseClient {
 
 	protected void init(URL uri, String user, String password) {
 		this._host = uri;
-		final String username = user;
+		this.username = user;
+		this.password = password;
 		final char[] pwd = password.toCharArray();
 		Authenticator.setDefault(new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {

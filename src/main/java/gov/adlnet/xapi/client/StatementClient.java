@@ -5,6 +5,7 @@ import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.Verb;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -20,6 +21,11 @@ public class StatementClient extends BaseClient {
 		super(new URL(uri), user, password);
 	}
 
+	public StatementClient(URL uri, String user, String password)
+			throws MalformedURLException {
+		super(uri, user, password);
+	}
+
 	public String publishStatement(Statement statement)
 			throws java.io.UnsupportedEncodingException, java.io.IOException {
 		Gson gson = getDecoder();
@@ -28,7 +34,6 @@ public class StatementClient extends BaseClient {
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		return jsonResult.get(0).getAsString();
 	}
-
 
 	public StatementResult getStatements(String more)
 			throws java.io.IOException {
@@ -41,7 +46,7 @@ public class StatementClient extends BaseClient {
 		query.append("/xapi/statements");
 		if (this.filters != null && !this.filters.isEmpty()) {
 			query.append("?");
-			for(Entry<String, String> item: this.filters.entrySet()){
+			for (Entry<String, String> item : this.filters.entrySet()) {
 				query.append(item.getKey());
 				query.append("=");
 				query.append(item.getValue());
@@ -66,11 +71,22 @@ public class StatementClient extends BaseClient {
 	}
 
 	private StatementClient addFilter(String key, String value) {
-		if (filters == null) {
-			filters = new TreeMap<String, String>();
+		try {
+			StatementClient client = new StatementClient(this._host,
+					this.username, this.password);
+			if (client.filters == null) {
+				client.filters = new TreeMap<String, String>();
+			}
+			if (this.filters != null) {
+				for (Entry<String, String> filter : filters.entrySet()) {
+					client.filters.put(filter.getKey(), filter.getValue());
+				}
+			}
+			client.filters.put(key, value);
+			return client;
+		} catch (MalformedURLException ex) {
+			return null;
 		}
-		filters.put(key, value);
-		return this;
 	}
 
 	public StatementClient filterByVerb(Verb v) {
