@@ -1,7 +1,7 @@
 package gov.adlnet.xapi.model;
 
-import java.util.Map.Entry;
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 public class Score {
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();

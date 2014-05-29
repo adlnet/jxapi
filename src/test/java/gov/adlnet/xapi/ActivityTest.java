@@ -1,18 +1,17 @@
 package gov.adlnet.xapi;
 
+import gov.adlnet.xapi.client.ActivityClient;
+import gov.adlnet.xapi.model.Activity;
+
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.UUID;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import gov.adlnet.xapi.client.ActivityClient;
-import gov.adlnet.xapi.client.StatementClient;
-import gov.adlnet.xapi.model.Activity;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class ActivityTest extends TestCase {
 	private static final String PROFILE_ID = UUID.randomUUID().toString();
