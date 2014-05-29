@@ -59,8 +59,34 @@ To get the next page of results call ```getStatements``` with the value returned
 StatementResult nextPage = client.getStatements(previousPage.getMore());
 ```
 
+To query an LRS by verb you add a call to ```filterByVerb``` to the above queries
 
+```java
+StatementResult results = client.filterByVerb(Verbs.experienced()).getStatements();
+```
 
+Subsequent pages can then be queried as the above example.
 
+There are a number of filters available that function similiarly to ```filterByVerb```, they are
 
+```java
+filterByVerb
+filterByActor
+filterByActivity
+filterByRegistration
+filterBySince
+filterByUntil
+```
+These filters can be chained together to created more complex queries, such as
 
+```
+StatementResult results = client.filterByVerb(verb).filterByActivity(activity).getStatements();
+```
+
+You can also specify what data is brought back from the LRS, by calling the ```include*``` methods, the available methods are
+
+```
+includeRelatedActivities
+includeRelatedAgents
+includeAttachments
+```
