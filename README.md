@@ -42,3 +42,25 @@ ad.setMoreInfo("http://example.com");
 a.setDefinition(ad);
 String publishedId = client.publishStatement(statement);
 ```
+
+## Querying an LRS
+
+You can get all the statements from an LRS by calling the ```getStatements``` method on the client
+
+This will return a ```StatementResult``` object, which will have a list of all returned statements along with a string needed to get the next page of results, the code below demonstrates how to get the first page of results.
+
+```
+StatementResult results = client.getStatements()
+```
+
+To get the next page of results call ```getStatements``` with the value returned from ```getMore```
+
+```
+StatementResult nextPage = client.getStatements(previousPage.getMore());
+```
+
+
+
+
+
+
