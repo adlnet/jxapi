@@ -90,3 +90,6 @@ includeRelatedActivities
 includeRelatedAgents
 includeAttachments
 ```
+
+To bring back only statement ids from the LRS, include the ```ids``` method call when chaining filters/include methods
+
