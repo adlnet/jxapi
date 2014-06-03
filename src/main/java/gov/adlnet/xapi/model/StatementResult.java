@@ -15,6 +15,9 @@ public class StatementResult {
 	public void setMore(String more) {
 		this.more = more;
 	}
+	public boolean hasMore() {
+		return this.more != null && this.more.length() > 0;
+	}
 	private ArrayList<Statement> statements;
 	private String more;
 	
