@@ -3,8 +3,8 @@ package gov.adlnet.xapi.model;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class StatementReference {
-	public static final String STATEMENT_REFERENCE = "statementRef";
+public class StatementReference implements IStatementObject {
+	public static final String STATEMENT_REFERENCE = "StatementRef";
 	private String id;
 
 	public JsonElement serialize() {
