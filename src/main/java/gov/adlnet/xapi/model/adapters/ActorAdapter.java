@@ -17,12 +17,16 @@ public class ActorAdapter implements JsonDeserializer<Actor>,
 		JsonObject obj = json.getAsJsonObject();
 		Class<?> klass = null;
 		try {
-			String objectType = obj.get(OBJECT_TYPE).getAsJsonPrimitive()
-					.getAsString().toLowerCase();			
-			if (objectType.equals(Agent.AGENT.toLowerCase())) {
+			if (obj.has(OBJECT_TYPE)) {
+				String objectType = obj.get(OBJECT_TYPE).getAsJsonPrimitive()
+						.getAsString().toLowerCase();
+				if (objectType.equals(Agent.AGENT.toLowerCase())) {
+					klass = Class.forName(Agent.class.getCanonicalName());
+				} else if (objectType.equals(Group.GROUP.toLowerCase())) {
+					klass = Class.forName(Group.class.getCanonicalName());
+				}
+			}else{
 				klass = Class.forName(Agent.class.getCanonicalName());
-			} else if (objectType.equals(Group.GROUP.toLowerCase())) {
-				klass = Class.forName(Group.class.getCanonicalName());
 			}
 		} catch (ClassNotFoundException e) {
 			throw new JsonParseException(e.getMessage());
