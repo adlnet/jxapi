@@ -1,21 +1,28 @@
 package gov.adlnet.xapi.model.adapters;
 
 import java.lang.reflect.Type;
+
 import com.google.gson.*;
+
 import gov.adlnet.xapi.model.*;
 
 public class ActorAdapter implements JsonDeserializer<Actor>,
 		JsonSerializer<Actor> {
+
+	private static final String OBJECT_TYPE = "objectType";
+
 	@Override
 	public Actor deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
 		Class<?> klass = null;
 		try {
-			if (!obj.has("objectType") || obj.get("objectType").toString().toLowerCase() == "agent") {
-				klass = Class.forName("gov.adlnet.xapi.model.Agent");
-			} else {
-				klass = Class.forName("gov.adlnet.xapi.model.Group");
+			String objectType = obj.get(OBJECT_TYPE).getAsJsonPrimitive()
+					.getAsString().toLowerCase();			
+			if (objectType.equals(Agent.AGENT.toLowerCase())) {
+				klass = Class.forName(Agent.class.getCanonicalName());
+			} else if (objectType.equals(Group.GROUP.toLowerCase())) {
+				klass = Class.forName(Group.class.getCanonicalName());
 			}
 		} catch (ClassNotFoundException e) {
 			throw new JsonParseException(e.getMessage());

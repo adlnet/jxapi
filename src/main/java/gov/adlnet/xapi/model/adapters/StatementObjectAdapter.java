@@ -17,8 +17,9 @@ public class StatementObjectAdapter implements JsonSerializer<IStatementObject>,
 		Class<?> klass = null;
 		try {
 			if (obj.has(OBJECT_TYPE)) {
+				
 				String objectType = obj.get(OBJECT_TYPE).getAsJsonPrimitive()
-						.getAsString().toLowerCase();
+						.getAsString().toLowerCase();				
 				if (objectType.equals(Agent.AGENT.toLowerCase())) {
 					klass = Class.forName(Agent.class.getCanonicalName());
 				} else if (objectType.equals(Group.GROUP.toLowerCase())) {
