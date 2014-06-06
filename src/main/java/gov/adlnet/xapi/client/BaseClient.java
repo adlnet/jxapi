@@ -86,11 +86,11 @@ public class BaseClient {
 	}
 	
 	protected HttpURLConnection initializePOSTConnection(URL url)
-         throws IOException {
-      HttpURLConnection conn = initializeConnection(url);
-      conn.setDoOutput(true);
-      return conn;
-   }
+			throws IOException {
+		HttpURLConnection conn = initializeConnection(url);
+		conn.setDoOutput(true);
+		return conn;
+	}
 
 	protected String issuePost(String path, String data)
 			throws java.io.IOException {
