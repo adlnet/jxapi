@@ -79,7 +79,6 @@ public class BaseClient {
 	protected HttpURLConnection initializeConnection(URL url)
 			throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//		conn.setDoOutput(true);
 		conn.setDoInput(true);
 		conn.addRequestProperty("X-Experience-API-Version", "1.0");
 		conn.setRequestProperty("Content-Type", "application/json");
