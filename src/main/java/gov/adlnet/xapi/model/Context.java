@@ -17,7 +17,12 @@ public class Context {
 	private ContextActivities contextActivities;
 
 	private HashMap<String, JsonElement> extensions;
-
+	public void setContextActivities(ContextActivities ca){
+		this.contextActivities = ca;
+	}
+	public ContextActivities getContextActivities(){
+		return this.contextActivities;
+	}
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
 		if (this.registration != null) {
