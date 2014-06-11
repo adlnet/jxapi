@@ -15,19 +15,19 @@ public class Result {
 		this.score = score;
 	}
 
-	public boolean isSuccess() {
+	public Boolean isSuccess() {
 		return success;
 	}
 
-	public void setSuccess(boolean success) {
+	public void setSuccess(Boolean success) {
 		this.success = success;
 	}
 
-	public boolean isCompletion() {
+	public Boolean isCompletion() {
 		return completion;
 	}
 
-	public void setCompletion(boolean completion) {
+	public void setCompletion(Boolean completion) {
 		this.completion = completion;
 	}
 
@@ -57,8 +57,12 @@ public class Result {
 
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
-		obj.addProperty("success", this.success);
-		obj.addProperty("completion", this.completion);
+		if (this.success != null) {
+			obj.addProperty("success", this.success);
+		}
+		if (this.completion != null) {
+			obj.addProperty("completion", this.completion);
+		}
 		if (this.response != null) {
 			obj.addProperty("response", this.response);
 		}
@@ -79,8 +83,8 @@ public class Result {
 	}
 
 	private Score score;
-	private boolean success;
-	private boolean completion;
+	private Boolean success;
+	private Boolean completion;
 	private String response;
 	private String duration;
 	private HashMap<String, String> extensions;
