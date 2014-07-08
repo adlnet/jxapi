@@ -5,6 +5,13 @@ import com.google.gson.*;
 public class Account {
 	private String homePage;
 	private String name;
+	
+	public Account() {}
+	
+	public Account(String name, String homepage) {
+	   this.name = name;
+	   this.homePage = homepage;
+	}
 
 	public String getHomePage() {
 		return homePage;
@@ -31,5 +38,9 @@ public class Account {
 			obj.addProperty("name", this.name);
 		}
 		return obj;
+	}
+	
+	public String toString() {
+	   return String.format("%s (%s)", name, homePage);
 	}
 }
