@@ -1,8 +1,5 @@
 package gov.adlnet.xapi.model;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 

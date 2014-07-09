@@ -1,6 +1,7 @@
 package gov.adlnet.xapi.model;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Statement {
 	private String id;
@@ -15,6 +16,15 @@ public class Statement {
 	private Context context;	
 	private Actor authority;
 	private ArrayList<Attachment> attachments;
+	
+	public Statement() {}
+	
+	public Statement(Actor actor, Verb verb, IStatementObject object) {
+	   this.id = UUID.randomUUID().toString();
+	   this.actor = actor;
+	   this.verb = verb;
+	   this.object = object;
+	}
 	
 	public String getTimestamp() {
 		return timestamp;
@@ -82,4 +92,8 @@ public class Statement {
 	public void setResult(Result result) {
 		this.result = result;
 	}	
+	
+	public String toString() {
+	   return String.format("%s: %s %s %s", id, actor, verb, object);
+	}
 }

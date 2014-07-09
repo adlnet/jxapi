@@ -25,6 +25,13 @@ public class ActivityDefinition {
 	private ArrayList<InteractionComponent> source;
 	private ArrayList<InteractionComponent> target;
 	private ArrayList<InteractionComponent> steps;
+	
+	public ActivityDefinition() {}
+	
+	public ActivityDefinition(HashMap<String, String>name, HashMap<String, String>description) {
+	   this.name = name;
+	   this.description = description;
+	}
 
 	private JsonElement serializeMap(HashMap<String, String> map) {
 		JsonObject obj = new JsonObject();
@@ -188,5 +195,9 @@ public class ActivityDefinition {
 
 	public void setSteps(ArrayList<InteractionComponent> steps) {
 		this.steps = steps;
+	}
+	
+	public String toString() {
+	   return name.get("en-US");
 	}
 }

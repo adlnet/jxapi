@@ -1,10 +1,17 @@
 package gov.adlnet.xapi.model;
 
 import java.util.ArrayList;
+
 import com.google.gson.*;
 public class Group extends Actor {
 
 	public static final String GROUP = "Group";
+	
+	public Group(ArrayList<Agent> members) {
+	   super();
+	   setMember(members);
+	}
+	
 	@Override
 	public String getObjectType() {
 		return GROUP;
@@ -24,5 +31,11 @@ public class Group extends Actor {
 		}
 		obj.add("member", members);
 		return obj;
+	}
+	
+	public String toString() {
+	   String ret = super.toString();
+	   if (ret == null || ret.isEmpty() || "Anonymous".equals(ret)) ret = member.toString();
+	   return ret;
 	}
 }

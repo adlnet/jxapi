@@ -9,6 +9,17 @@ public class Activity implements IStatementObject {
 	private String id;
 
 	private ActivityDefinition definition;
+	
+	public Activity() {}
+	
+	public Activity(String id) {
+	   this.id = id;
+	}
+	
+	public Activity(String id, ActivityDefinition definition) {
+	   this.id = id;
+	   this.definition = definition;
+	}
 
 	public String getObjectType() {
 		return ACTIVITY;
@@ -39,5 +50,12 @@ public class Activity implements IStatementObject {
 			obj.add("definition", this.definition.serialize());
 		}
 		return obj;
+	}
+	
+	public String toString() {
+	   return String.format(
+	         "%s", (definition == null || 
+	                definition.toString() == null || 
+	                definition.toString().isEmpty()) ? id : definition.toString());
 	}
 }

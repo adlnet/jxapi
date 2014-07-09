@@ -5,6 +5,18 @@ import java.util.Map.Entry;
 import com.google.gson.*;
 
 public class Verb {
+   
+   public Verb() {}
+   
+   public Verb(String id) {
+      this.id = id;
+   }
+   
+   public Verb(String id, HashMap<String, String> display) {
+      this.id = id;
+      this.display = display;
+   }
+   
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
 		if (this.id != null) {
@@ -34,6 +46,14 @@ public class Verb {
 
 	public void setDisplay(HashMap<String, String> display) {
 		this.display = display;
+	}
+	
+	public String toString() {
+	   String ret = id;
+	   if (display != null && 
+	       display.get("en-US") != null && 
+	       ! display.get("en-US").isEmpty()) ret = display.get("en-US");
+	   return ret;
 	}
 
 	private String id;
