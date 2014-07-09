@@ -12,6 +12,89 @@ StatementClient client = new StatementClient(url, username, password);
 
 This has the possiblitiy of throwing a ```MalformedURLException``` if an invalid URL is passed it.
 
+## Creating a Statement
+
+This library has some overloaded model constructors to simplify building common parts of a statement.  
+
+```java
+// create an activity with just an id
+Activity activity = new Activity("http://activity.com");
+System.out.println("Activity");
+System.out.println( "\t" +  activity  );
+
+Activity
+	http://activity.com
+
+// create an agent with name and mbox
+Agent agent = new Agent("tommy", "mailto:tommy@example.com");
+System.out.println("Agent - name & mbox");
+System.out.println("\t" + agent);
+
+Agent - name & mbox
+	tommy
+
+// create an agent with just an mbox
+Agent agent = new Agent(null, "mailto:tommy@example.com")
+System.out.println("Agent - mbox");
+System.out.println("\t" + agent);
+
+Agent - mbox
+	mailto:tommy@example.com
+
+// create an agent with openid
+Agent agent = new Agent(null, new URI("http://tom-is-me")));
+System.out.println("Agent - openid");
+System.out.println("\t" + agent);
+
+Agent - openid
+	http://tom-is-me
+
+// create an agent with an account
+Agent agent = new Agent("", new Account("joe", "http://joe.com"));
+System.out.println("Agent - account");
+System.out.println("\t" + agent);
+
+Agent - account
+	joe (http://joe.com)
+
+
+// use an ADL verb
+System.out.println("ADL verb");
+System.out.println("\t" + Verbs.answered());
+
+ADL verb
+	answered
+
+// create a verb
+Verb verb = new Verb("http://my.verb/didsomething");
+System.out.println("my verb");
+System.out.println("\t" + verb);
+
+my verb
+	http://my.verb/didsomething
+
+
+// create a verb with display 
+HashMap<String, String> disp = new HashMap<String, String>();
+disp.put("fr", "le ran");
+disp.put("en-US", "ran");
+Verb verb = new Verb("http://my.verb/ran", disp);
+System.out.println("my ran verb");
+System.out.println("\t" + verb);
+
+my ran verb
+	ran
+
+// create a basic statement
+System.out.println("Statement ");
+System.out.println("\t" + new Statement(new Agent("tom", "mailto:tom@example.com"), 
+                                        new Verb("http://verb.com/did", getVerbDisp()),
+                                        new Activity("act:id")));
+
+Statement 
+	7fdbc0cc-aef8-47d6-97ad-b1929afc34b5: tom did act:id
+```
+
 ## Publishing a Statement
 
 To publish a statement you'll need a Verb (There is a predefined list of ADL verbs available in ```gov.adlnet.xapi.model.Verbs``` class), an Actor who compled the activity the statment describes, and the Statement object, which can be an Activity, a SubStatement, or a StatementRef
