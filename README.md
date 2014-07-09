@@ -22,56 +22,63 @@ Activity activity = new Activity("http://activity.com");
 System.out.println("Activity");
 System.out.println( "\t" +  activity  );
 
-Activity
-	http://activity.com
+// prints...
+// Activity
+//	http://activity.com
 
 // create an agent with name and mbox
 Agent agent = new Agent("tommy", "mailto:tommy@example.com");
 System.out.println("Agent - name & mbox");
 System.out.println("\t" + agent);
 
-Agent - name & mbox
-	tommy
+// prints...
+// Agent - name & mbox
+//	tommy
 
 // create an agent with just an mbox
 Agent agent = new Agent(null, "mailto:tommy@example.com")
 System.out.println("Agent - mbox");
 System.out.println("\t" + agent);
 
-Agent - mbox
-	mailto:tommy@example.com
+// prints...
+// Agent - mbox
+//	mailto:tommy@example.com
 
 // create an agent with openid
 Agent agent = new Agent(null, new URI("http://tom-is-me")));
 System.out.println("Agent - openid");
 System.out.println("\t" + agent);
 
-Agent - openid
-	http://tom-is-me
+// prints...
+// Agent - openid
+//	http://tom-is-me
 
 // create an agent with an account
 Agent agent = new Agent("", new Account("joe", "http://joe.com"));
 System.out.println("Agent - account");
 System.out.println("\t" + agent);
 
-Agent - account
-	joe (http://joe.com)
+// prints...
+// Agent - account
+//	joe (http://joe.com)
 
 
 // use an ADL verb
 System.out.println("ADL verb");
 System.out.println("\t" + Verbs.answered());
 
-ADL verb
-	answered
+// prints...
+// ADL verb
+//	answered
 
 // create a verb
 Verb verb = new Verb("http://my.verb/didsomething");
 System.out.println("my verb");
 System.out.println("\t" + verb);
 
-my verb
-	http://my.verb/didsomething
+// prints...
+// my verb
+//	http://my.verb/didsomething
 
 
 // create a verb with display 
@@ -82,8 +89,9 @@ Verb verb = new Verb("http://my.verb/ran", disp);
 System.out.println("my ran verb");
 System.out.println("\t" + verb);
 
-my ran verb
-	ran
+// prints...
+// my ran verb
+//	ran
 
 // create a basic statement
 System.out.println("Statement ");
@@ -91,8 +99,9 @@ System.out.println("\t" + new Statement(new Agent("tom", "mailto:tom@example.com
                                         new Verb("http://verb.com/did", getVerbDisp()),
                                         new Activity("act:id")));
 
-Statement 
-	7fdbc0cc-aef8-47d6-97ad-b1929afc34b5: tom did act:id
+// prints...
+// Statement 
+//	7fdbc0cc-aef8-47d6-97ad-b1929afc34b5: tom did act:id
 ```
 
 ## Publishing a Statement
