@@ -52,6 +52,7 @@ public class StatementClient extends BaseClient {
 				query.append(item.getValue());
 				query.append("&");
 			}
+			query.deleteCharAt(query.length() - 1);
 			this.filters.clear();
 		}
 		String result = this.issueGet(query.toString());
