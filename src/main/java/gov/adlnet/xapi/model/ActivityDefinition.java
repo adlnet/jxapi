@@ -198,6 +198,8 @@ public class ActivityDefinition {
 	}
 	
 	public String toString() {
-	   return name.get("en-US");
+		if (name != null)
+			return name.get("en-US");
+		return "";
 	}
 }
