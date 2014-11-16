@@ -17,6 +17,8 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -25,6 +27,7 @@ public class BaseClient {
 	protected Gson gson;
 	protected String username;
 	protected String password;
+	protected String authString;
 	public BaseClient(String uri, String username, String password)
 			throws MalformedURLException {
 		init(new URL(uri), username, password);
@@ -34,7 +37,7 @@ public class BaseClient {
 			throws MalformedURLException {
 		init(uri, username, password);
 	}	
-	protected Gson getDecoder() {
+	protected Gson getDecoder() {	
 		if (gson == null) {
 			GsonBuilder builder = new GsonBuilder();
 			builder.registerTypeAdapter(Actor.class, new ActorAdapter());
@@ -49,13 +52,7 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-		final char[] pwd = password.toCharArray();
-		Authenticator.setDefault(new Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(username, pwd);
-
-			}
-		});
+		this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
 	}
 
 	protected String readFromConnection(HttpURLConnection conn)
@@ -82,6 +79,7 @@ public class BaseClient {
 		conn.setDoInput(true);
 		conn.addRequestProperty("X-Experience-API-Version", "1.0");
 		conn.setRequestProperty("Content-Type", "application/json");
+		conn.setRequestProperty("Authorization", this.authString);
 		return conn;
 	}
 	
@@ -131,7 +129,21 @@ public class BaseClient {
 		HttpURLConnection conn = initializeConnection(url);
 		try {
 			return readFromConnection(conn);
-		} finally {
+		} catch (IOException ex) {
+			InputStream s = conn.getErrorStream();
+			InputStreamReader isr = new InputStreamReader(s);
+			BufferedReader br = new BufferedReader(isr);
+			try {
+				String line = "";
+				while((line = br.readLine()) != null){
+					System.out.print(line);
+				}
+				System.out.println();
+			} finally {
+				s.close();
+			}
+			throw ex;
+		}finally {
 			conn.disconnect();
 		}
 	}

@@ -95,14 +95,14 @@ public class AppTest extends TestCase {
 		assert !collection.getStatements().isEmpty();
 	}
 
-	public void testGetSingleStatement() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
-		String statementId = "23d0a261-fede-4548-9431-314389bc1ebd";
-		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
-				PASSWORD);
-		Statement collection = _client.get(statementId);
-		assert collection.getId().equals(statementId);
-	}
+//	public void testGetSingleStatement() throws java.net.URISyntaxException,
+//			java.io.UnsupportedEncodingException, java.io.IOException {
+//		String statementId = "23d0a261-fede-4548-9431-314389bc1ebd";
+//		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+//				PASSWORD);
+//		Statement collection = _client.get(statementId);
+//		assert collection.getId().equals(statementId);
+//	}
 
 	public void testPublishStatementWithAgent()
 			throws java.net.URISyntaxException,
@@ -193,39 +193,39 @@ public class AppTest extends TestCase {
 		}
 	}
 
-	public void testQueryBySince() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException,
-			ParseException {
-		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
-				PASSWORD);
-		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
-		Calendar date = ISO8601.toCalendar(dateQuery);
-		StatementResult result = _client.filterBySince(dateQuery)
-				.getStatements();
-		assertFalse(result.getStatements().isEmpty());
-		for (Statement s : result.getStatements()) {
-			Calendar statementTimestampe = ISO8601.toCalendar(s.getTimestamp());
-			// the since date should be less than (denoted by a compareTo value
-			// being less than 0
-			assert date.compareTo(statementTimestampe) < 0;
-		}
-	}
+//	public void testQueryBySince() throws java.net.URISyntaxException,
+//			java.io.UnsupportedEncodingException, java.io.IOException,
+//			ParseException {
+//		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+//				PASSWORD);
+//		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
+//		Calendar date = ISO8601.toCalendar(dateQuery);
+//		StatementResult result = _client.filterBySince(dateQuery)
+//				.getStatements();
+//		assertFalse(result.getStatements().isEmpty());
+//		for (Statement s : result.getStatements()) {
+//			Calendar statementTimestampe = ISO8601.toCalendar(s.getTimestamp());
+//			// the since date should be less than (denoted by a compareTo value
+//			// being less than 0
+//			assert date.compareTo(statementTimestampe) < 0;
+//		}
+//	}
 
-	public void testQueryByUntil() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException,
-			ParseException {
-		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
-				PASSWORD);
-		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
-		Calendar date = ISO8601.toCalendar(dateQuery);
-		StatementResult result = _client.filterByUntil(dateQuery)
-				.getStatements();
-		assertFalse(result.getStatements().isEmpty());
-		for (Statement s : result.getStatements()) {
-			Calendar statementTimestampe = ISO8601.toCalendar(s.getTimestamp());
-			// the until date should be greater than (denoted by a compareTo value
-			// being greater than 0
-			assert date.compareTo(statementTimestampe) >= 0;
-		}
-	}
+//	public void testQueryByUntil() throws java.net.URISyntaxException,
+//			java.io.UnsupportedEncodingException, java.io.IOException,
+//			ParseException {
+//		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+//				PASSWORD);
+//		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
+//		Calendar date = ISO8601.toCalendar(dateQuery);
+//		StatementResult result = _client.filterByUntil(dateQuery)
+//				.getStatements();
+//		assertFalse(result.getStatements().isEmpty());
+//		for (Statement s : result.getStatements()) {
+//			Calendar statementTimestampe = ISO8601.toCalendar(s.getTimestamp());
+//			// the until date should be greater than (denoted by a compareTo value
+//			// being greater than 0
+//			assert date.compareTo(statementTimestampe) >= 0;
+//		}
+//	}
 }

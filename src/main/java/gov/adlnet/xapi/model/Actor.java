@@ -110,4 +110,15 @@ public abstract class Actor {
 		obj.addProperty("objectType", this.getObjectType());
 		return obj;
 	}
+	
+	public String toString() {
+	   if (name != null && ! name.isEmpty()) return name;
+	   
+	   String ret = "Anonymous";
+	   if (mbox != null && ! mbox.isEmpty()) ret = mbox;
+	   else if (mbox_sha1sum != null && ! mbox_sha1sum.isEmpty()) ret = mbox_sha1sum;
+	   else if (openid != null && ! openid.toString().isEmpty()) ret = openid.toString();
+	   else if (account != null) ret = account.toString();
+	   return ret;
+	}
 }

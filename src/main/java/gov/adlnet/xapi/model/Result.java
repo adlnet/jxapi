@@ -1,8 +1,5 @@
 package gov.adlnet.xapi.model;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -15,19 +12,19 @@ public class Result {
 		this.score = score;
 	}
 
-	public boolean isSuccess() {
+	public Boolean isSuccess() {
 		return success;
 	}
 
-	public void setSuccess(boolean success) {
+	public void setSuccess(Boolean success) {
 		this.success = success;
 	}
 
-	public boolean isCompletion() {
+	public Boolean isCompletion() {
 		return completion;
 	}
 
-	public void setCompletion(boolean completion) {
+	public void setCompletion(Boolean completion) {
 		this.completion = completion;
 	}
 
@@ -47,18 +44,22 @@ public class Result {
 		this.duration = duration;
 	}
 
-	public HashMap<String, String> getExtensions() {
+	public JsonObject getExtensions() {
 		return extensions;
 	}
 
-	public void setExtensions(HashMap<String, String> extensions) {
+	public void setExtensions(JsonObject extensions) {
 		this.extensions = extensions;
 	}
 
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
-		obj.addProperty("success", this.success);
-		obj.addProperty("completion", this.completion);
+		if (this.success != null) {
+			obj.addProperty("success", this.success);
+		}
+		if (this.completion != null) {
+			obj.addProperty("completion", this.completion);
+		}
 		if (this.response != null) {
 			obj.addProperty("response", this.response);
 		}
@@ -66,11 +67,7 @@ public class Result {
 			obj.addProperty("duration", this.duration);
 		}
 		if (this.extensions != null) {
-			JsonObject extensionsObj = new JsonObject();
-			obj.add("extensions", extensionsObj);
-			for (Entry<String, String> item : extensions.entrySet()) {
-				extensionsObj.addProperty(item.getKey(), item.getValue());
-			}
+			obj.add("extensions", extensions);
 		}
 		if (this.score != null) {
 			obj.add("score", this.score.serialize());
@@ -79,9 +76,9 @@ public class Result {
 	}
 
 	private Score score;
-	private boolean success;
-	private boolean completion;
+	private Boolean success;
+	private Boolean completion;
 	private String response;
 	private String duration;
-	private HashMap<String, String> extensions;
+	private JsonObject extensions;
 }
