@@ -11,10 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 
 import javax.xml.bind.DatatypeConverter;
@@ -52,8 +50,8 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-		this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
-	}
+        this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
+    }
 
 	protected String readFromConnection(HttpURLConnection conn)
 			throws java.io.IOException {
@@ -122,6 +120,67 @@ public class BaseClient {
 			conn.disconnect();
 		}
 	}
+
+    protected String issuePut(String path, String data)
+            throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        HttpURLConnection conn = initializePOSTConnection(url);
+        conn.setRequestMethod("PUT");
+        OutputStreamWriter writer = new OutputStreamWriter(
+                conn.getOutputStream());
+        try {
+            writer.write(data);
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line = "";
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        } finally {
+            writer.close();
+        }
+        try {
+            return readFromConnection(conn);
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    protected String issueDelete(String path)
+            throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        HttpURLConnection conn = initializeConnection(url);
+        conn.setRequestMethod("DELETE");
+        try{
+            return readFromConnection(conn);
+        }
+        catch (IOException ex){
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line = "";
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        }
+        finally{
+            conn.disconnect();
+        }
+    }
 
 	protected String issueGet(String path) throws java.io.IOException,
 			java.net.MalformedURLException {

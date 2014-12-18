@@ -5,8 +5,10 @@ import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.Verb;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -90,16 +92,16 @@ public class StatementClient extends BaseClient {
 		}
 	}
 
-	public StatementClient filterByVerb(Verb v) {
-		return addFilter("verb", v.getId());
+	public StatementClient filterByVerb(Verb v) throws UnsupportedEncodingException {
+		return addFilter("verb", URLEncoder.encode(v.getId(), "UTF-8"));
 	}
 
 	public StatementClient filterByVerb(String verbId) {
 		return addFilter("verb", verbId);
 	}
 
-	public StatementClient filterByActor(Actor a) {
-		return addFilter("agent", getDecoder().toJson(a));
+	public StatementClient filterByActor(Actor a) throws UnsupportedEncodingException{
+		return addFilter("agent", URLEncoder.encode(getDecoder().toJson(a.serialize()), "UTF-8"));
 	}
 
 	public StatementClient filterByActivity(String activityId) {

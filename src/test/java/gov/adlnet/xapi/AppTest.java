@@ -61,7 +61,7 @@ public class AppTest extends TestCase {
 	}
 
 	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI/";
-	private static final String USERNAME = "Walt Grata";
+	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 
 	/**
