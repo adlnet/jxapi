@@ -15,9 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-//import android.util.Base64;
-import javax.xml.bind.DatatypeConverter;
-//import org.apache.commons.codec.binary.Base64;
+import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -52,9 +50,7 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-//        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.DEFAULT);
-        this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
-//        this.authString = "Basic " + Base64.encodeBase64((this.username + ":" + this.password).getBytes()).toString();
+        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.DEFAULT);
     }
 
 	protected String readFromConnection(HttpURLConnection conn)
