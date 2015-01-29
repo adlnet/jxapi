@@ -137,6 +137,10 @@ public class StatementClient extends BaseClient {
 		return addFilter("since", timestamp);
 	}
 
+    public StatementClient limitResults(int limit){
+        return addFilter("limit", Integer.toString(limit));
+    }
+
 	public StatementClient filterByUntil(String timestamp) {
 		return addFilter("until", timestamp);
 	}
