@@ -175,6 +175,16 @@ public class AppTest extends TestCase {
 		}
 	}
 
+    public void testQueryByLimit() throws java.net.URISyntaxException,
+            java.io.UnsupportedEncodingException, java.io.IOException {
+        StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+                PASSWORD);
+
+        StatementResult result = _client.limitResults(1).getStatements();
+        assertFalse(result.getStatements().isEmpty());
+        assertEquals(result.getStatements().size(), 1);
+    }
+
 	public void testQueryByAgentAndVerb() throws java.net.URISyntaxException,
 			java.io.UnsupportedEncodingException, java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
