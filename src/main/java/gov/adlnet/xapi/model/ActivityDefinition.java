@@ -200,4 +200,7 @@ public class ActivityDefinition {
 	public String toString() {
 	   return name.get("en-US");
 	}
+    public String toString(String langMap) {
+        return name.get(langMap);
+    }
 }

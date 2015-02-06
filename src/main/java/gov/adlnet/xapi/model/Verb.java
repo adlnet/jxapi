@@ -5,7 +5,9 @@ import java.util.Map.Entry;
 import com.google.gson.*;
 
 public class Verb {
-   
+   private String id;
+   private HashMap<String, String> display;
+
    public Verb() {}
    
    public Verb(String id) {
@@ -56,6 +58,11 @@ public class Verb {
 	   return ret;
 	}
 
-	private String id;
-	private HashMap<String, String> display;
+    public String toString(String langKey) {
+        String ret = id;
+        if (display != null &&
+                display.get(langKey) != null &&
+                ! display.get(langKey).isEmpty()) ret = display.get(langKey);
+        return ret;
+    }
 }

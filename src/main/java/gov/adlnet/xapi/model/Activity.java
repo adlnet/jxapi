@@ -7,7 +7,6 @@ public class Activity implements IStatementObject {
 	public static final String ACTIVITY = "Activity";
 
 	private String id;
-
 	private ActivityDefinition definition;
 	
 	public Activity() {}
@@ -58,4 +57,10 @@ public class Activity implements IStatementObject {
 	                definition.toString() == null || 
 	                definition.toString().isEmpty()) ? id : definition.toString());
 	}
+    public String toString(String langMap) {
+        return String.format(
+                "%s", (definition == null ||
+                        definition.toString(langMap) == null ||
+                        definition.toString(langMap).isEmpty()) ? id : definition.toString(langMap));
+    }
 }
