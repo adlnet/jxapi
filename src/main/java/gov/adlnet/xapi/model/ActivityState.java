@@ -6,18 +6,32 @@ import java.util.UUID;
 
 public class ActivityState {
 	private String activityId;
-	private Agent agent;
+	private String stateId;
+    private Agent agent;
 	private UUID registration;
     private JsonObject state;
-    private String since;
+
+    public ActivityState(){}
+
+    public ActivityState(String activityId, String stateId, Agent agent){
+        this.activityId = activityId;
+        this.stateId = stateId;
+        this.agent = agent;
+    }
 
     public String getActivityId() {
 		return activityId;
 	}
 	public void setActivityId(String activityId) {
 		this.activityId = activityId;
-	} 
-	public void setAgent(Agent a){
+	}
+    public String getStateId() {
+        return stateId;
+    }
+    public void setStateId(String stateId) {
+        this.stateId = stateId;
+    }
+    public void setAgent(Agent a){
 		this.agent = a;
 	}
 	public Agent getAgent(){
@@ -31,6 +45,4 @@ public class ActivityState {
 	}
     public JsonObject getState(){return this.state;}
     public void setState(JsonObject s){ this.state = s; }
-    public String getSince() { return since; }
-    public void setSince(String s) {this.since = s;}
 }

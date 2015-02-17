@@ -8,8 +8,14 @@ import com.google.gson.JsonObject;
 public class AgentProfile {
     private Agent agent;
     private String profileId;
-    private String since;
     private JsonObject profile;
+
+    public AgentProfile(){}
+
+    public AgentProfile(Agent agent, String profileId){
+        this.agent = agent;
+        this.profileId = profileId;
+    }
 
     public Agent getAgent() {
         return agent;
@@ -20,12 +26,6 @@ public class AgentProfile {
     }
     public void setProfileId(String profileId){
         this.profileId = profileId;
-    }
-    public String getSince() {
-        return this.since;
-    }
-    public void setSince(String s) {
-        this.since = since;
     }
     public JsonObject getProfile(){return this.profile;}
     public void setProfile(JsonObject p){ this.profile = p; }

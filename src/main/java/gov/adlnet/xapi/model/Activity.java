@@ -54,13 +54,11 @@ public class Activity implements IStatementObject {
 	public String toString() {
 	   return String.format(
 	         "%s", (definition == null || 
-	                definition.toString() == null || 
-	                definition.toString().isEmpty()) ? id : definition.toString());
+	                definition.getName() == null) ? id : definition.toString());
 	}
     public String toString(String langMap) {
         return String.format(
                 "%s", (definition == null ||
-                        definition.toString(langMap) == null ||
-                        definition.toString(langMap).isEmpty()) ? id : definition.toString(langMap));
+                        definition.getName().get(langMap) == null) ? id : definition.toString(langMap));
     }
 }
