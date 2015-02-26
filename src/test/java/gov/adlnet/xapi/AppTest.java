@@ -16,14 +16,16 @@ import gov.adlnet.xapi.model.Verb;
 import gov.adlnet.xapi.model.Verbs;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -307,10 +309,10 @@ public class AppTest extends TestCase {
         out.write(UUID.randomUUID().toString());
         out.close();
 
-        String contentType = Files.probeContentType(testfile.toPath());
+        String contentType = "text/plain";
         att.setContentType(contentType);
         att.setLength((int)testfile.length());
-        byte[] arr = Files.readAllBytes(testfile.toPath());
+        byte[] arr = fileToByteArray(testfile);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(arr);
         att.setSha2(new String(Hex.encode(md.digest())));
@@ -328,6 +330,25 @@ public class AppTest extends TestCase {
         String res = _client.getStatementsWithAttachments();
         System.out.println(res);
 //        assertNotNull(res);
+    }
+    
+    private byte[] fileToByteArray(File file) throws IOException {
+        byte []buffer = new byte[(int) file.length()];
+        InputStream ios = null;
+        try {
+            ios = new FileInputStream(file);
+            if ( ios.read(buffer) == -1 ) {
+                throw new IOException("EOF reached while trying to read the whole file");
+            }        
+        } finally { 
+            try {
+                 if ( ios != null ) 
+                      ios.close();
+            } catch ( IOException e) {
+            }
+        }
+
+        return buffer;
     }
 
 	public void testQueryByVerb() throws java.net.URISyntaxException,
