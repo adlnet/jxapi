@@ -303,7 +303,8 @@ public class AppTest extends TestCase {
         File testfile = folder.newFile("testatt.txt");
         BufferedWriter out = new BufferedWriter(new FileWriter(testfile));
         out.write("This is the first line\n");
-        out.write("This is the second line.\n");
+        out.write("This is the second line!!!\n");
+        out.write(UUID.randomUUID().toString());
         out.close();
 
         String contentType = Files.probeContentType(testfile.toPath());
@@ -323,6 +324,10 @@ public class AppTest extends TestCase {
 
         String publishedId = _client.postStatementWithAttachment(statement, contentType, realAtts);
         assert publishedId.length() > 0;
+
+        String res = _client.getStatementsWithAttachments();
+        System.out.println(res);
+//        assertNotNull(res);
     }
 
 	public void testQueryByVerb() throws java.net.URISyntaxException,

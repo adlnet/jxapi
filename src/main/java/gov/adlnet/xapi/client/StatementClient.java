@@ -34,7 +34,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;
-    private static final String LINE_FEED = "\n\n";
+    private static final String LINE_FEED = "\r\n";
 
 	public StatementClient(String uri, String user, String password)
 			throws java.net.MalformedURLException {
@@ -74,7 +74,7 @@ public class StatementClient extends BaseClient {
                 conn.getOutputStream());
         try {
             writer.append("--" + boundary).append(LINE_FEED);
-            writer.append("Content-Type:application/json").append(LINE_FEED);
+            writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
             writer.append(data).append(LINE_FEED);
             writer.append("--" + boundary).append(LINE_FEED);
             for(byte[] ba: attachmentData){
@@ -83,9 +83,9 @@ public class StatementClient extends BaseClient {
                 String sha256String = new String(Hex.encode(md.digest()));
                 writer.append("Content-Type:" + contentType).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED);
+                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
                 writer.append(ba.toString()).append(LINE_FEED);
-                writer.append("--" + boundary).append(LINE_FEED);
+                writer.append("--" + boundary + "--");
             }
             writer.flush();
         } catch (IOException ex) {
@@ -163,7 +163,31 @@ public class StatementClient extends BaseClient {
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
 
-	public Statement get(String statementId) throws java.io.IOException {
+    public String getStatementsWithAttachments() throws java.io.IOException {
+        StringBuilder query = new StringBuilder();
+        query.append("/xapi/statements");
+        if (this.filters != null && !this.filters.isEmpty()) {
+            query.append("?");
+            for (Entry<String, String> item : this.filters.entrySet()) {
+                query.append(item.getKey());
+                query.append("=");
+                query.append(item.getValue());
+                query.append("&");
+            }
+            query.deleteCharAt(query.length() - 1);
+            this.filters.clear();
+        }
+        if (query.toString().contains("?")){
+            query.append("&attachments=true");
+        }
+        else{
+            query.append("?attachments=true");
+        }
+        String result = this.issueGet(query.toString());
+        return result;
+    }
+
+    public Statement get(String statementId) throws java.io.IOException {
 		String result = this.issueGet("/xapi/statements?statementId="
 				+ statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
@@ -226,13 +250,6 @@ public class StatementClient extends BaseClient {
 			return addFilter("related_agents", "true");
 		else
 			return addFilter("related_agents", "false");
-	}
-
-	public StatementClient includeAttachments(boolean include) {
-		if (include)
-			return addFilter("attachments", "true");
-		else
-			return addFilter("attachments", "false");
 	}
 
 	public StatementClient filterBySince(String timestamp) {

@@ -168,5 +168,15 @@
             <artifactId>bcprov-jdk16</artifactId>
             <version>1.46</version>
         </dependency>
+        <dependency>
+            <groupId>jetty</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <version>5.1.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.liferay.org.apache.commons.fileupload</groupId>
+            <artifactId>com.liferay.org.apache.commons.fileupload</artifactId>
+            <version>6.2.0.1</version>
+        </dependency>
     </dependencies>
 </project>

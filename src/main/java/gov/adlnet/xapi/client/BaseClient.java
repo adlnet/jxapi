@@ -15,7 +15,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.Buffer;
+import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.Gson;
@@ -207,7 +210,12 @@ public class BaseClient {
 			java.net.MalformedURLException {
 		URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
         HttpURLConnection conn = initializeConnection(url);
-		try {
+		Map<String, List<String>> map = conn.getHeaderFields();
+        for (Map.Entry<String, List<String>> entry : map.entrySet()){
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
+
+        try {
 			return readFromConnection(conn);
 		} catch (IOException ex) {
 			InputStream s = conn.getErrorStream();
@@ -227,4 +235,29 @@ public class BaseClient {
 			conn.disconnect();
 		}
 	}
+
+    protected HttpServletResponse issueGetWithAttachments(String path) throws java.io.IOException,
+            java.net.MalformedURLException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        HttpURLConnection conn = initializeConnection(url);
+        try {
+            return (HttpServletResponse)conn.getInputStream();
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line = "";
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        }finally {
+            conn.disconnect();
+        }
+    }
 }
