@@ -16,3 +16,7 @@ target/
 .classpath
 .project
 .settings/
+
+# IntelliJ additions
+*.iml
+.idea/
