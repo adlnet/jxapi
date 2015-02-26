@@ -7,6 +7,12 @@ public class StatementReference implements IStatementObject {
 	public static final String STATEMENT_REFERENCE = "StatementRef";
 	private String id;
 
+    public StatementReference(){}
+
+    public StatementReference(String id){
+        this.id = id;
+    }
+
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("objectType", this.getObjectType());

@@ -15,6 +15,22 @@ public class Person {
         return OBJECTTYPE;
     }
 
+    public String[] getName(){
+        return this.name;
+    }
+    public String[] getMbox(){
+        return this.mbox;
+    }
+    public String[] getMbox_sha1sum(){
+        return this.mbox_sha1sum;
+    }
+    public String[] getOpenid(){
+        return this.openid;
+    }
+    public Account[] getAccount(){
+        return this.account;
+    }
+
     public String toString() {
         String ret = getObjectType() + " ; ";
         if (name != null && name.length != 0){

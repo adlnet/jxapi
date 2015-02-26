@@ -1,5 +1,9 @@
 package gov.adlnet.xapi.model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -8,7 +12,6 @@ public class Statement {
 	private String timestamp;
 	private String stored;
 	private String version;
-	
 	private Verb verb;
 	private Actor actor;
 	private IStatementObject object;
@@ -32,7 +35,7 @@ public class Statement {
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
-	public String getStored() {
+    public String getStored() {
 		return stored;
 	}
 	public void setStored(String stored) {
@@ -92,8 +95,48 @@ public class Statement {
 	public void setResult(Result result) {
 		this.result = result;
 	}	
-	
-	public String toString() {
-	   return String.format("%s: %s %s %s", id, actor, verb, object);
-	}
+
+    public String toString(){
+        return String.format("%s %s %s", actor.toString(), verb.toString(), object.toString());
+    }
+
+    public JsonElement serialize() {
+        JsonObject obj = new JsonObject();
+        if (this.id!= null) {
+            obj.addProperty("id", this.id);
+        }
+        if (this.actor != null) {
+            obj.add("actor", this.actor.serialize());
+        }
+        if (this.verb != null) {
+            obj.add("verb", verb.serialize());
+        }
+        if (this.object != null) {
+            obj.add("object", object.serialize());
+        }
+        if (this.result != null) {
+            obj.add("result", result.serialize());
+        }
+        if (this.context != null) {
+            obj.add("context", this.context.serialize());
+        }
+        if (this.timestamp != null) {
+            obj.addProperty("timestamp", this.timestamp);
+        }
+        if (this.stored != null) {
+            obj.addProperty("stored", this.stored);
+        }
+        if (this.version != null) {
+            obj.addProperty("version", this.version);
+        }
+        if (this.authority != null) {
+            obj.add("authority", this.authority.serialize());
+        }
+        JsonArray jsonAttachments = new JsonArray();
+        obj.add("attachments", jsonAttachments);
+        for (Attachment a : this.attachments) {
+            jsonAttachments.add(a.serialize());
+        }
+        return obj;
+    }
 }

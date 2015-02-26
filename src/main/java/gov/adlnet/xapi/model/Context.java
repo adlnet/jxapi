@@ -10,53 +10,18 @@ public class Context {
 	private String revision;
 	private String platform;
 	private String language;
-
 	private Actor instructor;
 	private Group team;
 	private StatementReference statement;
 	private ContextActivities contextActivities;
-
 	private HashMap<String, JsonElement> extensions;
-	public void setContextActivities(ContextActivities ca){
+
+    public void setContextActivities(ContextActivities ca){
 		this.contextActivities = ca;
 	}
+
 	public ContextActivities getContextActivities(){
 		return this.contextActivities;
-	}
-	public JsonElement serialize() {
-		JsonObject obj = new JsonObject();
-		if (this.registration != null) {
-			obj.addProperty("registration", this.registration);
-		}
-		if (this.revision != null) {
-			obj.addProperty("revision", this.revision);
-		}
-		if (this.platform != null) {
-			obj.addProperty("platform", this.platform);
-		}
-		if (this.language != null) {
-			obj.addProperty("language", this.language);
-		}
-		if (this.instructor != null) {
-			obj.add("instructor", instructor.serialize());
-		}
-		if (this.team != null) {
-			obj.add("team", this.team.serialize());
-		}
-		if (this.extensions != null) {
-			JsonObject extensionsObj = new JsonObject();
-			obj.add("extensions", extensionsObj);
-			for (Entry<String, JsonElement> item : extensions.entrySet()) {
-				extensionsObj.add(item.getKey(), item.getValue());
-			}
-		}
-		if (this.statement != null) {
-			obj.add("statement", statement.serialize());
-		}
-		if (this.contextActivities != null) {
-			obj.add("contextActivities", contextActivities.serialize());
-		}
-		return obj;
 	}
 
 	public String getRegistration() {
@@ -122,4 +87,40 @@ public class Context {
 	public void setExtensions(HashMap<String, JsonElement> extensions) {
 		this.extensions = extensions;
 	}
+
+    public JsonElement serialize() {
+        JsonObject obj = new JsonObject();
+        if (this.registration != null) {
+            obj.addProperty("registration", this.registration);
+        }
+        if (this.revision != null) {
+            obj.addProperty("revision", this.revision);
+        }
+        if (this.platform != null) {
+            obj.addProperty("platform", this.platform);
+        }
+        if (this.language != null) {
+            obj.addProperty("language", this.language);
+        }
+        if (this.instructor != null) {
+            obj.add("instructor", instructor.serialize());
+        }
+        if (this.team != null) {
+            obj.add("team", this.team.serialize());
+        }
+        if (this.extensions != null) {
+            JsonObject extensionsObj = new JsonObject();
+            obj.add("extensions", extensionsObj);
+            for (Entry<String, JsonElement> item : extensions.entrySet()) {
+                extensionsObj.add(item.getKey(), item.getValue());
+            }
+        }
+        if (this.statement != null) {
+            obj.add("statement", statement.serialize());
+        }
+        if (this.contextActivities != null) {
+            obj.add("contextActivities", contextActivities.serialize());
+        }
+        return obj;
+    }
 }

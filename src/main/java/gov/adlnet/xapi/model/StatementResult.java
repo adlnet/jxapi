@@ -3,6 +3,9 @@ package gov.adlnet.xapi.model;
 import java.util.ArrayList;
 
 public class StatementResult {
+    private ArrayList<Statement> statements;
+    private String more;
+
 	public ArrayList<Statement> getStatements() {
 		return statements;
 	}
@@ -18,7 +21,4 @@ public class StatementResult {
 	public boolean hasMore() {
 		return this.more != null && this.more.length() > 0;
 	}
-	private ArrayList<Statement> statements;
-	private String more;
-	
 }
