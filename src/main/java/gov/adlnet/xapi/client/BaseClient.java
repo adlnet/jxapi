@@ -16,8 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
