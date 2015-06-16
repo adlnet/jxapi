@@ -18,8 +18,7 @@ import java.nio.Buffer;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
+import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,7 +53,7 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-        this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
+        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.DEFAULT);
     }
 
 	protected String readFromConnection(HttpURLConnection conn)
