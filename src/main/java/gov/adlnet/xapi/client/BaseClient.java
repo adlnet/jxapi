@@ -4,13 +4,9 @@ import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
+import gov.adlnet.xapi.util.Base64;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,10 +14,12 @@ import java.nio.Buffer;
 import java.util.List;
 import java.util.Map;
 
-import android.util.Base64;
+//import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class BaseClient {
 	protected URL _host;
@@ -53,7 +51,7 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.DEFAULT);
+        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.NO_WRAP);
     }
 
 	protected String readFromConnection(HttpURLConnection conn)

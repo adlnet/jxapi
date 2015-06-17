@@ -87,7 +87,7 @@ public class AppTest extends TestCase {
 			return calendar;
 		}
 	}
-	private static final String LRS_URI = "http://localhost:8000/XAPI/";
+	private static final String LRS_URI = "https://lrs.adlnet.gov/XAPI/";
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 
@@ -197,6 +197,9 @@ public class AppTest extends TestCase {
 		ic.setDescription(new HashMap<String, String>());
 		ic.getDescription().put("en-US", "test");
 		ad.getChoices().add(ic);
+        ArrayList<String> crp = new ArrayList<String>();
+        crp.add("http://example.com");
+        ad.setCorrectResponsesPattern(crp);
 		ad.setInteractionType("choice");
 		ad.setMoreInfo("http://example.com");
 		a.setDefinition(ad);
@@ -242,6 +245,9 @@ public class AppTest extends TestCase {
         ic.getDescription().put("en-US", "test");
         ad.getChoices().add(ic);
         ad.setInteractionType("choice");
+        ArrayList<String> crp = new ArrayList<String>();
+        crp.add("http://example.com");
+        ad.setCorrectResponsesPattern(crp);
         ad.setMoreInfo("http://example.com");
         a.setDefinition(ad);
 
@@ -292,6 +298,9 @@ public class AppTest extends TestCase {
         ic.getDescription().put("en-US", "test");
         ad.getChoices().add(ic);
         ad.setInteractionType("choice");
+        ArrayList<String> crp = new ArrayList<String>();
+        crp.add("http://example.com");
+        ad.setCorrectResponsesPattern(crp);
         ad.setMoreInfo("http://example.com");
         a.setDefinition(ad);
 

@@ -1,5 +1,7 @@
 package gov.adlnet.xapi.model;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.URI;
 
 import com.google.gson.*;
@@ -10,7 +12,7 @@ public abstract class Actor {
 	private String mbox_sha1sum;
 	private URI openid;
 	private Account account;
-	private boolean inverseFunctionalPropertySet = false;
+	private transient boolean inverseFunctionalPropertySet = false;
 
 	public String getMbox() {
 		return mbox;
@@ -108,7 +110,7 @@ public abstract class Actor {
 			obj.add("account", this.account.serialize());
 		}
 		obj.addProperty("objectType", this.getObjectType());
-		return obj;
+        return obj;
 	}
 	
 	public String toString() {
