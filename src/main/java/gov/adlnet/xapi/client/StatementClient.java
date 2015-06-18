@@ -6,15 +6,10 @@ import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.Verb;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -92,7 +87,7 @@ public class StatementClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -112,7 +107,7 @@ public class StatementClient extends BaseClient {
     }
 
 	public String postStatement(Statement statement)
-			throws java.io.UnsupportedEncodingException, java.io.IOException {
+			throws java.io.IOException {
 		Gson gson = getDecoder();
 		String json = gson.toJson(statement);
 		String result = issuePost("/xapi/statements", json);
@@ -121,7 +116,7 @@ public class StatementClient extends BaseClient {
 	}
 
     public Boolean putStatement(Statement statement, String stmtId)
-            throws java.io.UnsupportedEncodingException, java.io.IOException {
+            throws java.io.IOException {
         Gson gson = getDecoder();
         String json = gson.toJson(statement);
         String result = issuePut("/xapi/statements?statementId=" + stmtId, json);
@@ -129,7 +124,7 @@ public class StatementClient extends BaseClient {
     }
 
     public String postStatementWithAttachment(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
-            throws UnsupportedEncodingException, IOException, NoSuchAlgorithmException{
+            throws IOException, NoSuchAlgorithmException{
         Gson gson = getDecoder();
         String json = gson.toJson(statement);
         String result = issuePostWithFileAttachment("/xapi/statements", json, contentType, attachmentData);
@@ -182,8 +177,7 @@ public class StatementClient extends BaseClient {
         else{
             query.append("?attachments=true");
         }
-        String result = this.issueGet(query.toString());
-        return result;
+        return this.issueGet(query.toString());
     }
 
     public Statement get(String statementId) throws java.io.IOException {

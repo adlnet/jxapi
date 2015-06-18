@@ -1,19 +1,8 @@
 package gov.adlnet.xapi;
 
+import gov.adlnet.xapi.client.AboutClient;
 import gov.adlnet.xapi.client.StatementClient;
-import gov.adlnet.xapi.model.Activity;
-import gov.adlnet.xapi.model.ActivityDefinition;
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.Agent;
-import gov.adlnet.xapi.model.Attachment;
-import gov.adlnet.xapi.model.Context;
-import gov.adlnet.xapi.model.ContextActivities;
-import gov.adlnet.xapi.model.InteractionComponent;
-import gov.adlnet.xapi.model.Statement;
-import gov.adlnet.xapi.model.StatementReference;
-import gov.adlnet.xapi.model.StatementResult;
-import gov.adlnet.xapi.model.Verb;
-import gov.adlnet.xapi.model.Verbs;
+import gov.adlnet.xapi.model.*;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -337,8 +326,7 @@ public class AppTest extends TestCase {
         assert publishedId.length() > 0;
 
         String res = _client.getStatementsWithAttachments();
-        System.out.println(res);
-//        assertNotNull(res);
+        assertNotNull(res);
     }
     
     private byte[] fileToByteArray(File file) throws IOException {
@@ -492,8 +480,7 @@ public class AppTest extends TestCase {
 	}
 
 	public void testQueryBySince() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException,
-			ParseException {
+			java.io.IOException, ParseException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
@@ -509,32 +496,8 @@ public class AppTest extends TestCase {
 		}
 	}
 
-	public void testQueryByUntil() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException,
-			ParseException {
-		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
-				PASSWORD);
-
-        Calendar today = Calendar.getInstance();
-        Date todayDate = today.getTime();
-        String formatted = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'").format(todayDate);
-        String sd = formatted.replace("Z", "+00:00");
-        Calendar date = ISO8601.toCalendar(sd);
-
-        StatementResult result = _client.filterByUntil(sd).limitResults(10)
-				.getStatements();
-		assertFalse(result.getStatements().isEmpty());
-		for (Statement s : result.getStatements()) {
-			Calendar statementTimestamp = ISO8601.toCalendar(s.getTimestamp());
-			// the until date should be greater than (denoted by a compareTo value
-			// being greater than 0
-            assert date.compareTo(statementTimestamp) >= 0;
-		}
-	}
-
     public void testQueryByAscending() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException,
-            ParseException {
+            java.io.IOException, ParseException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
 
@@ -546,5 +509,13 @@ public class AppTest extends TestCase {
             Calendar secondTimestamp = ISO8601.toCalendar(result.getStatements().get(i+1).getTimestamp());
             assert firstTimestamp.compareTo(secondTimestamp) < 0;
         }
+    }
+
+    public void testAbout() throws URISyntaxException, IOException, ParseException{
+        AboutClient _client = new AboutClient(LRS_URI, USERNAME,
+                PASSWORD);
+        About result = _client.getAbout();
+        assertNotNull(result.getVersion());
+        assertNotNull(result.getExtensions());
     }
 }

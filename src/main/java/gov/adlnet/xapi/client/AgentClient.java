@@ -43,7 +43,7 @@ public class AgentClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -87,7 +87,7 @@ public class AgentClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -121,7 +121,7 @@ public class AgentClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -147,7 +147,7 @@ public class AgentClient extends BaseClient {
 	}
 
     public Person getPerson(Agent a)
-            throws MalformedURLException, IOException {
+            throws IOException {
         String path = "/xapi/agents?agent=" + getDecoder().toJson(a.serialize());
         String result = issueGet(path);
         return getDecoder().fromJson(result, Person.class);
@@ -164,14 +164,14 @@ public class AgentClient extends BaseClient {
 	}
 
 	public JsonElement getAgentProfile(AgentProfile agentProfile)
-			throws MalformedURLException, IOException {
+			throws IOException {
 		String path = formatProfilePath(agentProfile);
 		String result = issueGet(path);
 		return getDecoder().fromJson(result, JsonElement.class);
 	}
 
     public boolean putAgentProfile(AgentProfile agentProfile, HashMap<String, String> etag)
-            throws MalformedURLException, IOException {
+            throws IOException {
         String path = formatProfilePath(agentProfile);
         String json = getDecoder().toJson(agentProfile.getProfile());
         String result = issueProfilePut(path, json, etag);
@@ -179,7 +179,7 @@ public class AgentClient extends BaseClient {
     }
 
     public boolean postAgentProfile(AgentProfile agentProfile, HashMap<String, String> etag)
-            throws MalformedURLException, IOException {
+            throws IOException {
         String path = formatProfilePath(agentProfile);
         String json = getDecoder().toJson(agentProfile.getProfile());
         String result = issueProfilePost(path, json, etag);
@@ -187,14 +187,14 @@ public class AgentClient extends BaseClient {
     }
 
     public boolean deleteAgentProfile(AgentProfile agentProfile, String ifMatchEtagValue)
-            throws MalformedURLException, IOException {
+            throws IOException {
         String path = formatProfilePath(agentProfile);
         String result = issueProfileDelete(path, ifMatchEtagValue);
         return result.isEmpty();
     }
 
     public JsonArray getAgentProfiles(Agent a, String since)
-            throws MalformedURLException, IOException {
+            throws IOException {
         String agentJson = getDecoder().toJson(a.serialize());
         String path = "/xAPI/agents/profile?agent=" + agentJson;
         if (since != null && since.length() > 0){

@@ -1,7 +1,5 @@
 package gov.adlnet.xapi.model;
 
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.net.URI;
 
 import com.google.gson.*;

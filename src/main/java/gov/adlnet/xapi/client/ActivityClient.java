@@ -41,7 +41,7 @@ public class ActivityClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -85,7 +85,7 @@ public class ActivityClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -119,7 +119,7 @@ public class ActivityClient extends BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -145,7 +145,7 @@ public class ActivityClient extends BaseClient {
 	}
 
 	public Activity getActivity(String activityId)
-			throws MalformedURLException, IOException {
+			throws IOException {
 		String path = "/xapi/activities?activityId=" + activityId;
 		String result = issueGet(path);
 		return getDecoder().fromJson(result, Activity.class);
@@ -161,7 +161,7 @@ public class ActivityClient extends BaseClient {
     }
 
     public JsonObject getActivityProfile(ActivityProfile activityProfile)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String result = issueGet(createProfilePath(activityProfile));
         return getDecoder().fromJson(result, JsonObject.class);
     }
@@ -186,7 +186,7 @@ public class ActivityClient extends BaseClient {
         return response.isEmpty();
     }
 
-    public JsonArray getActivityProfiles(String activityId, String since) throws MalformedURLException, IOException {
+    public JsonArray getActivityProfiles(String activityId, String since) throws IOException {
         String path = "/xapi/activities/profile?activityId=" + activityId;
         if (since != null && since.length() > 0){
             path += ("&since=" + since);
@@ -211,33 +211,33 @@ public class ActivityClient extends BaseClient {
     }
 
     public JsonObject getActivityState(ActivityState activityState)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String result = issueGet(createStatePath(activityState));
         return getDecoder().fromJson(result, JsonObject.class);
     }
 
     public boolean postActivityState(ActivityState activityState)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String json = getDecoder().toJson(activityState.getState());
         String result = issuePost(createStatePath(activityState), json);
         return result.isEmpty();
     }
 
     public boolean putActivityState(ActivityState activityState)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String json = getDecoder().toJson(activityState.getState());
         String result = issuePut(createStatePath(activityState), json);
         return result.isEmpty();
     }
 
     public boolean deleteActivityState(ActivityState activityState)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String result = issueDelete(createStatePath(activityState));
         return result.isEmpty();
     }
 
     public JsonArray getActivityStates(String activityId, Agent agent, String registration, String since)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){
@@ -251,7 +251,7 @@ public class ActivityClient extends BaseClient {
     }
 
     public boolean deleteActivityStates(String activityId, Agent agent, String registration)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){

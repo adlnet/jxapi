@@ -10,11 +10,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.Buffer;
-import java.util.List;
-import java.util.Map;
-
-//import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -123,7 +118,7 @@ public class BaseClient {
 			InputStreamReader isr = new InputStreamReader(s);
 			BufferedReader br = new BufferedReader(isr);
 			try {
-				String line = "";
+				String line;
 				while((line = br.readLine()) != null){
 					System.out.print(line);
 				}
@@ -156,7 +151,7 @@ public class BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -188,7 +183,7 @@ public class BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -203,15 +198,9 @@ public class BaseClient {
         }
     }
 
-	protected String issueGet(String path) throws java.io.IOException,
-			java.net.MalformedURLException {
+	protected String issueGet(String path) throws java.io.IOException {
 		URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
         HttpURLConnection conn = initializeConnection(url);
-		Map<String, List<String>> map = conn.getHeaderFields();
-        for (Map.Entry<String, List<String>> entry : map.entrySet()){
-            System.out.println(entry.getKey() + " : " + entry.getValue());
-        }
-
         try {
 			return readFromConnection(conn);
 		} catch (IOException ex) {
@@ -219,7 +208,7 @@ public class BaseClient {
 			InputStreamReader isr = new InputStreamReader(s);
 			BufferedReader br = new BufferedReader(isr);
 			try {
-				String line = "";
+				String line;
 				while((line = br.readLine()) != null){
 					System.out.print(line);
 				}
@@ -233,8 +222,7 @@ public class BaseClient {
 		}
 	}
 
-    protected HttpServletResponse issueGetWithAttachments(String path) throws java.io.IOException,
-            java.net.MalformedURLException {
+    protected HttpServletResponse issueGetWithAttachments(String path) throws java.io.IOException {
         URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
         HttpURLConnection conn = initializeConnection(url);
         try {
@@ -244,7 +232,7 @@ public class BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }

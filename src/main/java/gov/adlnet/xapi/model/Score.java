@@ -2,6 +2,7 @@ package gov.adlnet.xapi.model;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 public class Score {
     private float scaled;
     private float raw;

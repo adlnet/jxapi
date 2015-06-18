@@ -14,16 +14,7 @@ public class About {
     public ArrayList<String> getVersion() {
         return version;
     }
-
-    public void setVersion(ArrayList<String> v) {
-        this.version= v;
-    }
-
     public JsonObject getExtensions() {
         return extensions;
-    }
-
-    public void setExtensions(JsonObject extensions) {
-        this.extensions = extensions;
     }
 }
