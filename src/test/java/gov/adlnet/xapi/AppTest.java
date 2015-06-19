@@ -5,34 +5,25 @@ import gov.adlnet.xapi.client.StatementClient;
 import gov.adlnet.xapi.model.*;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
@@ -104,7 +95,7 @@ public class AppTest extends TestCase {
 	 * Rigourous Test ;-)
 	 */
 	public void testGetStatements() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		StatementResult collection = _client.getStatements();
@@ -112,7 +103,7 @@ public class AppTest extends TestCase {
 	}
 
     public void testGetMoreStatements() throws URISyntaxException,
-            UnsupportedEncodingException, IOException{
+            IOException{
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         StatementResult collection = _client.getStatements();
@@ -127,7 +118,7 @@ public class AppTest extends TestCase {
     }
 
 	public void testPutGetSingleStatement() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			java.io.IOException {
 		String statementId = UUID.randomUUID().toString();
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
@@ -142,7 +133,7 @@ public class AppTest extends TestCase {
 	}
 
     public void testVoidStatement() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         String voidedId = UUID.randomUUID().toString();
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
@@ -163,8 +154,7 @@ public class AppTest extends TestCase {
     }
 
 	public void testPublishStatementWithAgent()
-			throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			throws java.net.URISyntaxException, java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		Statement statement = new Statement();
@@ -197,8 +187,7 @@ public class AppTest extends TestCase {
 	}
 
 	public void testSettingMultipeInverseFunctionProperties()
-			throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			throws java.net.URISyntaxException, java.io.IOException {
 		Agent agent = new Agent();
 		agent.setMbox("mailto:test@example.com");
 		try {
@@ -210,8 +199,7 @@ public class AppTest extends TestCase {
 	}
 
     public void testPublishStatementWithAttachmentFileURL()
-            throws URISyntaxException,
-            UnsupportedEncodingException, IOException{
+            throws URISyntaxException, IOException{
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         Statement statement = new Statement();
@@ -263,8 +251,7 @@ public class AppTest extends TestCase {
 
     @org.junit.Test
     public void testPublishStatementWithAttachmentFile()
-            throws URISyntaxException,
-            UnsupportedEncodingException, IOException, NoSuchAlgorithmException{
+            throws URISyntaxException, IOException, NoSuchAlgorithmException{
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         Statement statement = new Statement();
@@ -349,7 +336,7 @@ public class AppTest extends TestCase {
     }
 
 	public void testQueryByVerb() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		Verb v = Verbs.experienced();
@@ -363,7 +350,7 @@ public class AppTest extends TestCase {
 	}
 
 	public void testQueryByAgent() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		Actor a = new Agent();
@@ -378,7 +365,7 @@ public class AppTest extends TestCase {
 	}
 
     public void testQueryByActivity() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         StatementResult result = _client.filterByActivity("http://example.com")
@@ -391,7 +378,7 @@ public class AppTest extends TestCase {
     }
 
     public void testQueryByRelatedAgent() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         Agent a = new Agent();
@@ -408,7 +395,7 @@ public class AppTest extends TestCase {
     }
 
     public void testQueryByRelatedActivity() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         Agent a = new Agent();
@@ -431,7 +418,7 @@ public class AppTest extends TestCase {
     }
 
     public void testQueryByRegistration() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         String reg = UUID.randomUUID().toString();
@@ -452,7 +439,7 @@ public class AppTest extends TestCase {
     }
 
     public void testQueryByLimit() throws java.net.URISyntaxException,
-            java.io.UnsupportedEncodingException, java.io.IOException {
+            java.io.IOException {
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
 
@@ -462,7 +449,7 @@ public class AppTest extends TestCase {
     }
 
 	public void testQueryByAgentAndVerb() throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException, java.io.IOException {
+			java.io.IOException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
 		Actor a = new Agent();
@@ -483,16 +470,36 @@ public class AppTest extends TestCase {
 			java.io.IOException, ParseException {
 		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
 				PASSWORD);
-		String dateQuery = "2014-05-02T17:28:47.000000+00:00";
-		Calendar date = ISO8601.toCalendar(dateQuery);
-		StatementResult result = _client.filterBySince(dateQuery).limitResults(10)
+		String dateQuery = "2014-05-02T00:00:00Z";
+        Calendar date = javax.xml.bind.DatatypeConverter.parseDateTime(dateQuery);
+        StatementResult result = _client.filterBySince(dateQuery).limitResults(10)
 				.getStatements();
 		assertFalse(result.getStatements().isEmpty());
 		for (Statement s : result.getStatements()) {
-			Calendar statementTimestamp = ISO8601.toCalendar(s.getTimestamp());
+            Calendar statementTimestamp = javax.xml.bind.DatatypeConverter.parseDateTime(s.getTimestamp());
 			// the since date should be less than (denoted by a compareTo value
 			// being less than 0
 			assert date.compareTo(statementTimestamp) < 0;
+		}
+	}
+
+	public void testQueryByUntil() throws java.net.URISyntaxException,
+			java.io.IOException, ParseException {
+		StatementClient _client = new StatementClient(LRS_URI, USERNAME,
+				PASSWORD);
+		TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(tz);
+        String dateQuery = df.format(new Date());
+		Calendar date = javax.xml.bind.DatatypeConverter.parseDateTime(dateQuery);
+		StatementResult result = _client.filterByUntil(dateQuery).limitResults(10)
+				.getStatements();
+		assertFalse(result.getStatements().isEmpty());
+		for (Statement s : result.getStatements()) {
+            Calendar statementTimestamp = javax.xml.bind.DatatypeConverter.parseDateTime(s.getTimestamp());
+			// the until date should be greater than (denoted by a compareTo value
+			// being greater than 0
+			assert date.compareTo(statementTimestamp) >= 0;
 		}
 	}
 
