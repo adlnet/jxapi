@@ -6,18 +6,15 @@ import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 import gov.adlnet.xapi.util.Base64;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import javax.servlet.http.HttpServletResponse;
 
 public class BaseClient {
 	protected URL _host;
@@ -49,34 +46,52 @@ public class BaseClient {
 		this._host = uri;
 		this.username = user;
 		this.password = password;
-//        this.authString = "Basic " + DatatypeConverter.printBase64Binary((this.username + ":" + this.password).getBytes());
-        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.URL_SAFE);//.DEFAULT);
-        this.authString = this.authString.replaceAll("\n", "").replaceAll("\r", "");
+        this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.NO_WRAP);
     }
 
 	protected String readFromConnection(HttpURLConnection conn)
 			throws java.io.IOException {
-		InputStream in = new BufferedInputStream(conn.getInputStream());
-		StringBuilder sb = new StringBuilder();
-		InputStreamReader reader = new InputStreamReader(in);
-		BufferedReader br = new BufferedReader(reader);
-		try {
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-			return sb.toString();
-		} finally {
-			br.close();
-			reader.close();
-		}
+		InputStream in;
+        if(conn.getResponseCode() >= 400){
+            in = new BufferedInputStream(conn.getErrorStream());
+            StringBuilder sb = new StringBuilder();
+            InputStreamReader reader = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(reader);
+            try {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+            } finally {
+                br.close();
+                reader.close();
+            }
+            throw new IOException(String.format("Server Responded with %d: %s",
+                    conn.getResponseCode(), sb.toString()));
+        }
+        else {
+            in = new BufferedInputStream(conn.getInputStream());
+            StringBuilder sb = new StringBuilder();
+            InputStreamReader reader = new InputStreamReader(in);
+            BufferedReader br = new BufferedReader(reader);
+            try {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                return sb.toString();
+            } finally {
+                br.close();
+                reader.close();
+            }
+        }
 	}
 
 	protected HttpURLConnection initializeConnection(URL url)
 			throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setDoInput(true);
-		conn.addRequestProperty("X-Experience-API-Version", "1.0");
+		conn.addRequestProperty("X-Experience-API-Version", "1.0.0");
 		conn.setRequestProperty("Content-Type", "application/json");
 		conn.setRequestProperty("Authorization", this.authString);
 		return conn;
@@ -91,7 +106,7 @@ public class BaseClient {
 
 	protected String issuePost(String path, String data)
 			throws java.io.IOException {
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
 		HttpURLConnection conn = initializePOSTConnection(url);
 		conn.setRequestMethod("POST");
 		OutputStreamWriter writer = new OutputStreamWriter(
@@ -103,7 +118,7 @@ public class BaseClient {
 			InputStreamReader isr = new InputStreamReader(s);
 			BufferedReader br = new BufferedReader(isr);
 			try {
-				String line = "";
+				String line;
 				while((line = br.readLine()) != null){
 					System.out.print(line);
 				}
@@ -124,7 +139,7 @@ public class BaseClient {
 
     protected String issuePut(String path, String data)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
         HttpURLConnection conn = initializePOSTConnection(url);
         conn.setRequestMethod("PUT");
         OutputStreamWriter writer = new OutputStreamWriter(
@@ -136,7 +151,7 @@ public class BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -157,7 +172,7 @@ public class BaseClient {
 
     protected String issueDelete(String path)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
         HttpURLConnection conn = initializeConnection(url);
         conn.setRequestMethod("DELETE");
         try{
@@ -168,7 +183,7 @@ public class BaseClient {
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader br = new BufferedReader(isr);
             try {
-                String line = "";
+                String line;
                 while((line = br.readLine()) != null){
                     System.out.print(line);
                 }
@@ -183,18 +198,17 @@ public class BaseClient {
         }
     }
 
-	protected String issueGet(String path) throws java.io.IOException,
-			java.net.MalformedURLException {
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
-		HttpURLConnection conn = initializeConnection(url);
-		try {
+	protected String issueGet(String path) throws java.io.IOException {
+		URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        HttpURLConnection conn = initializeConnection(url);
+        try {
 			return readFromConnection(conn);
 		} catch (IOException ex) {
 			InputStream s = conn.getErrorStream();
 			InputStreamReader isr = new InputStreamReader(s);
 			BufferedReader br = new BufferedReader(isr);
 			try {
-				String line = "";
+				String line;
 				while((line = br.readLine()) != null){
 					System.out.print(line);
 				}
@@ -207,4 +221,28 @@ public class BaseClient {
 			conn.disconnect();
 		}
 	}
+
+    protected HttpServletResponse issueGetWithAttachments(String path) throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        HttpURLConnection conn = initializeConnection(url);
+        try {
+            return (HttpServletResponse)conn.getInputStream();
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line;
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        }finally {
+            conn.disconnect();
+        }
+    }
 }

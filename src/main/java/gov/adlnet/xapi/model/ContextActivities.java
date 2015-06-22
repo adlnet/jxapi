@@ -8,7 +8,8 @@ public class ContextActivities {
 	private ArrayList<Activity> grouping;
 	private ArrayList<Activity> category;
 	private ArrayList<Activity> other;
-	public ArrayList<Activity> getParent() {
+
+    public ArrayList<Activity> getParent() {
 		return parent;
 	}
 
@@ -23,6 +24,22 @@ public class ContextActivities {
 	public void setGrouping(ArrayList<Activity> grouping) {
 		this.grouping = grouping;
 	}
+
+    public ArrayList<Activity> getCategory() {
+        return category;
+    }
+
+    public void setCategory(ArrayList<Activity> category) {
+        this.category = category;
+    }
+
+    public ArrayList<Activity> getOther() {
+        return other;
+    }
+
+    public void setOther(ArrayList<Activity> other) {
+        this.other = other;
+    }
 
 	public JsonElement serialize() {
 		JsonObject obj = new JsonObject();
@@ -55,21 +72,5 @@ public class ContextActivities {
 			}
 		}			
 		return obj;
-	}
-
-	public ArrayList<Activity> getCategory() {
-		return category;
-	}
-
-	public void setCategory(ArrayList<Activity> category) {
-		this.category = category;
-	}
-
-	public ArrayList<Activity> getOther() {
-		return other;
-	}
-
-	public void setOther(ArrayList<Activity> other) {
-		this.other = other;
 	}
 }

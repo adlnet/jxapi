@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class InteractionComponent {
-	public String getId() {
+    private String id;
+    private HashMap<String, String> description;
+    public String getId() {
 		return id;
 	}
 
@@ -39,7 +41,4 @@ public class InteractionComponent {
 		}
 		return obj;
 	}
-
-	private String id;
-	private HashMap<String, String> description;
 }

@@ -1,12 +1,17 @@
 package gov.adlnet.xapi;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.UUID;
 
 import com.google.gson.*;
 
 import gov.adlnet.xapi.client.AgentClient;
+import gov.adlnet.xapi.model.Account;
 import gov.adlnet.xapi.model.Agent;
+import gov.adlnet.xapi.model.AgentProfile;
 import gov.adlnet.xapi.model.Person;
 
 import junit.framework.TestCase;
@@ -28,33 +33,45 @@ public class AgentTest extends TestCase {
         a.setMbox(MBOX);
         JsonObject puobj = new JsonObject();
         puobj.addProperty("puttest", "puttest");
-        assertTrue(client.putAgentProfile(a, PUT_PROFILE_ID, puobj));
+        AgentProfile ap = new AgentProfile(a, PUT_PROFILE_ID);
+        ap.setProfile(puobj);
+        HashMap<String, String> putEtag = new HashMap<String, String>();
+        putEtag.put("If-Match", "*");
+        assertTrue(client.putAgentProfile(ap, putEtag));
         JsonObject pobj = new JsonObject();
         pobj.addProperty("posttest", "posttest");
-        assertTrue(client.postAgentProfile(a, POST_PROFILE_ID, pobj));
+        AgentProfile poap = new AgentProfile(a, POST_PROFILE_ID);
+        poap.setProfile(pobj);
+        HashMap<String, String> postEtag = new HashMap<String, String>();
+        postEtag.put("If-Match", "*");
+        assertTrue(client.postAgentProfile(poap, postEtag));
     }
 
     public void tearDown() throws IOException{
         AgentClient client = new AgentClient(LRS_URI, USERNAME, PASSWORD);
         Agent a = new Agent();
         a.setMbox(MBOX);
-        boolean putResp = client.deleteAgentProfile(a, PUT_PROFILE_ID);
+        boolean putResp = client.deleteAgentProfile(new AgentProfile(a, PUT_PROFILE_ID), "*");
         assertTrue(putResp);
-        boolean postResp = client.deleteAgentProfile(a, POST_PROFILE_ID);
+        boolean postResp = client.deleteAgentProfile(new AgentProfile(a, POST_PROFILE_ID), "*");
         assertTrue(postResp);
     }
 
 	public void testGetProfile() throws IOException {
-		AgentClient client = new AgentClient(LRS_URI, USERNAME, PASSWORD);
+        URL url = new URL("https", "lrs.adlnet.gov", "/xAPI/");
+        AgentClient client = new AgentClient(url, USERNAME, PASSWORD);
 		Agent a = new Agent();
 		a.setMbox(MBOX);
-		JsonElement putProfile = client.getAgentProfile(a, PUT_PROFILE_ID);
+		JsonElement putProfile = client.getAgentProfile(new AgentProfile(a, PUT_PROFILE_ID));
 		assertNotNull(putProfile);
 		assertTrue(putProfile.isJsonObject());
 		JsonObject obj = (JsonObject)putProfile;
 		assertEquals(obj.getAsJsonPrimitive("puttest").getAsString(), "puttest");
 
-        JsonElement postProfile = client.getAgentProfile(a, POST_PROFILE_ID);
+        AgentProfile ap = new AgentProfile();
+        ap.setAgent(a);
+        ap.setProfileId(POST_PROFILE_ID);
+        JsonElement postProfile = client.getAgentProfile(ap);
         assertNotNull(postProfile);
         assertTrue(postProfile.isJsonObject());
         JsonObject pobj = (JsonObject)postProfile;
@@ -69,6 +86,14 @@ public class AgentTest extends TestCase {
         assertNotNull(profiles);
         assertTrue(profiles.size() >= 2);
     }
+
+    public void testPutProfileIfNoneMatch() throws IOException{}
+
+    public void testPostProfileIfNoneMatch() throws IOException{}
+
+    public void testPutProfileBadEtag() throws IOException{}
+
+    public void testPostProfileBadEtag() throws IOException{}
 
     public void testGetProfilesWithSince() throws IOException{
         AgentClient client = new AgentClient(LRS_URI, USERNAME, PASSWORD);
@@ -85,5 +110,6 @@ public class AgentTest extends TestCase {
         a.setMbox(MBOX);
         Person p = client.getPerson(a);
         assertNotNull(p);
+        assertEquals(p.getMbox()[0], MBOX);
     }
 }

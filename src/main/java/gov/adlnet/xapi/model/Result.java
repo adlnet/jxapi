@@ -4,6 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Result {
+    private Score score;
+    private Boolean success;
+    private Boolean completion;
+    private String response;
+    private String duration;
+    private JsonObject extensions;
+
 	public Score getScore() {
 		return score;
 	}
@@ -74,11 +81,4 @@ public class Result {
 		}
 		return obj;
 	}
-
-	private Score score;
-	private Boolean success;
-	private Boolean completion;
-	private String response;
-	private String duration;
-	private JsonObject extensions;
 }

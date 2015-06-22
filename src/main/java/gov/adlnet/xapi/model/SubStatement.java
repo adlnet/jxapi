@@ -13,35 +13,6 @@ public class SubStatement implements IStatementObject {
 	private Context context;
 	private ArrayList<Attachment> attachments;
 
-	public JsonElement serialize() {
-		JsonObject obj = new JsonObject();
-		if (this.timestamp != null) {
-			obj.addProperty("timestamp", this.timestamp);
-		}
-		if (this.actor != null) {
-			obj.add("actor", this.actor.serialize());
-		}
-		if (this.verb != null) {
-			obj.add("verb", verb.serialize());
-		}
-		if (this.object != null) {
-			obj.add("object", object.serialize());
-		}
-		if (this.result != null) {
-			obj.add("result", result.serialize());
-		}
-		if (this.context != null) {
-			obj.add("context", this.context.serialize());
-		}
-		obj.addProperty("objectType", this.getObjectType());
-		JsonArray jsonAttachments = new JsonArray();
-		obj.add("attachments", jsonAttachments);
-		for (Attachment a : this.attachments) {
-			jsonAttachments.add(a.serialize());
-		}
-		return obj;
-	}
-
 	public String getTimestamp() {
 		return timestamp;
 	}
@@ -105,4 +76,33 @@ public class SubStatement implements IStatementObject {
 	public String getObjectType() {
 		return SUB_STATEMENT;
 	}
+
+    public JsonElement serialize() {
+        JsonObject obj = new JsonObject();
+        if (this.timestamp != null) {
+            obj.addProperty("timestamp", this.timestamp);
+        }
+        if (this.actor != null) {
+            obj.add("actor", this.actor.serialize());
+        }
+        if (this.verb != null) {
+            obj.add("verb", verb.serialize());
+        }
+        if (this.object != null) {
+            obj.add("object", object.serialize());
+        }
+        if (this.result != null) {
+            obj.add("result", result.serialize());
+        }
+        if (this.context != null) {
+            obj.add("context", this.context.serialize());
+        }
+        obj.addProperty("objectType", this.getObjectType());
+        JsonArray jsonAttachments = new JsonArray();
+        obj.add("attachments", jsonAttachments);
+        for (Attachment a : this.attachments) {
+            jsonAttachments.add(a.serialize());
+        }
+        return obj;
+    }
 }

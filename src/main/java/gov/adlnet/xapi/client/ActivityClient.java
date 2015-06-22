@@ -1,17 +1,138 @@
 package gov.adlnet.xapi.client;
 
 import gov.adlnet.xapi.model.Activity;
+import gov.adlnet.xapi.model.ActivityProfile;
+import gov.adlnet.xapi.model.ActivityState;
 import gov.adlnet.xapi.model.Agent;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.UUID;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ActivityClient extends BaseClient {
+
+    protected String issueProfilePost(String path, String data, HashMap<String, String> etag)
+            throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        HttpURLConnection conn = initializePOSTConnection(url);
+
+        // Agent Profile requires either of these headers being sent
+        // If neither are sent it will set If-None-Match to null and exception
+        // will be caught during request
+        if (etag.containsKey("If-Match")){
+            conn.addRequestProperty("If-Match", etag.get("If-Match"));
+        }
+        else{
+            conn.addRequestProperty("If-None-Match", etag.get("If-None-Match"));
+        }
+        conn.setRequestMethod("POST");
+        OutputStreamWriter writer = new OutputStreamWriter(
+                conn.getOutputStream());
+        try {
+            writer.write(data);
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line;
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        } finally {
+            writer.close();
+        }
+        try {
+            return readFromConnection(conn);
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    protected String issueProfilePut(String path, String data, HashMap<String, String> etag)
+            throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        HttpURLConnection conn = initializePOSTConnection(url);
+
+        // Agent Profile requires either of these headers being sent
+        // If neither are sent it will set If-None-Match to null and exception
+        // will be caught during request
+        if (etag.containsKey("If-Match")){
+            conn.addRequestProperty("If-Match", etag.get("If-Match"));
+        }
+        else{
+            conn.addRequestProperty("If-None-Match", etag.get("If-None-Match"));
+        }
+
+        conn.setRequestMethod("PUT");
+        OutputStreamWriter writer = new OutputStreamWriter(
+                conn.getOutputStream());
+        try {
+            writer.write(data);
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line;
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        } finally {
+            writer.close();
+        }
+        try {
+            return readFromConnection(conn);
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    protected String issueProfileDelete(String path, String ifMatchEtagValue)
+            throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        HttpURLConnection conn = initializeConnection(url);
+        //Agent profile requires If-Match header - exception will get caught when making
+        conn.addRequestProperty("If-Match", ifMatchEtagValue);
+        conn.setRequestMethod("DELETE");
+        try{
+            return readFromConnection(conn);
+        }
+        catch (IOException ex){
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line;
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        }
+        finally{
+            conn.disconnect();
+        }
+    }
 
 	public ActivityClient(String uri, String username, String password)
 			throws MalformedURLException {
@@ -24,96 +145,99 @@ public class ActivityClient extends BaseClient {
 	}
 
 	public Activity getActivity(String activityId)
-			throws MalformedURLException, IOException {
+			throws IOException {
 		String path = "/xapi/activities?activityId=" + activityId;
 		String result = issueGet(path);
 		return getDecoder().fromJson(result, Activity.class);
 	}
 
-    private String createProfilePath(String activityId, String profileId){
+    private String createProfilePath(ActivityProfile activityProfile){
         StringBuilder sb = new StringBuilder();
         sb.append("/xAPI/activities/profile?activityId=");
-        sb.append(activityId);
+        sb.append(activityProfile.getActivityId());
         sb.append("&profileId=");
-        sb.append(profileId);
+        sb.append(activityProfile.getProfileId());
         return sb.toString();
     }
 
-    public JsonObject getActivityProfile(String activityId, String profileId)
-            throws MalformedURLException, IOException{
-        String result = issueGet(createProfilePath(activityId, profileId));
+    public JsonObject getActivityProfile(ActivityProfile activityProfile)
+            throws IOException{
+        String result = issueGet(createProfilePath(activityProfile));
         return getDecoder().fromJson(result, JsonObject.class);
     }
 
-	public JsonArray getActivityProfiles(String activityId, String since) throws MalformedURLException, IOException {
-		String path = "/xapi/activities/profile?activityId=" + activityId;
-		if (since != null && since.length() > 0){
-			path += ("&since=" + since);
-		}
-		String result = issueGet(path);
-		return getDecoder().fromJson(result, JsonArray.class);		
-	}
-
-	public boolean postActivityProfile(String activityId, String profileId,
-			JsonElement profile) throws IOException {
-		String json = getDecoder().toJson(profile);
-		String response = issuePost(createProfilePath(activityId, profileId),
-				json);
+	public boolean postActivityProfile(ActivityProfile activityProfile, HashMap<String, String> etag)
+            throws IOException {
+		String json = getDecoder().toJson(activityProfile.getProfile());
+		String response = issueProfilePost(createProfilePath(activityProfile), json, etag);
 		return response.isEmpty();
 	}
 
-    public boolean putActivityProfile(String activityId, String profileId,
-                                       JsonElement profile) throws IOException {
-        String json = getDecoder().toJson(profile);
-        String response = issuePut(createProfilePath(activityId, profileId),
-                json);
+    public boolean putActivityProfile(ActivityProfile activityProfile, HashMap<String, String> etag)
+            throws IOException {
+        String json = getDecoder().toJson(activityProfile.getProfile());
+        String response = issueProfilePut(createProfilePath(activityProfile), json, etag);
         return response.isEmpty();
     }
 
-    public boolean deleteActivityProfile(String activityId, String profileId) throws IOException {
-        String response = issueDelete(createProfilePath(activityId, profileId));
+    public boolean deleteActivityProfile(ActivityProfile activityProfile, String ifMatchEtagValue)
+            throws IOException {
+        String response = issueProfileDelete(createProfilePath(activityProfile), ifMatchEtagValue);
         return response.isEmpty();
     }
 
-    private String createStatePath(String activityId, Agent agent, String registration, String stateId){
-        String path = String.format("/xapi/activities/state?activityId=%s&agent=%s&stateId=%s", activityId,
-                getDecoder().toJson(agent.serialize()), stateId);
-        if (registration != null && registration.length() > 0){
-            path += ("&registration=" + registration);
+    public JsonArray getActivityProfiles(String activityId, String since) throws IOException {
+        String path = "/xapi/activities/profile?activityId=" + activityId;
+        if (since != null && since.length() > 0){
+            path += ("&since=" + since);
         }
-        return path;
+        String result = issueGet(path);
+        return getDecoder().fromJson(result, JsonArray.class);
     }
 
-    public JsonObject getActivityState(String activityId, Agent agent, String registration, String stateId)
-            throws MalformedURLException, IOException{
-        String result = issueGet(createStatePath(activityId, agent, registration, stateId));
+    private String createStatePath(ActivityState activityState){
+        StringBuilder sb = new StringBuilder();
+        sb.append("/xAPI/activities/state?activityId=");
+        sb.append(activityState.getActivityId());
+        sb.append("&stateId=");
+        sb.append(activityState.getStateId());
+        sb.append("&agent=");
+        sb.append(getDecoder().toJson(activityState.getAgent()));
+        UUID reg = activityState.getRegistration();
+        if (reg != null){
+            sb.append("&registration=" + reg.toString());
+        }
+        return sb.toString();
+    }
+
+    public JsonObject getActivityState(ActivityState activityState)
+            throws IOException{
+        String result = issueGet(createStatePath(activityState));
         return getDecoder().fromJson(result, JsonObject.class);
     }
 
-    public boolean postActivityState(String activityId, Agent agent, String registration, String stateId,
-                                        JsonElement state)
-            throws MalformedURLException, IOException{
-        String json = getDecoder().toJson((state));
-        String result = issuePost(createStatePath(activityId, agent, registration, stateId), json);
+    public boolean postActivityState(ActivityState activityState)
+            throws IOException{
+        String json = getDecoder().toJson(activityState.getState());
+        String result = issuePost(createStatePath(activityState), json);
         return result.isEmpty();
     }
 
-    public boolean putActivityState(String activityId, Agent agent, String registration, String stateId,
-                                     JsonElement state)
-            throws MalformedURLException, IOException{
-        String json = getDecoder().toJson((state));
-        String result = issuePut(createStatePath(activityId, agent, registration, stateId), json);
+    public boolean putActivityState(ActivityState activityState)
+            throws IOException{
+        String json = getDecoder().toJson(activityState.getState());
+        String result = issuePut(createStatePath(activityState), json);
         return result.isEmpty();
     }
 
-    public boolean deleteActivityState(String activityId, Agent agent, String registration, String stateId)
-            throws MalformedURLException, IOException{
-        String result = issueDelete(createStatePath(activityId, agent, registration, stateId));
+    public boolean deleteActivityState(ActivityState activityState)
+            throws IOException{
+        String result = issueDelete(createStatePath(activityState));
         return result.isEmpty();
     }
 
     public JsonArray getActivityStates(String activityId, Agent agent, String registration, String since)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){
@@ -127,7 +251,7 @@ public class ActivityClient extends BaseClient {
     }
 
     public boolean deleteActivityStates(String activityId, Agent agent, String registration)
-            throws MalformedURLException, IOException{
+            throws IOException{
         String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){

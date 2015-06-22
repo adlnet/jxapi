@@ -15,24 +15,6 @@ public class Attachment {
 	private String sha2;
 	private URI fileUrl;
 
-	private JsonElement serializeHash(HashMap<String, String> map) {
-		JsonObject obj = new JsonObject();
-		for (Entry<String, String> item : map.entrySet()) {
-			obj.addProperty(item.getKey(), item.getValue());
-		}
-		return obj;
-	}
-	public JsonElement serialize(){
-		JsonObject obj = new JsonObject();
-		obj.addProperty("usageType", this.usageType.toString());
-		obj.add("display", this.serializeHash(this.display));
-		obj.add("description", this.serializeHash(this.description));
-		obj.addProperty("contentType", this.contentType);
-		obj.addProperty("length", this.length);
-		obj.addProperty("sha2", this.sha2);
-		obj.addProperty("fileUrl", this.fileUrl.toString());
-		return obj;
-	}
 	public URI getUsageType() {
 		return usageType;
 	}
@@ -88,4 +70,23 @@ public class Attachment {
 	public void setFileUrl(URI fileUrl) {
 		this.fileUrl = fileUrl;
 	}
+
+    private JsonElement serializeHash(HashMap<String, String> map) {
+        JsonObject obj = new JsonObject();
+        for (Entry<String, String> item : map.entrySet()) {
+            obj.addProperty(item.getKey(), item.getValue());
+        }
+        return obj;
+    }
+    public JsonElement serialize(){
+        JsonObject obj = new JsonObject();
+        obj.addProperty("usageType", this.usageType.toString());
+        obj.add("display", this.serializeHash(this.display));
+        obj.add("description", this.serializeHash(this.description));
+        obj.addProperty("contentType", this.contentType);
+        obj.addProperty("length", this.length);
+        obj.addProperty("sha2", this.sha2);
+        obj.addProperty("fileUrl", this.fileUrl.toString());
+        return obj;
+    }
 }
