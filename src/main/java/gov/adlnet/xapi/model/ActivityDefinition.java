@@ -203,6 +203,9 @@ public class ActivityDefinition {
 		return "";
 	}
     public String toString(String langMap) {
-        return name.get(langMap);
+        if (name != null){
+            return name.get(langMap);
+        }
+        return "";
     }
 }
