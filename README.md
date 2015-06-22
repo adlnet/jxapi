@@ -2,7 +2,7 @@ jxapi - Experience API Java library
 =====
 [![Build Status](https://travis-ci.org/adlnet/jxapi.png?branch=master)](https://travis-ci.org/adlnet/jxapi)
 
-## Note: To build jxapi jar with all included dependencies simply run `mvn package`
+##### Note: To build jxapi jar with all included dependencies simply run `mvn package`
 
 # StatementClient
 
