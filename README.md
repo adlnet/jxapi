@@ -2,6 +2,8 @@ jxapi - Experience API Java library
 =====
 [![Build Status](https://travis-ci.org/adlnet/jxapi.png?branch=master)](https://travis-ci.org/adlnet/jxapi)
 
+## Note: To build jxapi jar with all included dependencies simply run `mvn package`
+
 # StatementClient
 
 To instantiate a new StatementClient you need the URL to an LRS, and a username/password combo that works for HTTP BasicAuth
