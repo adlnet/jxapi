@@ -67,7 +67,7 @@ public class AppTest extends TestCase {
 			return calendar;
 		}
 	}
-	private static final String LRS_URI = "https://lrs.adlnet.gov/XAPI/";
+	private static final String LRS_URI = "https://lrs.adlnet.gov/xapi";
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 
@@ -345,7 +345,7 @@ public class AppTest extends TestCase {
 		assertFalse(result.getStatements().isEmpty());
 		for (Statement s : result.getStatements()) {
 			assertNotNull(s.getVerb());
-			assertEquals(v.getId(), s.getVerb().getId());
+            assertTrue(s.getVerb().getId().equals(v.getId()) || s.getVerb().getId().equals(Verbs.voided().getId()));
 		}
 	}
 

@@ -19,7 +19,7 @@ public class ActivityClient extends BaseClient {
 
     protected String issueProfilePost(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
         HttpURLConnection conn = initializePOSTConnection(url);
 
         // Agent Profile requires either of these headers being sent
@@ -62,7 +62,7 @@ public class ActivityClient extends BaseClient {
 
     protected String issueProfilePut(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
         HttpURLConnection conn = initializePOSTConnection(url);
 
         // Agent Profile requires either of these headers being sent
@@ -106,7 +106,7 @@ public class ActivityClient extends BaseClient {
 
     protected String issueProfileDelete(String path, String ifMatchEtagValue)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
         HttpURLConnection conn = initializeConnection(url);
         //Agent profile requires If-Match header - exception will get caught when making
         conn.addRequestProperty("If-Match", ifMatchEtagValue);
@@ -146,14 +146,14 @@ public class ActivityClient extends BaseClient {
 
 	public Activity getActivity(String activityId)
 			throws IOException {
-		String path = "/xapi/activities?activityId=" + activityId;
+		String path = "/activities?activityId=" + activityId;
 		String result = issueGet(path);
 		return getDecoder().fromJson(result, Activity.class);
 	}
 
     private String createProfilePath(ActivityProfile activityProfile){
         StringBuilder sb = new StringBuilder();
-        sb.append("/xAPI/activities/profile?activityId=");
+        sb.append("/activities/profile?activityId=");
         sb.append(activityProfile.getActivityId());
         sb.append("&profileId=");
         sb.append(activityProfile.getProfileId());
@@ -187,7 +187,7 @@ public class ActivityClient extends BaseClient {
     }
 
     public JsonArray getActivityProfiles(String activityId, String since) throws IOException {
-        String path = "/xapi/activities/profile?activityId=" + activityId;
+        String path = "/activities/profile?activityId=" + activityId;
         if (since != null && since.length() > 0){
             path += ("&since=" + since);
         }
@@ -197,7 +197,7 @@ public class ActivityClient extends BaseClient {
 
     private String createStatePath(ActivityState activityState){
         StringBuilder sb = new StringBuilder();
-        sb.append("/xAPI/activities/state?activityId=");
+        sb.append("/activities/state?activityId=");
         sb.append(activityState.getActivityId());
         sb.append("&stateId=");
         sb.append(activityState.getStateId());
@@ -238,7 +238,7 @@ public class ActivityClient extends BaseClient {
 
     public JsonArray getActivityStates(String activityId, Agent agent, String registration, String since)
             throws IOException{
-        String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
+        String path = String.format("/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){
             path += ("&registration=" + registration);
@@ -252,7 +252,7 @@ public class ActivityClient extends BaseClient {
 
     public boolean deleteActivityStates(String activityId, Agent agent, String registration)
             throws IOException{
-        String path = String.format("/xapi/activities/state?activityId=%s&agent=%s", activityId,
+        String path = String.format("/activities/state?activityId=%s&agent=%s", activityId,
                 getDecoder().toJson(agent.serialize()));
         if (registration != null && registration.length() > 0){
             path += ("&registration=" + registration);
