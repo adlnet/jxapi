@@ -28,7 +28,7 @@ public class ActivityTest extends TestCase {
     private String PUT_STATE_ID;
     private String POST_STATE_ID;
 	private String ACTIVITY_ID;
-	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI/";
+	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI";
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
     private static final String MBOX = "mailto:test@example.com";
@@ -62,7 +62,6 @@ public class ActivityTest extends TestCase {
         ACTIVITY_ID = "http://example.com";
         Agent a = new Agent();
         a.setMbox(MBOX);
-
         ActivityClient _client = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
         JsonObject puobj = new JsonObject();
         puobj.addProperty("putproftest", "putproftest");
@@ -145,8 +144,7 @@ public class ActivityTest extends TestCase {
     public void testPostProfileBadEtag() throws IOException{}
 
 	public void testGetActivityProfiles() throws IOException{
-        URL url = new URL("https", "lrs.adlnet.gov", "/xAPI/");
-		ActivityClient _client = new ActivityClient(url, USERNAME, PASSWORD);
+		ActivityClient _client = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
 		JsonArray a = _client.getActivityProfiles(ACTIVITY_ID, null);
 		assertNotNull(a);
         assertTrue(a.size() >= 2);

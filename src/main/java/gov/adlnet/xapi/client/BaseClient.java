@@ -42,8 +42,16 @@ public class BaseClient {
 		return gson;
 	}
 
-	protected void init(URL uri, String user, String password) {
-		this._host = uri;
+	protected void init(URL uri, String user, String password)
+            throws MalformedURLException{
+		String holder = uri.toString();
+        if(holder.endsWith("/")){
+            URL newUri = new URL(holder.substring(0, holder.length()-1));
+            this._host = newUri;
+        }
+        else{
+            this._host = uri;
+        }
 		this.username = user;
 		this.password = password;
         this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.NO_WRAP);
@@ -53,6 +61,8 @@ public class BaseClient {
 			throws java.io.IOException {
 		InputStream in;
         if(conn.getResponseCode() >= 400){
+            String server = conn.getURL().toString();
+            int statusCode = conn.getResponseCode();
             in = new BufferedInputStream(conn.getErrorStream());
             StringBuilder sb = new StringBuilder();
             InputStreamReader reader = new InputStreamReader(in);
@@ -62,12 +72,11 @@ public class BaseClient {
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
-            } finally {
-                br.close();
-                reader.close();
             }
-            throw new IOException(String.format("Server Responded with %d: %s",
-                    conn.getResponseCode(), sb.toString()));
+            finally {
+                throw new IOException(String.format("Server (%s) Responded with %d: %s",
+                        server, statusCode, sb.toString()));
+            }
         }
         else {
             in = new BufferedInputStream(conn.getInputStream());
@@ -106,7 +115,7 @@ public class BaseClient {
 
 	protected String issuePost(String path, String data)
 			throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
 		HttpURLConnection conn = initializePOSTConnection(url);
 		conn.setRequestMethod("POST");
 		OutputStreamWriter writer = new OutputStreamWriter(
@@ -139,7 +148,7 @@ public class BaseClient {
 
     protected String issuePut(String path, String data)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializePOSTConnection(url);
         conn.setRequestMethod("PUT");
         OutputStreamWriter writer = new OutputStreamWriter(
@@ -172,7 +181,7 @@ public class BaseClient {
 
     protected String issueDelete(String path)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializeConnection(url);
         conn.setRequestMethod("DELETE");
         try{
@@ -199,7 +208,8 @@ public class BaseClient {
     }
 
 	protected String issueGet(String path) throws java.io.IOException {
-		URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
+        String fixedPath = checkPath(path);
+		URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+fixedPath);
         HttpURLConnection conn = initializeConnection(url);
         try {
 			return readFromConnection(conn);
@@ -244,5 +254,14 @@ public class BaseClient {
         }finally {
             conn.disconnect();
         }
+    }
+
+    // When retrieving 'more' statements, LRS will return full path..the client will have part in the URI already so cut that off
+    protected String checkPath(String path){
+        if (path.toLowerCase().contains(this._host.getPath().toLowerCase())){
+            int pathLength = this._host.getPath().length();
+            return path.substring(pathLength, path.length());
+        }
+        return path;
     }
 }

@@ -23,7 +23,7 @@ public class AboutClient extends BaseClient {
 
     public About getAbout()
             throws IOException {
-        String path = "/xAPI/about";
+        String path = "/about";
         String result = issueGet(path);
         return getDecoder().fromJson(result, About.class);
     }

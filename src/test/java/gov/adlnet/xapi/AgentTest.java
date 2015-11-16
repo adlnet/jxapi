@@ -17,7 +17,7 @@ import gov.adlnet.xapi.model.Person;
 import junit.framework.TestCase;
 
 public class AgentTest extends TestCase {
-	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI/";
+	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI";
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 	private static final String MBOX = "mailto:test@example.com";
@@ -58,8 +58,7 @@ public class AgentTest extends TestCase {
     }
 
 	public void testGetProfile() throws IOException {
-        URL url = new URL("https", "lrs.adlnet.gov", "/xAPI/");
-        AgentClient client = new AgentClient(url, USERNAME, PASSWORD);
+        AgentClient client = new AgentClient(LRS_URI, USERNAME, PASSWORD);
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		JsonElement putProfile = client.getAgentProfile(new AgentProfile(a, PUT_PROFILE_ID));
