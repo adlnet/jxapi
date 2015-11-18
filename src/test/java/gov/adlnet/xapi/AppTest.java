@@ -331,7 +331,6 @@ public class AppTest extends TestCase {
             } catch ( IOException e) {
             }
         }
-
         return buffer;
     }
 
