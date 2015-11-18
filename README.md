@@ -4,6 +4,8 @@ jxapi - Experience API Java library
 
 ##### Note: To build jxapi jar with all included dependencies simply run `mvn package`
 
+#### If you're just interested in using the library, the jar can be found [here](https://search.maven.org/#search%7Cga%7C1%7Cjxapi). We will be discontinuing the releases here on GitHub.
+
 # StatementClient
 
 To instantiate a new StatementClient you need the URL to an LRS, and a username/password combo that works for HTTP BasicAuth
