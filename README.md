@@ -12,6 +12,7 @@ To instantiate a new StatementClient you need the URL to an LRS, and a username/
 
 ```java
 StatementClient client = new StatementClient(url, username, password);
+//URL example: https://lrs.adlnet.gov/xAPI
 ```
 
 This has the possiblitiy of throwing a ```MalformedURLException``` if an invalid URL is passed it.
