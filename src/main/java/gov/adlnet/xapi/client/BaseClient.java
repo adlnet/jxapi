@@ -258,7 +258,7 @@ public class BaseClient {
 
     // When retrieving 'more' statements, LRS will return full path..the client will have part in the URI already so cut that off
     protected String checkPath(String path){
-        if (path.toLowerCase().contains(this._host.getPath().toLowerCase())){
+        if (path.toLowerCase().contains("statements") && path.toLowerCase().contains("more")){
             int pathLength = this._host.getPath().length();
             return path.substring(pathLength, path.length());
         }
