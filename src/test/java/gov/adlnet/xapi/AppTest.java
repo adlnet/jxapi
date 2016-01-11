@@ -4,12 +4,7 @@ import gov.adlnet.xapi.client.AboutClient;
 import gov.adlnet.xapi.client.StatementClient;
 import gov.adlnet.xapi.model.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -247,8 +242,7 @@ public class AppTest extends TestCase {
     }
 
     @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
-
+    public TemporaryFolder testFolder = new TemporaryFolder();
     @org.junit.Test
     public void testPublishStatementWithAttachmentFile()
             throws URISyntaxException, IOException, NoSuchAlgorithmException{
@@ -260,12 +254,15 @@ public class AppTest extends TestCase {
         verb.setId("http://adlnet.gov/expapi/verbs/experienced");
         agent.setMbox("mailto:test@example.com");
         agent.setName("Tester McTesterson");
+
         statement.setActor(agent);
         statement.setId(UUID.randomUUID().toString());
         statement.setVerb(verb);
+
         Activity a = new Activity();
         a.setId("http://attachmentexample.com");
         statement.setObject(a);
+
         ActivityDefinition ad = new ActivityDefinition();
         ad.setChoices(new ArrayList<InteractionComponent>());
         InteractionComponent ic = new InteractionComponent();
@@ -274,6 +271,7 @@ public class AppTest extends TestCase {
         ic.getDescription().put("en-US", "test");
         ad.getChoices().add(ic);
         ad.setInteractionType("choice");
+
         ArrayList<String> crp = new ArrayList<String>();
         crp.add("http://example.com");
         ad.setCorrectResponsesPattern(crp);
@@ -287,8 +285,8 @@ public class AppTest extends TestCase {
         URI usageType = new URI("http://example.com/test/usage");
         att.setUsageType(usageType);
 
-        File testfile = folder.newFile("testatt.txt");
-        BufferedWriter out = new BufferedWriter(new FileWriter(testfile));
+        File testFile = testFolder.newFile("testatt.txt");
+        BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
         out.write("This is the first line\n");
         out.write("This is the second line!!!\n");
         out.write(UUID.randomUUID().toString());
@@ -296,8 +294,8 @@ public class AppTest extends TestCase {
 
         String contentType = "text/plain";
         att.setContentType(contentType);
-        att.setLength((int)testfile.length());
-        byte[] arr = fileToByteArray(testfile);
+        att.setLength((int)testFile.length());
+        byte[] arr = fileToByteArray(testFile);
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(arr);
         att.setSha2(new String(Hex.encode(md.digest())));
@@ -314,6 +312,8 @@ public class AppTest extends TestCase {
 
         String res = _client.getStatementsWithAttachments();
         assertNotNull(res);
+
+        testFile.deleteOnExit();
     }
     
     private byte[] fileToByteArray(File file) throws IOException {
@@ -323,10 +323,10 @@ public class AppTest extends TestCase {
             ios = new FileInputStream(file);
             if ( ios.read(buffer) == -1 ) {
                 throw new IOException("EOF reached while trying to read the whole file");
-            }        
-        } finally { 
+            }
+        } finally {
             try {
-                 if ( ios != null ) 
+                 if ( ios != null )
                       ios.close();
             } catch ( IOException e) {
             }
@@ -510,10 +510,10 @@ public class AppTest extends TestCase {
         StatementResult result = _client.limitResults(10).ascending(true)
                 .getStatements();
         assertFalse(result.getStatements().isEmpty());
-        for (int i=0; i<result.getStatements().size()-2; i++){
+        for (int i=0; i<result.getStatements().size() - 1; i++){
             Calendar firstTimestamp = ISO8601.toCalendar(result.getStatements().get(i).getTimestamp());
             Calendar secondTimestamp = ISO8601.toCalendar(result.getStatements().get(i+1).getTimestamp());
-            assert firstTimestamp.compareTo(secondTimestamp) < 0;
+            assert (firstTimestamp.compareTo(secondTimestamp) < 0 || firstTimestamp.compareTo(secondTimestamp) == 0);
         }
     }
 
