@@ -132,11 +132,13 @@ public class Statement {
         if (this.authority != null) {
             obj.add("authority", this.authority.serialize());
         }
-        JsonArray jsonAttachments = new JsonArray();
-        obj.add("attachments", jsonAttachments);
-        for (Attachment a : this.attachments) {
-            jsonAttachments.add(a.serialize());
-        }
-        return obj;
+        if (this.attachments != null) {
+			JsonArray jsonAttachments = new JsonArray();
+			obj.add("attachments", jsonAttachments);
+			for (Attachment a : this.attachments) {
+				jsonAttachments.add(a.serialize());
+			} 
+		}
+		return obj;
     }
 }
