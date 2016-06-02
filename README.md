@@ -10,7 +10,7 @@ jxapi - Experience API Java library
 
 Either clone:
 
-`git clone https://github.com/adlnet/`
+`git clone https://github.com/adlnet/jxapi`
 
 run `mvn package`
 
