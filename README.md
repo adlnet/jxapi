@@ -6,7 +6,23 @@ jxapi - Experience API Java library
 
 #### If you're just interested in using the library, the jar can be found [here](https://search.maven.org/#search%7Cga%7C1%7Cjxapi). We will be discontinuing the releases here on GitHub.
 
-# StatementClient
+## Installation
+
+Either clone:
+
+`git clone https://github.com/adlnet/jxapi`
+
+run `mvn package`
+
+or 
+
+Download directly from the Central [Repository](https://search.maven.org/#search%7Cga%7C1%7Cjxapi)
+
+## Use
+
+### StatementClient
+
+`import gov.adlnet.xapi.client.StatementClient;`
 
 To instantiate a new StatementClient you need the URL to an LRS, and a username/password combo that works for HTTP BasicAuth
 
@@ -17,7 +33,9 @@ StatementClient client = new StatementClient(url, username, password);
 
 This has the possiblitiy of throwing a ```MalformedURLException``` if an invalid URL is passed it.
 
-## Creating a Statement
+### Creating a Statement
+
+`import gov.adlnet.xapi.model.*;`
 
 This library has some overloaded model constructors to simplify building common parts of a statement.  
 
@@ -109,7 +127,7 @@ System.out.println("\t" + new Statement(new Agent("tom", "mailto:tom@example.com
 //	7fdbc0cc-aef8-47d6-97ad-b1929afc34b5: tom did act:id
 ```
 
-## Publishing a Statement
+### Publishing a Statement
 
 To publish a statement you'll need a Verb (There is a predefined list of ADL verbs available in ```gov.adlnet.xapi.model.Verbs``` class), an Actor who compled the activity the statment describes, and the Statement object, which can be an Activity, a SubStatement, or a StatementRef
 
@@ -140,7 +158,7 @@ a.setDefinition(ad);
 String publishedId = client.publishStatement(statement);
 ```
 
-## Querying an LRS
+### Querying an LRS
 
 You can get all the statements from an LRS by calling the ```getStatements``` method on the client
 
@@ -190,7 +208,12 @@ includeAttachments
 
 To bring back only statement ids from the LRS, include the ```ids``` method call when chaining filters/include methods
 
-## License
+Contributing to the Project
+## Contributing to the project
+We welcome contributions to this project. Fork this repository, make changes, and submit pull requests. If you're not comfortable with editing the code, please [submit an issue](https://github.com/adlnet/jxapi/issues) and we'll be happy to address it. 
+
+
+### License
    Copyright &copy;2016 Advanced Distributed Learning
 
    Licensed under the Apache License, Version 2.0 (the "License");
