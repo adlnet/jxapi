@@ -2,7 +2,7 @@ package gov.adlnet.xapi.model;
 
 import java.net.URI;
 
-public class Agent extends Actor implements IStatementObject {
+public class Agent extends Actor {
 
 	public static final String AGENT = "Agent";
 	
