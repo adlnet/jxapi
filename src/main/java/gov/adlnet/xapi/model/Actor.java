@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.google.gson.*;
 
-public abstract class Actor {
+public abstract class Actor implements IStatementObject {
 	private String name;
 	private String mbox;
 	private String mbox_sha1sum;
