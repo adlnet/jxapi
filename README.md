@@ -155,7 +155,7 @@ ad.getChoices().add(ic);
 ad.setInteractionType("choice");
 ad.setMoreInfo("http://example.com");
 a.setDefinition(ad);
-String publishedId = client.publishStatement(statement);
+String publishedId = client.postStatement(statement);
 ```
 
 ### Querying an LRS
