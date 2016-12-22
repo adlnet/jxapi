@@ -194,7 +194,7 @@ public class AppTest extends TestCase {
 	}
 
     public void testPublishStatementWithAttachmentFileURL()
-            throws URISyntaxException, IOException{
+            throws URISyntaxException, IOException, NoSuchAlgorithmException{
         StatementClient _client = new StatementClient(LRS_URI, USERNAME,
                 PASSWORD);
         Statement statement = new Statement();
@@ -232,6 +232,7 @@ public class AppTest extends TestCase {
         att.setContentType("application/json");
         att.setLength(45);
         att.setFileUrl(new URI("http://test/attachment/url"));
+        att.setSha2(generateSha2("http://test/attachment/url".getBytes()));
 
         ArrayList<Attachment> attList = new ArrayList<Attachment>();
         attList.add(att);
@@ -296,9 +297,7 @@ public class AppTest extends TestCase {
         att.setContentType(contentType);
         att.setLength((int)testFile.length());
         byte[] arr = fileToByteArray(testFile);
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(arr);
-        att.setSha2(new String(Hex.encode(md.digest())));
+        att.setSha2(generateSha2(arr));
 
         ArrayList<Attachment> attList = new ArrayList<Attachment>();
         attList.add(att);
@@ -332,6 +331,12 @@ public class AppTest extends TestCase {
             }
         }
         return buffer;
+    }
+
+    public String generateSha2(byte[] bytes) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(bytes);
+        return new String(Hex.encode(md.digest()));
     }
 
 	public void testQueryByVerb() throws java.net.URISyntaxException,
