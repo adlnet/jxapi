@@ -192,7 +192,7 @@ public class StatementClient extends BaseClient {
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
-	private StatementClient addFilter(String key, String value) {
+	public StatementClient addFilter(String key, String value) {
 		try {
 			StatementClient client = new StatementClient(this._host,
 					this.username, this.password);
