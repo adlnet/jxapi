@@ -192,6 +192,12 @@ filterByRegistration
 filterBySince
 filterByUntil
 ```
+
+In addition to these preset filters, you can add non-standard filters to the statements query by using `addFilter`. For example:
+```java
+client.addFilter('context.extensions.yourExtension', 'customExtensionValue').getStatements();
+```
+
 These filters can be chained together to created more complex queries, such as
 
 ```java
