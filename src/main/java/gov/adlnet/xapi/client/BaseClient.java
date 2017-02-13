@@ -31,6 +31,19 @@ public class BaseClient {
 			throws MalformedURLException {
 		init(uri, username, password);
 	}	
+	
+	public BaseClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		
+		init(new URL(uri), encodedUsernamePassword);
+	}
+	
+	public BaseClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		
+		init(uri, encodedUsernamePassword);
+	}
+	
 	protected Gson getDecoder() {	
 		if (gson == null) {
 			GsonBuilder builder = new GsonBuilder();
@@ -55,6 +68,22 @@ public class BaseClient {
 		this.username = user;
 		this.password = password;
         this.authString = "Basic " + Base64.encodeToString((this.username + ":" + this.password).getBytes(), Base64.NO_WRAP);
+    }
+	
+	
+	
+	protected void init(URL uri, String encodedUsernamePassword)
+            throws MalformedURLException{
+		String holder = uri.toString();
+        if(holder.endsWith("/")){
+            URL newUri = new URL(holder.substring(0, holder.length()-1));
+            this._host = newUri;
+        }
+        else{
+            this._host = uri;
+        }
+
+        this.authString = "Basic " + encodedUsernamePassword;
     }
 
 	protected String readFromConnection(HttpURLConnection conn)
