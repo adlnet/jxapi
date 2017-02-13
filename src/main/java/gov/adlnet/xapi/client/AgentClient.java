@@ -145,6 +145,16 @@ public class AgentClient extends BaseClient {
 			throws MalformedURLException {
 		super(uri, username, password);
 	}
+	
+	public AgentClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public AgentClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
     public Person getPerson(Agent a)
             throws IOException {
