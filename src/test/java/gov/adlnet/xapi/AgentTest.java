@@ -13,7 +13,7 @@ import gov.adlnet.xapi.model.Account;
 import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.AgentProfile;
 import gov.adlnet.xapi.model.Person;
-
+import gov.adlnet.xapi.util.Base64;
 import junit.framework.TestCase;
 
 public class AgentTest extends TestCase {
@@ -55,6 +55,32 @@ public class AgentTest extends TestCase {
         assertTrue(putResp);
         boolean postResp = client.deleteAgentProfile(new AgentProfile(a, POST_PROFILE_ID), "*");
         assertTrue(postResp);
+    }
+    
+    public void testAgentClient() throws IOException {
+    	String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+    	URL lrs_url = new URL(LRS_URI);
+    	
+    	AgentClient client = new AgentClient(LRS_URI, encodedCreds);
+    	assertNotNull(client);
+        
+    	// Verify the client can do something.
+    	Agent a = new Agent();         
+        a.setMbox(MBOX);
+        Person p = client.getPerson(a);
+        assertNotNull(p);
+        assertEquals(p.getMbox()[0], MBOX);
+        
+        client = null;
+        p = null;
+        
+        client = new AgentClient(lrs_url, encodedCreds);
+        assertNotNull(client);
+        
+        // Verify the client can do something.
+        p = client.getPerson(a);
+        assertNotNull(p);
+        assertEquals(p.getMbox()[0], MBOX);
     }
 
 	public void testGetProfile() throws IOException {
