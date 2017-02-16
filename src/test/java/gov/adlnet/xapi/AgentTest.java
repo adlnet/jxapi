@@ -1,15 +1,17 @@
 package gov.adlnet.xapi;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
 
-import com.google.gson.*;
+import org.junit.Test;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import gov.adlnet.xapi.client.AgentClient;
-import gov.adlnet.xapi.model.Account;
 import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.AgentProfile;
 import gov.adlnet.xapi.model.Person;
@@ -57,30 +59,122 @@ public class AgentTest extends TestCase {
         assertTrue(postResp);
     }
     
-    public void testAgentClient() throws IOException {
-    	String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
-    	URL lrs_url = new URL(LRS_URI);
-    	
-    	AgentClient client = new AgentClient(LRS_URI, encodedCreds);
-    	assertNotNull(client);
-        
-    	// Verify the client can do something.
-    	Agent a = new Agent();         
+    @Test
+    public void testAgentClientStringStringString() throws IOException {
+    	   
+    	//Happy path
+    	AgentClient client = new AgentClient(LRS_URI, USERNAME, PASSWORD);
+    	Agent a = new Agent();
         a.setMbox(MBOX);
         Person p = client.getPerson(a);
         assertNotNull(p);
         assertEquals(p.getMbox()[0], MBOX);
         
-        client = null;
-        p = null;
+        //Incorrect password       
+        client = new AgentClient(LRS_URI, USERNAME, "passw0rd");
+        try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
         
-        client = new AgentClient(lrs_url, encodedCreds);
-        assertNotNull(client);
-        
-        // Verify the client can do something.
-        p = client.getPerson(a);
+        //Non URL parameter
+    	try {
+    		client = new AgentClient("fail", USERNAME, PASSWORD);
+		} catch (Exception e) {
+			assertTrue(true);
+		}        
+        assertNotNull(client);        
+    }
+    
+    @Test
+    public void testAgentClientURLStringString() throws IOException {
+    	URL lrs_url = new URL(LRS_URI);
+    	
+    	//Happy path
+    	AgentClient client = new AgentClient(lrs_url, USERNAME, PASSWORD);
+    	Agent a = new Agent();
+        a.setMbox(MBOX);
+        Person p = null;
+		try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			fail("Exception "+e.toString());
+		}
         assertNotNull(p);
         assertEquals(p.getMbox()[0], MBOX);
+        
+        //Incorrect password       
+        client = new AgentClient(lrs_url, USERNAME, "passw0rd");
+        try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			assertTrue(true);
+		}             
+    }
+    
+    @Test
+    public void testAgentClientStringString() throws IOException {
+    	String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+    	
+    	//Happy path
+    	AgentClient client = new AgentClient(LRS_URI, encodedCreds);
+    	Agent a = new Agent();
+        a.setMbox(MBOX);
+        Person p = null;
+		try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			fail("Exception "+e.toString());
+		}
+        assertNotNull(p);
+        assertEquals(p.getMbox()[0], MBOX);
+        
+        //Incorrect password
+        encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);       
+        client = new AgentClient(LRS_URI, encodedCreds);
+        try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+        encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+        
+        //Non URL parameter
+    	try {
+    		client = new AgentClient("fail", encodedCreds);
+		} catch (Exception e) {
+			assertTrue(true);
+		}        
+        assertNotNull(client);        
+    }
+    
+    @Test
+    public void testAgentClientURLString() throws IOException {
+    	String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+    	URL lrs_url = new URL(LRS_URI);
+    	
+    	//Happy path
+    	AgentClient client = new AgentClient(lrs_url, encodedCreds);
+    	Agent a = new Agent();
+        a.setMbox(MBOX);
+        Person p = null;
+		try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			fail("Exception "+e.toString());
+		}
+        assertNotNull(p);
+        assertEquals(p.getMbox()[0], MBOX);
+        
+        //Incorrect password
+        encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);       
+        client = new AgentClient(lrs_url, encodedCreds);
+        try {
+			p = client.getPerson(a);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
     }
 
 	public void testGetProfile() throws IOException {
