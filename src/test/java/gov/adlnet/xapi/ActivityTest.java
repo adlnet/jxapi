@@ -1,5 +1,16 @@
 package gov.adlnet.xapi;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.UUID;
+
+import org.junit.Test;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import gov.adlnet.xapi.client.ActivityClient;
 import gov.adlnet.xapi.client.StatementClient;
 import gov.adlnet.xapi.model.Activity;
@@ -8,21 +19,11 @@ import gov.adlnet.xapi.model.ActivityState;
 import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.Verb;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.UUID;
-
-import junit.framework.Test;
+import gov.adlnet.xapi.util.Base64;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-public class ActivityTest extends TestCase {
+public class ActivityTest extends TestCase{
 	private String PUT_PROFILE_ID;
     private String POST_PROFILE_ID;
     private String PUT_STATE_ID;
@@ -34,32 +35,12 @@ public class ActivityTest extends TestCase {
     private static final String MBOX = "mailto:test@example.com";
     private static final UUID REGISTRATION = UUID.randomUUID();
 
-	/**
-	 * Create the test case
-	 * 
-	 * @param testName
-	 *            name of the test case
-	 */
-
-	public ActivityTest(String testName) throws java.net.URISyntaxException,
-			java.io.UnsupportedEncodingException {
-		super(testName);
-
-	}
-
-	/**
-	 * @return the suite of tests being tested
-	 */
-	public static Test suite() {
-		return new TestSuite(ActivityTest.class);
-	}
-
     public void setUp() throws IOException{
         PUT_PROFILE_ID = UUID.randomUUID().toString();
         POST_PROFILE_ID = UUID.randomUUID().toString();
         PUT_STATE_ID = UUID.randomUUID().toString();
         POST_STATE_ID = UUID.randomUUID().toString();
-        ACTIVITY_ID = "http://example.com";
+        ACTIVITY_ID = "http://example.com/"+UUID.randomUUID().toString();
         Agent a = new Agent();
         a.setMbox(MBOX);
         ActivityClient _client = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
@@ -102,6 +83,130 @@ public class ActivityTest extends TestCase {
         assertTrue(_client.deleteActivityState(new ActivityState(ACTIVITY_ID, PUT_STATE_ID, a)));
         assertTrue(_client.deleteActivityStates(ACTIVITY_ID, a, null));
     }
+    
+    @Test
+    public void testActivityClientUrlStringString() throws IOException{
+    	URL lrs_url = new URL(LRS_URI); 
+    	
+    	StatementClient sc = new StatementClient(lrs_url, USERNAME, PASSWORD);
+        Agent a = new Agent();
+        a.setMbox(MBOX);
+        Verb v = new Verb("http://example.com/tested");
+        Activity act = new Activity(ACTIVITY_ID);
+        Statement st = new Statement(a, v, act);
+        sc.postStatement(st);        
+        
+        //Happy path
+		ActivityClient ac = new ActivityClient(lrs_url, USERNAME, PASSWORD);
+		Activity returnAct = ac.getActivity(ACTIVITY_ID);
+		assertNotNull(returnAct);
+		assertEquals(returnAct.getId(), ACTIVITY_ID);
+		
+		//Incorrect password 
+		ac = new ActivityClient(lrs_url, USERNAME, "passw0rd");
+		try {
+			returnAct = ac.getActivity(ACTIVITY_ID);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+    }
+    
+    @Test
+	public void testActivityClientStringStringString() throws IOException{
+		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
+        Agent a = new Agent();
+        a.setMbox(MBOX);
+        Verb v = new Verb("http://example.com/tested");
+        Activity act = new Activity(ACTIVITY_ID);
+        Statement st = new Statement(a, v, act);
+        sc.postStatement(st);        
+        
+        //Happy path
+		ActivityClient ac = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
+		Activity returnAct = ac.getActivity(ACTIVITY_ID);
+		assertNotNull(returnAct);
+		assertEquals(returnAct.getId(), ACTIVITY_ID);
+		
+		//Incorrect password 
+		ac = new ActivityClient(LRS_URI, USERNAME, "passw0rd");
+		try {
+			returnAct = ac.getActivity(ACTIVITY_ID);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+		
+		//Non URL parameter
+		try {
+			ac = new ActivityClient("fail", USERNAME, PASSWORD);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+	}
+	
+    @Test
+	public void testActivityClientUrlString() throws IOException{
+		URL lrs_url = new URL(LRS_URI); 
+		String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+    	
+    	StatementClient sc = new StatementClient(lrs_url, USERNAME, PASSWORD);
+        Agent a = new Agent();
+        a.setMbox(MBOX);
+        Verb v = new Verb("http://example.com/tested");
+        Activity act = new Activity(ACTIVITY_ID);
+        Statement st = new Statement(a, v, act);
+        sc.postStatement(st);        
+        
+        //Happy path
+		ActivityClient ac = new ActivityClient(lrs_url, encodedCreds);
+		Activity returnAct = ac.getActivity(ACTIVITY_ID);
+		assertNotNull(returnAct);
+		assertEquals(returnAct.getId(), ACTIVITY_ID);
+		
+		//Incorrect password 
+		encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
+		ac = new ActivityClient(lrs_url, encodedCreds);
+		try {
+			returnAct = ac.getActivity(ACTIVITY_ID);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+	}
+	
+    @Test
+	public void testActivityClientStringString() throws IOException{
+		String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+		
+		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
+        Agent a = new Agent();
+        a.setMbox(MBOX);
+        Verb v = new Verb("http://example.com/tested");
+        Activity act = new Activity(ACTIVITY_ID);
+        Statement st = new Statement(a, v, act);
+        sc.postStatement(st);        
+        
+        //Happy path
+		ActivityClient ac = new ActivityClient(LRS_URI, encodedCreds);
+		Activity returnAct = ac.getActivity(ACTIVITY_ID);
+		assertNotNull(returnAct);
+		assertEquals(returnAct.getId(), ACTIVITY_ID);
+		
+		//Incorrect password 
+		encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
+		ac = new ActivityClient(LRS_URI, encodedCreds);
+		try {
+			returnAct = ac.getActivity(ACTIVITY_ID);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+		encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+		
+		//Non URL parameter
+		try {
+			ac = new ActivityClient("fail", encodedCreds);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+	}
 
 	public void testGetActivity() throws IOException {
 		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
@@ -110,6 +215,7 @@ public class ActivityTest extends TestCase {
         Verb v = new Verb("http://example.com/tested");
         Activity act = new Activity(ACTIVITY_ID);
         Statement st = new Statement(a, v, act);
+        sc.postStatement(st);
 
         ActivityClient _client = new ActivityClient(LRS_URI, USERNAME, PASSWORD);
 		Activity returnAct = _client.getActivity(ACTIVITY_ID);
