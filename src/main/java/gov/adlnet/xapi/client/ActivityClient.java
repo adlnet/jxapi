@@ -143,6 +143,16 @@ public class ActivityClient extends BaseClient {
 			throws MalformedURLException {
 		super(uri, username, password);
 	}
+	
+	public ActivityClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public ActivityClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
 	public Activity getActivity(String activityId)
 			throws IOException {
