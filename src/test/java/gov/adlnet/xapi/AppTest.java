@@ -123,7 +123,7 @@ public class AppTest extends TestCase {
         stmt.setId(statementId);
         Boolean put = _client.putStatement(stmt, statementId);
 		assertTrue(put);
-        Statement collection = _client.get(statementId);
+        Statement collection = _client.getStatement(statementId);
 		assert collection.getId().equals(statementId);
 	}
 
