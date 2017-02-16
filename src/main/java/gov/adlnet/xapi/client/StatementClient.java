@@ -39,6 +39,16 @@ public class StatementClient extends BaseClient {
 			throws MalformedURLException {
 		super(uri, user, password);
 	}
+	
+	public StatementClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public StatementClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
     protected HttpURLConnection initializeConnectionForAttachments(URL url, String boundary)
             throws IOException {
@@ -162,7 +172,7 @@ public class StatementClient extends BaseClient {
         query.append("/statements");
         if (this.filters != null && !this.filters.isEmpty()) {
             query.append("?");
-            for (Entry<String, String> item : this.filters.entrySet()) {
+            for (Entry<String, String> item : this.filters.entrySet()) {            	
                 query.append(item.getKey());
                 query.append("=");
                 query.append(item.getValue());
@@ -180,7 +190,7 @@ public class StatementClient extends BaseClient {
         return this.issueGet(query.toString());
     }
 
-    public Statement get(String statementId) throws java.io.IOException {
+    public Statement getStatement(String statementId) throws java.io.IOException {
 		String result = this.issueGet("/statements?statementId="
 				+ statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
