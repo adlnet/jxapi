@@ -1,22 +1,33 @@
 package gov.adlnet.xapi.client;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.bouncycastle.util.encoders.Hex;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
 import gov.adlnet.xapi.util.Base64;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import javax.servlet.http.HttpServletResponse;
-
 public class BaseClient {
+	private static final String LINE_FEED = "\r\n";
+	private static final int ERROR_RESPONSE = 400;
 	protected URL _host;
 	protected Gson gson;
 	protected String username;
@@ -89,24 +100,21 @@ public class BaseClient {
 	protected String readFromConnection(HttpURLConnection conn)
 			throws java.io.IOException {
 		InputStream in;
-        if(conn.getResponseCode() >= 400){
-            String server = conn.getURL().toString();
-            int statusCode = conn.getResponseCode();
-            in = new BufferedInputStream(conn.getErrorStream());
-            StringBuilder sb = new StringBuilder();
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(reader);
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-            }
-            finally {
-                throw new IOException(String.format("Server (%s) Responded with %d: %s",
-                        server, statusCode, sb.toString()));
-            }
-        }
+		if (conn.getResponseCode() >= ERROR_RESPONSE) {
+			String server = conn.getURL().toString();
+			int statusCode = conn.getResponseCode();
+			in = new BufferedInputStream(conn.getErrorStream());
+			StringBuilder sb = new StringBuilder();
+			InputStreamReader reader = new InputStreamReader(in);
+			BufferedReader br = new BufferedReader(reader);
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+			throw new IOException(
+					String.format("Server (%s) Responded with %d: %s", server, statusCode, sb.toString()));
+		}
         else {
             in = new BufferedInputStream(conn.getInputStream());
             StringBuilder sb = new StringBuilder();
@@ -121,6 +129,7 @@ public class BaseClient {
             } finally {
                 br.close();
                 reader.close();
+                conn.disconnect();
             }
         }
 	}
@@ -141,6 +150,17 @@ public class BaseClient {
 		conn.setDoOutput(true);
 		return conn;
 	}
+	
+	protected HttpURLConnection initializeConnectionForAttachments(URL url, String boundary)
+            throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setDoInput(true);
+        conn.addRequestProperty("X-Experience-API-Version", "1.0.0");
+        conn.setRequestProperty("Content-Type", "multipart/mixed; boundary=" + boundary);
+        conn.setRequestProperty("Authorization", this.authString);
+        conn.setUseCaches(false);
+        return conn;
+    }
 
 	protected String issuePost(String path, String data)
 			throws java.io.IOException {
@@ -174,6 +194,62 @@ public class BaseClient {
 			conn.disconnect();
 		}
 	}
+
+    protected HttpURLConnection initializePOSTConnectionForAttachments(URL url, String boundary)
+            throws IOException {
+        HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
+        conn.setDoOutput(true);
+        conn.setRequestMethod("POST");
+        return conn;
+    }
+
+    protected String issuePostWithFileAttachment(String path, String data, String contentType, ArrayList<byte[]> attachmentData)
+            throws java.io.IOException, NoSuchAlgorithmException {
+        String boundary = "===" + System.currentTimeMillis() + "===";
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
+ 
+        HttpURLConnection conn = initializePOSTConnectionForAttachments(url, boundary);
+        OutputStreamWriter writer = new OutputStreamWriter(
+                conn.getOutputStream());
+        try {
+            writer.append("--" + boundary).append(LINE_FEED);
+            writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
+            writer.append(data).append(LINE_FEED);
+            writer.append("--" + boundary).append(LINE_FEED);
+            for(byte[] ba: attachmentData){
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(ba);
+                String sha256String = new String(Hex.encode(md.digest()));
+                writer.append("Content-Type:" + contentType).append(LINE_FEED);
+                writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
+                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
+                writer.append(Arrays.toString(ba)).append(LINE_FEED);
+                writer.append("--" + boundary + "--");
+            }
+            writer.flush();
+        } catch (IOException ex) {
+            InputStream s = conn.getErrorStream();
+            InputStreamReader isr = new InputStreamReader(s);
+            BufferedReader br = new BufferedReader(isr);
+            try {
+                String line;
+                while((line = br.readLine()) != null){
+                    System.out.print(line);
+                }
+                System.out.println();
+            } finally {
+                s.close();
+            }
+            throw ex;
+        } finally {
+            writer.close();
+        }
+        try {
+            return readFromConnection(conn);
+        } finally {
+            conn.disconnect();
+        }
+    }
 
     protected String issuePut(String path, String data)
             throws java.io.IOException {
@@ -261,30 +337,44 @@ public class BaseClient {
 		}
 	}
 
-    protected HttpServletResponse issueGetWithAttachments(String path) throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort() ,path);
-        HttpURLConnection conn = initializeConnection(url);
-        try {
-            return (HttpServletResponse)conn.getInputStream();
-        } catch (IOException ex) {
-            InputStream s = conn.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(s);
-            BufferedReader br = new BufferedReader(isr);
-            try {
-                String line;
-                while((line = br.readLine()) != null){
-                    System.out.print(line);
-                }
-                System.out.println();
-            } finally {
-                s.close();
-            }
-            throw ex;
-        }finally {
-            conn.disconnect();
-        }
-    }
+	protected String issueGetWithAttachments(String path) throws java.io.IOException {
+		String fixedPath = checkPath(path);
+		URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(),
+				this._host.getPath() + fixedPath);
+		String boundary = "======ADL_LRS======";
 
+		HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
+		InputStream in = new BufferedInputStream(conn.getInputStream());
+		StringBuilder sb = new StringBuilder();
+		InputStreamReader reader = new InputStreamReader(in);
+		BufferedReader br = new BufferedReader(reader);
+
+		String line;
+
+		if (conn.getResponseCode() >= ERROR_RESPONSE) {
+			String server = conn.getURL().toString();
+			int statusCode = conn.getResponseCode();
+			in = new BufferedInputStream(conn.getErrorStream());
+
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+
+			}
+			throw new IOException(
+					String.format("Server (%s) Responded with %d: %s", server, statusCode, sb.toString()));
+
+		} else {
+			// Create parsable multipart/mixed string.
+			while ((line = br.readLine()) != null) {
+				sb.append(line + LINE_FEED);
+			}
+		}
+		br.close();
+		reader.close();
+		conn.disconnect();
+		return sb.toString();
+	}
+    
     // When retrieving 'more' statements, LRS will return full path..the client will have part in the URI already so cut that off
     protected String checkPath(String path){
         if (path.toLowerCase().contains("statements") && path.toLowerCase().contains("more")){
