@@ -41,6 +41,11 @@
             <artifactId>maven-gpg-plugin</artifactId>
             <version>1.6</version>
         </dependency>
+        <dependency>
+    		<groupId>javax.mail</groupId>
+    		<artifactId>mail</artifactId>
+    		<version>1.4.7</version>
+		</dependency>
     </dependencies>
     <build>
         <plugins>
