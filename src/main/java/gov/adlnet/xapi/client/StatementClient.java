@@ -1,6 +1,9 @@
 package gov.adlnet.xapi.client;
 
+import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,6 +25,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonSyntaxException;
@@ -30,8 +36,9 @@ import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.Verb;
-import gov.adlnet.xapi.util.AttachmentResult;
 import gov.adlnet.xapi.util.AttachmentAndType;
+import gov.adlnet.xapi.util.AttachmentResult;
+import gov.adlnet.xapi.util.Base64;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;
@@ -186,12 +193,11 @@ public class StatementClient extends BaseClient {
 				} else {
 					throw new IOException(String.format("Failed to store JSON."));
 				}
-			} else {
+			} else if (bodypart.isMimeType("text/plain")) {
 				// get content type of attachment
 				String type = bodypart.getContentType();
 				
-				// get hash of attachment 
-				
+				// get hash of attachment 				
 				Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
 				String hash = null;
 				if (e != null && e.hasMoreElements()) {
@@ -199,18 +205,108 @@ public class StatementClient extends BaseClient {
 				}
 
 				// get attachment
-				String msgBytes = bodypart.getContent().toString();
-				msgBytes = msgBytes.substring(1, msgBytes.length() - 1);
-				String[] bytesString = msgBytes.split(", ");
-				byte[] bytes = new byte[bytesString.length];
-				for (int x = 0; x < bytes.length; ++x) {
-					bytes[x] = Byte.parseByte(bytesString[x]);
-				}
+				String stringOfBytes = bodypart.getContent().toString();
+				byte[] bytes = convertStringOfBytesToByteArray(stringOfBytes);
+				
 				attachment.add(bytes);
 				attachments.put(hash, new AttachmentAndType(attachment, type));
+			} else if (bodypart.isMimeType("image/jpeg")) {
+//				System.out.println("jpeg");
+				// get content type of attachment
+				String type = bodypart.getContentType();
+				byte[] bytes = null;
+				InputStream contentStream = null;
+				if (bodypart.getContent() instanceof InputStream) {
+//					InputStream in = (InputStream) bodypart.getContent();
+					bytes = IOUtils.toByteArray((InputStream) bodypart.getContent());
+					DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
+//					System.out.println(new String(buffer.getData()));
+	
+					File file1 = new File("/home/randy/Downloads/noBueno.bin");
+					FileUtils.writeByteArrayToFile(file1, buffer.getData());
+//					BufferedImage bf = ImageIO.read( new ByteArrayInputStream(bytes));
+//					ImageIO.write(bf, "jpeg", file1);
+//					
+					
+					
+					
+					
+				}
+					
+
+			        
+//					// get hash of attachment 				
+//					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
+//					String hash = null;
+//					if (e != null && e.hasMoreElements()) {
+//						hash = e.nextElement().getValue();
+//					}
+//
+//					attachment.add(bytes);
+//					attachments.put(hash, new AttachmentAndType(attachment, type));
+				
+			}else if (bodypart.isMimeType("image/gif")) {
+				// get content type of attachment
+				String type = bodypart.getContentType();
+				if (bodypart.getContent() instanceof InputStream) {
+					System.out.println(responseMessage);
+					InputStream r = (InputStream) bodypart.getContent();
+					BufferedReader read = new BufferedReader(new InputStreamReader(r));
+					String stringOfBytes = read.readLine();
+					byte[] bytes = null;
+					if(stringOfBytes.charAt(0) == '[' && stringOfBytes.charAt(stringOfBytes.length()-1) == ']'){
+						bytes = convertStringOfBytesToByteArray(stringOfBytes);
+					} else {
+						System.out.println("fail");
+					}
+							
+					
+					// get hash of attachment 				
+					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
+					String hash = null;
+					if (e != null && e.hasMoreElements()) {
+						hash = e.nextElement().getValue();
+					}
+
+					attachment.add(bytes);
+					attachments.put(hash, new AttachmentAndType(attachment, type));
+				}
+			}else if (bodypart.isMimeType("audio/mpeg")) {
+				System.out.println("audio");
+				// get content type of attachment
+				String type = bodypart.getContentType();
+				
+				System.out.println(type);
+				if (bodypart.getContent() instanceof InputStream) {
+					System.out.println("inputstream");
+					InputStream r = (InputStream) bodypart.getContent();
+					BufferedReader read = new BufferedReader(new InputStreamReader(r));
+					
+					String codedString = read.readLine();
+					byte[] decoded = Base64.decode(codedString,
+		                    Base64.DEFAULT);
+					File file1 = new File("/home/randy/Downloads/f.mp3");
+
+			        FileOutputStream os = new FileOutputStream(file1, true);
+			        os.write(decoded);
+
+			        os.close();
+					
+//					byte[] bytes = convertStringOfBytesToByteArray(stringOfBytes);
+//					
+//					// get hash of attachment 				
+//					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
+//					String hash = null;
+//					if (e != null && e.hasMoreElements()) {
+//						hash = e.nextElement().getValue();
+//					}
+//
+//					attachment.add(bytes);
+//					attachments.put(hash, new AttachmentAndType(attachment, type));
+				}
 			}
 		} // end loop
-
+		
 		if (statements == null) {
 			results = new AttachmentResult(responseMessage, statement, attachments);
 		} else {
@@ -219,6 +315,16 @@ public class StatementClient extends BaseClient {
 
 		return results;
 
+	}
+	
+	private byte[] convertStringOfBytesToByteArray(String stringArray){
+		stringArray = stringArray.substring(1, stringArray.length() - 1);
+		String[] bytesString = stringArray.split(", ");
+		byte[] bytes = new byte[bytesString.length];
+		for (int x = 0; x < bytes.length; ++x) {
+			bytes[x] = Byte.parseByte(bytesString[x]);
+		}
+		return bytes;
 	}
 
     public Statement getStatement(String statementId) throws java.io.IOException {

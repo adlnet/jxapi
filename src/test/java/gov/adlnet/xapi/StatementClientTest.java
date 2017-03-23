@@ -2,6 +2,7 @@ package gov.adlnet.xapi;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
@@ -17,11 +18,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
 
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Before;
@@ -51,57 +54,108 @@ import gov.adlnet.xapi.util.Base64;
 import junit.framework.TestCase;
 
 public class StatementClientTest extends TestCase {
-	private String STMNT_ID;
-	private String ACTIVITY_ID;
+	private String STMNT_ID = null;
+
 	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI";
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 	private static final String MBOX = "mailto:test@example.com";
+	private String lrs_uri = null;
+	private String username = null;
+	private String password = null;
+	private String mbox = null;
+
+	private String activity_id = null;
+	private Agent a = null;
+	private Verb v = null;
+
+	private StatementClient sc = null;
+	private Statement st = null;
 
 	@Before
 	public void setUp() throws IOException {
-		ACTIVITY_ID = "http://example.com/" + UUID.randomUUID().toString();
 
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
+		Properties p = new Properties();
+		p.load(new FileReader(new File("../jxapi/src/test/java/config/config.properties")));
+		lrs_uri = p.getProperty("lrs_uri");
+		username = p.getProperty("username");
+		password = p.getProperty("password");
+		mbox = p.getProperty("mbox");
+
+		if (lrs_uri == null || lrs_uri.length() == 0) {
+			lrs_uri = LRS_URI;
+		}
+
+		if (username == null || username.length() == 0) {
+			username = USERNAME;
+		}
+
+		if (password == null || password.length() == 0) {
+			password = PASSWORD;
+		}
+
+		if (mbox == null || mbox.length() == 0) {
+			mbox = MBOX;
+		}
+
+		sc = new StatementClient(lrs_uri, username, password);
+
+		a = new Agent();
+		a.setMbox(mbox);
+		v = new Verb("http://example.com/tested");
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
 		STMNT_ID = st.getId();
 		assertTrue(STMNT_ID.length() > 0);
-		sc.putStatement(st, STMNT_ID);
+		assertTrue(sc.putStatement(st, STMNT_ID));
 
 	}
 
 	@After
 	public void tearDown() throws Exception {
-
+		a = null;
+		v = null;
+		sc = null;
+		st = null;
 	}
 
 	@Test
 	public void testStatementClientStringStringString() throws IOException {
 
 		// Happy path
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
-		sc.postStatement(st);
+		StatementClient validArgs = new StatementClient(lrs_uri, username, password);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		String publishedId = validArgs.postStatement(st);
+		assertTrue(publishedId.length() > 0);
+
+		// Incorrect username
+		StatementClient incorrectUser = new StatementClient(lrs_uri, "username", password);
+		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectUser.postStatement(st);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
 
 		// Incorrect password
-		sc = new StatementClient(LRS_URI, USERNAME, "passw0rd");
+		StatementClient incorrectPassword = new StatementClient(lrs_uri, username, "passw0rd");
 		try {
-			sc.postStatement(st);
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectPassword.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
 
 		// Non URL parameter
 		try {
-			sc = new StatementClient("fail", USERNAME, PASSWORD);
+			StatementClient incorrectURL = new StatementClient("fail", username, password);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
@@ -109,21 +163,34 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testStatementClientURLStringString() throws IOException {
-		URL lrs_url = new URL(LRS_URI);
+		URL lrs_url = new URL(lrs_uri);
 
 		// Happy path
-		StatementClient sc = new StatementClient(lrs_url, USERNAME, PASSWORD);
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
-		sc.postStatement(st);
+		StatementClient validArgs = new StatementClient(lrs_url, username, password);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		String publishedId = validArgs.postStatement(st);
+		assertTrue(publishedId.length() > 0);
+
+		// Incorrect username
+		StatementClient incorrectUser = new StatementClient(lrs_url, "username", password);
+		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectUser.postStatement(st);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
 
 		// Incorrect password
-		sc = new StatementClient(lrs_url, USERNAME, "passw0rd");
+		StatementClient incorrectPassword = new StatementClient(lrs_url, username, "passw0rd");
 		try {
-			sc.postStatement(st);
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectPassword.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
@@ -131,26 +198,39 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testStatementClientStringString() throws IOException {
-		String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+		String encodedCreds = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
 
 		// Happy path
-		StatementClient sc = new StatementClient(LRS_URI, encodedCreds);
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
+		StatementClient sc = new StatementClient(lrs_uri, encodedCreds);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
 		sc.postStatement(st);
 
-		// Incorrect password
-		encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
-		sc = new StatementClient(LRS_URI, USERNAME, "passw0rd");
+		// Incorrect username
+		encodedCreds = Base64.encodeToString(("username" + ":" + password).getBytes(), Base64.NO_WRAP);
+		StatementClient incorrectUser = new StatementClient(lrs_uri, "username", password);
 		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectUser.postStatement(st);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+
+		// Incorrect password
+		encodedCreds = Base64.encodeToString((username + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
+		sc = new StatementClient(lrs_uri, encodedCreds);
+		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
 			sc.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
-		encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+		encodedCreds = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
 
 		// Non URL parameter
 		try {
@@ -162,22 +242,35 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testStatementClientURLString() throws IOException {
-		URL lrs_url = new URL(LRS_URI);
-		String encodedCreds = Base64.encodeToString((USERNAME + ":" + PASSWORD).getBytes(), Base64.NO_WRAP);
+		URL lrs_url = new URL(lrs_uri);
+		String encodedCreds = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
 
 		// Happy path
 		StatementClient sc = new StatementClient(lrs_url, encodedCreds);
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
 		sc.postStatement(st);
 
+		// Incorrect username
+		encodedCreds = Base64.encodeToString(("username" + ":" + password).getBytes(), Base64.NO_WRAP);
+		StatementClient incorrectUser = new StatementClient(lrs_url, "username", password);
+		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
+			incorrectUser.postStatement(st);
+		} catch (Exception e) {
+			assertTrue(true);
+		}
+
 		// Incorrect password
-		encodedCreds = Base64.encodeToString((USERNAME + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
+		encodedCreds = Base64.encodeToString((username + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
 		sc = new StatementClient(lrs_url, encodedCreds);
 		try {
+			activity_id = "http://example.com/" + UUID.randomUUID().toString();
+			act = new Activity(activity_id);
+			st = new Statement(a, v, act);
 			sc.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
@@ -186,28 +279,21 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testPostStatement() throws IOException {
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
 		String publishedId = sc.postStatement(st);
 		assertTrue(publishedId.length() > 0);
 	}
 
 	@Test
 	public void testPutStatement() throws IOException {
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement st = new Statement(a, v, act);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
 		String stmntID = st.getId();
 		assertTrue(stmntID.length() > 0);
 		assertTrue(sc.putStatement(st, stmntID));
-
 	}
 
 	@Rule
@@ -221,12 +307,167 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testPostStatementWithAttachment() throws IOException, URISyntaxException, NoSuchAlgorithmException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
+		Activity act = new Activity(activity_id);
+		Statement statement = new Statement(a, v, act);
+
+		ActivityDefinition ad = new ActivityDefinition();
+		ad.setChoices(new ArrayList<InteractionComponent>());
+		InteractionComponent ic = new InteractionComponent();
+		ic.setId("http://example.com");
+		ic.setDescription(new HashMap<String, String>());
+		ic.getDescription().put("en-US", "test");
+		ad.getChoices().add(ic);
+		ad.setInteractionType("choice");
+
+		ArrayList<String> crp = new ArrayList<String>();
+		crp.add("http://example.com");
+		ad.setCorrectResponsesPattern(crp);
+		ad.setMoreInfo("http://example.com");
+		act.setDefinition(ad);
+
+		Attachment att = new Attachment();
+
+		HashMap<String, String> display = new HashMap<String, String>();
+		display.put("en-US", "Test Display.");
+		att.setDisplay(display);
+
+		HashMap<String, String> description = new HashMap<String, String>();
+		description.put("en-US", "Test Description.");
+		att.setDescription(description);
+
+		URI usageType = new URI("http://example.com/test/usage");
+		att.setUsageType(usageType);
+
+		byte[] arr = "This is text/plain testing.".getBytes("UTF-8");
+		String contentType = "text/plain";
+		att.setContentType(contentType);
+		att.setLength(arr.length);
+
+		att.setSha2(generateSha2(arr));
+
+		ArrayList<Attachment> attList = new ArrayList<Attachment>();
+		attList.add(att);
+		statement.setAttachments(attList);
+
+		ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
+		attachedData.add(arr);
+
+		String publishedId = sc.postStatementWithAttachment(statement, contentType, attachedData);
+System.out.println(publishedId);
+		assertTrue(publishedId.length() > 0);
+	}
+
+	@Test
+	public void testGetStatementsString() throws IOException {
+		StatementResult collection = sc.getStatements();
+		assertFalse(collection.getStatements().isEmpty());
+
+		String more = collection.getMore();
+
+		if (!more.isEmpty()) {
+			StatementResult moreCollection = sc.getStatements(more);
+			assertFalse(moreCollection.getStatements().isEmpty());
+		}
+	}
+
+	@Test
+	public void testGetStatements() throws IOException {
+		StatementResult returned = sc.getStatements();
+		assertNotNull(returned);
+	}
+
+	@Test
+	public void testGetStatementsWithAttachments() throws NoSuchAlgorithmException, IOException, URISyntaxException,
+			JsonSyntaxException, NumberFormatException, MessagingException {
+
+		Agent a = new Agent();
+		a.setMbox(MBOX);
+		Verb v = new Verb("http://example.com/tested");
+		Activity act = new Activity(activity_id);
+		Statement statement = new Statement(a, v, act);
+
+		ActivityDefinition ad = new ActivityDefinition();
+		ad.setChoices(new ArrayList<InteractionComponent>());
+		InteractionComponent ic = new InteractionComponent();
+		ic.setId("http://example.com");
+		ic.setDescription(new HashMap<String, String>());
+		ic.getDescription().put("en-US", "test");
+		ad.getChoices().add(ic);
+		ad.setInteractionType("choice");
+
+		ArrayList<String> crp = new ArrayList<String>();
+		crp.add("http://example.com");
+		ad.setCorrectResponsesPattern(crp);
+		ad.setMoreInfo("http://example.com");
+		act.setDefinition(ad);
+
+		Attachment att = new Attachment();
+		HashMap<String, String> attDis = new HashMap<String, String>();
+		attDis.put("en-US", "jxapi Test Attachment From File");
+		att.setDisplay(attDis);
+		URI usageType = new URI("http://example.com/test/usage");
+		att.setUsageType(usageType);
+
+		// File testFile = testFolder.newFile("testatt.txt");
+		// BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
+		// out.write("This is the first line\n");
+		// out.write("This is the second line!!!\n");
+		// out.write(UUID.randomUUID().toString());
+		// out.close();
+
+		File testFile = new File("/home/randy/Downloads/tomcat.jpg");
+		// String contentType = "image/gif";
+		String contentType = "image/jpeg";
+		// String contentType = "text/plain";
+		att.setContentType(contentType);
+		att.setLength((int) testFile.length());
+		byte[] arr = Files.readAllBytes(testFile.toPath());
+		// System.out.println(new String(arr));
+		att.setSha2(generateSha2(arr));
+
+		File file1 = new File("/home/randy/Downloads/bueno.bin");
+		FileUtils.writeByteArrayToFile(file1, arr);
+		// BufferedImage bf = ImageIO.read( new ByteArrayInputStream(arr));
+		// ImageIO.write(bf, "jpeg", file1);
+		// bf.flush();
+
+		ArrayList<Attachment> attList = new ArrayList<Attachment>();
+		attList.add(att);
+		statement.setAttachments(attList);
+
+		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
+		realAtts.add(arr);
+
+		// String publishedId = sc.postStatementWithAttachment(statement,
+		// contentType, realAtts);
+		// System.out.println(publishedId);
+		// assertTrue(publishedId.length() > 0);
+		// attachmntResult = sc.getStatementsWithAttachments();
+		// Statement s =
+		// attachmntResult.getXapiStatements().getStatements().get(0);
+		// assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
+
+		AttachmentResult attachmntResult = sc.addFilter("statementId", "f60effee-5ba4-409b-a5d9-a2be31003e9f")
+				.getStatementsWithAttachments();
+		// attachmntResult = sc.getStatementsWithAttachments();
+		String id = attachmntResult.getXapiStatement().getId();
+		// assertTrue(id.contains((publishedId)));
+
+		// testFile.deleteOnExit();
+	}
+
+	@Test
+	public void testGetStatementsWithAttachmentsString() throws NoSuchAlgorithmException, IOException,
+			URISyntaxException, JsonSyntaxException, NumberFormatException, MessagingException {
+
+		Agent a = new Agent();
+		a.setMbox(MBOX);
+		Verb v = new Verb("http://example.com/tested");
+		Activity act = new Activity(activity_id);
 		Statement statement = new Statement(a, v, act);
 
 		ActivityDefinition ad = new ActivityDefinition();
@@ -274,162 +515,16 @@ public class StatementClientTest extends TestCase {
 		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
 
 		assertTrue(publishedId.length() > 0);
-		testFile.deleteOnExit();
-	}
-
-	@Test
-	public void testGetStatementsString() throws IOException {
-		StatementClient _client = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		StatementResult collection = _client.getStatements();
-		assertFalse(collection.getStatements().isEmpty());
-
-		String more = collection.getMore();
-
-		if (!more.isEmpty()) {
-			StatementResult moreCollection = _client.getStatements(more);
-			assertFalse(moreCollection.getStatements().isEmpty());
-		}
-	}
-
-	@Test
-	public void testGetStatements() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		StatementResult returned = sc.getStatements();
-		assertNotNull(returned);
-	}
-
-	@Test
-	public void testGetStatementsWithAttachments() throws NoSuchAlgorithmException, IOException, URISyntaxException, JsonSyntaxException, NumberFormatException, MessagingException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement statement = new Statement(a, v, act);
-
-		ActivityDefinition ad = new ActivityDefinition();
-		ad.setChoices(new ArrayList<InteractionComponent>());
-		InteractionComponent ic = new InteractionComponent();
-		ic.setId("http://example.com");
-		ic.setDescription(new HashMap<String, String>());
-		ic.getDescription().put("en-US", "test");
-		ad.getChoices().add(ic);
-		ad.setInteractionType("choice");
-
-		ArrayList<String> crp = new ArrayList<String>();
-		crp.add("http://example.com");
-		ad.setCorrectResponsesPattern(crp);
-		ad.setMoreInfo("http://example.com");
-		act.setDefinition(ad);
-
-		Attachment att = new Attachment();
-		HashMap<String, String> attDis = new HashMap<String, String>();
-		attDis.put("en-US", "jxapi Test Attachment From File");
-		att.setDisplay(attDis);
-		URI usageType = new URI("http://example.com/test/usage");
-		att.setUsageType(usageType);
-
-		File testFile = testFolder.newFile("testatt.txt");
-		BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
-		out.write("This is the first line\n");
-		out.write("This is the second line!!!\n");
-		out.write(UUID.randomUUID().toString());
-		out.close();
-
-		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength((int) testFile.length());
-		byte[] arr = Files.readAllBytes(testFile.toPath());
-		att.setSha2(generateSha2(arr));		
-		
-		ArrayList<Attachment> attList = new ArrayList<Attachment>();
-		attList.add(att);
-		statement.setAttachments(attList);
-
-		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
-		realAtts.add(arr);
- 
-		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
-
-		assertTrue(publishedId.length() > 0);
-		AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
-		Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
-		assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
-		
-		attachmntResult = sc.addFilter("statementId", publishedId).getStatementsWithAttachments();
-		String id = attachmntResult.getXapiStatement().getId();
-		assertTrue(id.contains((publishedId)));
-
-		testFile.deleteOnExit();		
-	}
-	
-	@Test
-	public void testGetStatementsWithAttachmentsString() throws NoSuchAlgorithmException, IOException, URISyntaxException, JsonSyntaxException, NumberFormatException, MessagingException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-
-		Agent a = new Agent();
-		a.setMbox(MBOX);
-		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
-		Statement statement = new Statement(a, v, act);
-
-		ActivityDefinition ad = new ActivityDefinition();
-		ad.setChoices(new ArrayList<InteractionComponent>());
-		InteractionComponent ic = new InteractionComponent();
-		ic.setId("http://example.com");
-		ic.setDescription(new HashMap<String, String>());
-		ic.getDescription().put("en-US", "test");
-		ad.getChoices().add(ic);
-		ad.setInteractionType("choice");
-
-		ArrayList<String> crp = new ArrayList<String>();
-		crp.add("http://example.com");
-		ad.setCorrectResponsesPattern(crp);
-		ad.setMoreInfo("http://example.com");
-		act.setDefinition(ad);
-
-		Attachment att = new Attachment();
-		HashMap<String, String> attDis = new HashMap<String, String>();
-		attDis.put("en-US", "jxapi Test Attachment From File");
-		att.setDisplay(attDis);
-		URI usageType = new URI("http://example.com/test/usage");
-		att.setUsageType(usageType);
-
-		File testFile = testFolder.newFile("testatt.txt");
-		BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
-		out.write("This is the first line\n");
-		out.write("This is the second line!!!\n");
-		out.write(UUID.randomUUID().toString());
-		out.close();
-
-		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength((int) testFile.length());
-		byte[] arr = Files.readAllBytes(testFile.toPath());
-		att.setSha2(generateSha2(arr));		
-		
-		ArrayList<Attachment> attList = new ArrayList<Attachment>();
-		attList.add(att);
-		statement.setAttachments(attList);
-
-		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
-		realAtts.add(arr);
- 
-		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
-
-		assertTrue(publishedId.length() > 0);
 
 		AttachmentResult attachmntResult = sc.getStatementWithAttachments(publishedId);
 		String id = attachmntResult.getXapiStatement().getId();
 		assertTrue(id.contains((publishedId)));
 
-		testFile.deleteOnExit();		
+		testFile.deleteOnExit();
 	}
 
 	@Test
 	public void testGetStatement() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Statement result = sc.getStatement(STMNT_ID);
 		assertNotNull(result);
 	}
@@ -439,9 +534,8 @@ public class StatementClientTest extends TestCase {
 		String voidedId = UUID.randomUUID().toString();
 		Agent a = new Agent();
 		a.setMbox(MBOX);
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
+		Activity act = new Activity(activity_id);
 		Statement st = new Statement(a, v, act);
 		st.setId(voidedId);
 
@@ -458,7 +552,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testAddFilter() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		String verbId = "http://example.com/tested";
 		StatementResult result = sc.addFilter("verb", verbId).limitResults(10).getStatements();
 		assertFalse(result.getStatements().isEmpty());
@@ -466,7 +559,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterByVerbVerb() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Verb v = new Verb("http://example.com/tested");
 		StatementResult result = sc.filterByVerb(v).limitResults(10).getStatements();
 		assertFalse(result.getStatements().isEmpty());
@@ -478,7 +570,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterByVerbString() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		String v = "http://example.com/tested";
 		StatementResult result = sc.filterByVerb("http://example.com/tested").limitResults(10).getStatements();
 		assertFalse(result.getStatements().isEmpty());
@@ -490,7 +581,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterByActor() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Actor a = new Agent();
 		a.setMbox(MBOX);
 		StatementResult result = sc.filterByActor(a).limitResults(10).getStatements();
@@ -503,23 +593,21 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterByActivity() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-		StatementResult result = sc.filterByActivity(ACTIVITY_ID).getStatements();
+		StatementResult result = sc.filterByActivity(activity_id).getStatements();
 		assertFalse(result.getStatements().isEmpty());
 		for (Statement s : result.getStatements()) {
 			assertNotNull(s.getObject());
-			assertEquals(ACTIVITY_ID, ((Activity) s.getObject()).getId());
+			assertEquals(activity_id, ((Activity) s.getObject()).getId());
 		}
 	}
 
 	@Test
 	public void testFilterByRegistration() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		String reg = UUID.randomUUID().toString();
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		Verb v = new Verb("http://example.com/tested");
-		Activity act = new Activity(ACTIVITY_ID);
+		Activity act = new Activity(activity_id);
 		Statement statement = new Statement(a, v, act);
 		Context c = new Context();
 		c.setRegistration(reg);
@@ -533,7 +621,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testIncludeRelatedActivities() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		ArrayList<Activity> arr = new ArrayList<Activity>();
@@ -558,7 +645,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testIncludeRelatedAgents() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		Agent oa = new Agent();
@@ -577,7 +663,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterBySince() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		String dateQuery = "2014-05-02T00:00:00Z";
 		Calendar date = javax.xml.bind.DatatypeConverter.parseDateTime(dateQuery);
 		StatementResult result = sc.filterBySince(dateQuery).limitResults(10).getStatements();
@@ -592,8 +677,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testLimitResults() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-
 		StatementResult result = sc.limitResults(1).getStatements();
 		assertFalse(result.getStatements().isEmpty());
 		assertEquals(result.getStatements().size(), 1);
@@ -601,7 +684,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testFilterByUntil() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		TimeZone tz = TimeZone.getTimeZone("UTC");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		df.setTimeZone(tz);
@@ -620,23 +702,18 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testExact() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-
 		StatementResult result = sc.exact().getStatements();
 		assertFalse(result.getStatements().isEmpty());
 	}
 
 	@Test
 	public void testIds() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
-
 		StatementResult result = sc.limitResults(10).ids().getStatements();
 		assertFalse(result.getStatements().isEmpty());
 	}
 
 	@Test
 	public void testCanonical() throws IOException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		Agent a = new Agent();
 		a.setMbox("mailto:tester2@example.com");
 
@@ -646,7 +723,6 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testAscending() throws IOException, ParseException {
-		StatementClient sc = new StatementClient(LRS_URI, USERNAME, PASSWORD);
 		// Test ascending
 		StatementResult result = sc.limitResults(10).ascending(true).getStatements();
 		assertFalse(result.getStatements().isEmpty());
@@ -665,5 +741,4 @@ public class StatementClientTest extends TestCase {
 			assertTrue(firstTimestamp.compareTo(secondTimestamp) > 0 || firstTimestamp.compareTo(secondTimestamp) == 0);
 		}
 	}
-
 }

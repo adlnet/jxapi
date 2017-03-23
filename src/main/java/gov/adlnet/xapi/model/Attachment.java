@@ -4,7 +4,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class Attachment {
 	private URI usageType;
