@@ -1,9 +1,6 @@
 package gov.adlnet.xapi.client;
 
-import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,7 +22,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
@@ -38,36 +34,27 @@ import gov.adlnet.xapi.model.StatementResult;
 import gov.adlnet.xapi.model.Verb;
 import gov.adlnet.xapi.util.AttachmentAndType;
 import gov.adlnet.xapi.util.AttachmentResult;
-import gov.adlnet.xapi.util.Base64;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;
-    
-	
-	public StatementClient(String uri, String user, String password)
-			throws java.net.MalformedURLException {
+
+	public StatementClient(String uri, String user, String password) throws java.net.MalformedURLException {
 		super(uri, user, password);
 	}
 
-	public StatementClient(URL uri, String user, String password)
-			throws MalformedURLException {
+	public StatementClient(URL uri, String user, String password) throws MalformedURLException {
 		super(uri, user, password);
 	}
-	
-	public StatementClient(String uri, String encodedUsernamePassword)
-			throws MalformedURLException {
-		super(uri, encodedUsernamePassword);
-	}
-	
-	public StatementClient(URL uri, String encodedUsernamePassword)
-			throws MalformedURLException {
+
+	public StatementClient(String uri, String encodedUsernamePassword) throws MalformedURLException {
 		super(uri, encodedUsernamePassword);
 	}
 
-    
+	public StatementClient(URL uri, String encodedUsernamePassword) throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
-	public String postStatement(Statement statement)
-			throws java.io.IOException {
+	public String postStatement(Statement statement) throws java.io.IOException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
 		String result = this.issuePost("/statements", json);
@@ -75,26 +62,23 @@ public class StatementClient extends BaseClient {
 		return jsonResult.get(0).getAsString();
 	}
 
-    public Boolean putStatement(Statement statement, String stmtId)
-            throws java.io.IOException {
-        Gson gson = this.getDecoder();
-        String json = gson.toJson(statement);
-        String result = this.issuePut("/statements?statementId=" + stmtId, json);
-        return result.isEmpty();
-    }
+	public Boolean putStatement(Statement statement, String stmtId) throws java.io.IOException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePut("/statements?statementId=" + stmtId, json);
+		return result.isEmpty();
+	}
 
-    public String postStatementWithAttachment(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
-            throws IOException, NoSuchAlgorithmException{
-        Gson gson = this.getDecoder();
-        String json = gson.toJson(statement);
-        String result = this.issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
-        JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-        return jsonResult.get(0).getAsString();
-    }
+	public String postStatementWithAttachment(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
+			throws IOException, NoSuchAlgorithmException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		return jsonResult.get(0).getAsString();
+	}
 
-
-	public StatementResult getStatements(String more)
-			throws java.io.IOException {
+	public StatementResult getStatements(String more) throws java.io.IOException {
 		String result = this.issueGet(more);
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
@@ -152,13 +136,13 @@ public class StatementClient extends BaseClient {
 		String result = this.issueGetWithAttachments(query.toString());
 		return parseMultipartString(result);
 	}
-    
+
 	private AttachmentResult parseMultipartString(String responseMessage)
 			throws IOException, JsonSyntaxException, NumberFormatException, MessagingException {
 
 		final String STMNTS = "{\"statements\": [";
 		final String[] NAME = { "X-Experience-API-Hash" };
-		
+
 		StatementResult statements = null;
 		Statement statement = null;
 		ArrayList<byte[]> attachment = new ArrayList<byte[]>();
@@ -176,8 +160,8 @@ public class StatementClient extends BaseClient {
 		for (int i = 0; i < multipart.getCount(); i++) {
 			bodypart = multipart.getBodyPart(i);
 
-			// get xAPI JSON statement
 			if (bodypart.isMimeType("application/json")) {
+				// Get xAPI JSON statement
 				if (bodypart.getContent() instanceof InputStream) {
 					InputStream r = (InputStream) bodypart.getContent();
 					BufferedReader read = new BufferedReader(new InputStreamReader(r));
@@ -194,119 +178,47 @@ public class StatementClient extends BaseClient {
 					throw new IOException(String.format("Failed to store JSON."));
 				}
 			} else if (bodypart.isMimeType("text/plain")) {
-				// get content type of attachment
+				// Handle plain text
+
+				// Get content type
 				String type = bodypart.getContentType();
-				
-				// get hash of attachment 				
+
+				// get hash of attachment
 				Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
 				String hash = null;
 				if (e != null && e.hasMoreElements()) {
 					hash = e.nextElement().getValue();
 				}
 
-				// get attachment
-				String stringOfBytes = bodypart.getContent().toString();
-				byte[] bytes = convertStringOfBytesToByteArray(stringOfBytes);
-				
+				// Get attachment
+				byte[] bytes = bodypart.getContent().toString().getBytes("UTF-8");
+
 				attachment.add(bytes);
 				attachments.put(hash, new AttachmentAndType(attachment, type));
-			} else if (bodypart.isMimeType("image/jpeg")) {
-//				System.out.println("jpeg");
-				// get content type of attachment
+			} else {
+				// Get binary attachment
+
+				// Get content type
 				String type = bodypart.getContentType();
 				byte[] bytes = null;
-				InputStream contentStream = null;
-				if (bodypart.getContent() instanceof InputStream) {
-//					InputStream in = (InputStream) bodypart.getContent();
-					bytes = IOUtils.toByteArray((InputStream) bodypart.getContent());
-					DataBufferByte buffer = new DataBufferByte(bytes, bytes.length);
-//					System.out.println(new String(buffer.getData()));
-	
-					File file1 = new File("/home/randy/Downloads/noBueno.bin");
-					FileUtils.writeByteArrayToFile(file1, buffer.getData());
-//					BufferedImage bf = ImageIO.read( new ByteArrayInputStream(bytes));
-//					ImageIO.write(bf, "jpeg", file1);
-//					
-					
-					
-					
-					
-				}
-					
 
-			        
-//					// get hash of attachment 				
-//					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
-//					String hash = null;
-//					if (e != null && e.hasMoreElements()) {
-//						hash = e.nextElement().getValue();
-//					}
-//
-//					attachment.add(bytes);
-//					attachments.put(hash, new AttachmentAndType(attachment, type));
-				
-			}else if (bodypart.isMimeType("image/gif")) {
-				// get content type of attachment
-				String type = bodypart.getContentType();
 				if (bodypart.getContent() instanceof InputStream) {
-					System.out.println(responseMessage);
-					InputStream r = (InputStream) bodypart.getContent();
-					BufferedReader read = new BufferedReader(new InputStreamReader(r));
-					String stringOfBytes = read.readLine();
-					byte[] bytes = null;
-					if(stringOfBytes.charAt(0) == '[' && stringOfBytes.charAt(stringOfBytes.length()-1) == ']'){
-						bytes = convertStringOfBytesToByteArray(stringOfBytes);
-					} else {
-						System.out.println("fail");
-					}
-							
-					
-					// get hash of attachment 				
+
+					InputStream in = (InputStream) bodypart.getInputStream();
+					bytes = IOUtils.toByteArray(in);
+
+					// get hash of attachment
 					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
 					String hash = null;
 					if (e != null && e.hasMoreElements()) {
 						hash = e.nextElement().getValue();
 					}
-
 					attachment.add(bytes);
 					attachments.put(hash, new AttachmentAndType(attachment, type));
 				}
-			}else if (bodypart.isMimeType("audio/mpeg")) {
-				System.out.println("audio");
-				// get content type of attachment
-				String type = bodypart.getContentType();
-				
-				System.out.println(type);
-				if (bodypart.getContent() instanceof InputStream) {
-					System.out.println("inputstream");
-					InputStream r = (InputStream) bodypart.getContent();
-					BufferedReader read = new BufferedReader(new InputStreamReader(r));
-					
-					String codedString = read.readLine();
-					byte[] decoded = Base64.decode(codedString,
-		                    Base64.DEFAULT);
-					File file1 = new File("/home/randy/Downloads/f.mp3");
-
-			        FileOutputStream os = new FileOutputStream(file1, true);
-			        os.write(decoded);
-
-			        os.close();
-					
-//					byte[] bytes = convertStringOfBytesToByteArray(stringOfBytes);
-//					
-//					// get hash of attachment 				
-//					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
-//					String hash = null;
-//					if (e != null && e.hasMoreElements()) {
-//						hash = e.nextElement().getValue();
-//					}
-//
-//					attachment.add(bytes);
-//					attachments.put(hash, new AttachmentAndType(attachment, type));
-				}
 			}
 		} // end loop
-		
+
 		if (statements == null) {
 			results = new AttachmentResult(responseMessage, statement, attachments);
 		} else {
@@ -314,35 +226,21 @@ public class StatementClient extends BaseClient {
 		}
 
 		return results;
-
-	}
-	
-	private byte[] convertStringOfBytesToByteArray(String stringArray){
-		stringArray = stringArray.substring(1, stringArray.length() - 1);
-		String[] bytesString = stringArray.split(", ");
-		byte[] bytes = new byte[bytesString.length];
-		for (int x = 0; x < bytes.length; ++x) {
-			bytes[x] = Byte.parseByte(bytesString[x]);
-		}
-		return bytes;
 	}
 
-    public Statement getStatement(String statementId) throws java.io.IOException {
-		String result = this.issueGet("/statements?statementId="
-				+ statementId);
+	public Statement getStatement(String statementId) throws java.io.IOException {
+		String result = this.issueGet("/statements?statementId=" + statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
 	public Statement getVoided(String statementId) throws java.io.IOException {
-		String result = this.issueGet("/statements?voidedStatementId="
-				+ statementId);
+		String result = this.issueGet("/statements?voidedStatementId=" + statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
 	public StatementClient addFilter(String key, String value) {
 		try {
-			StatementClient client = new StatementClient(this._host,
-					this.username, this.password);
+			StatementClient client = new StatementClient(this._host, this.username, this.password);
 			if (client.filters == null) {
 				client.filters = new TreeMap<String, String>();
 			}
@@ -366,7 +264,7 @@ public class StatementClient extends BaseClient {
 		return addFilter("verb", verbId);
 	}
 
-	public StatementClient filterByActor(Actor a) throws UnsupportedEncodingException{
+	public StatementClient filterByActor(Actor a) throws UnsupportedEncodingException {
 		return addFilter("agent", URLEncoder.encode(getDecoder().toJson(a.serialize()), "UTF-8"));
 	}
 
@@ -396,9 +294,9 @@ public class StatementClient extends BaseClient {
 		return addFilter("since", timestamp);
 	}
 
-    public StatementClient limitResults(int limit){
-        return addFilter("limit", Integer.toString(limit));
-    }
+	public StatementClient limitResults(int limit) {
+		return addFilter("limit", Integer.toString(limit));
+	}
 
 	public StatementClient filterByUntil(String timestamp) {
 		return addFilter("until", timestamp);
