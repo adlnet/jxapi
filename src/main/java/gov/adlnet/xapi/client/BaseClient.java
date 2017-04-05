@@ -12,8 +12,8 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
+import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 import com.google.gson.Gson;
@@ -115,23 +115,22 @@ public class BaseClient {
 			throw new IOException(
 					String.format("Server (%s) Responded with %d: %s", server, statusCode, sb.toString()));
 		}
-        else {
-            in = new BufferedInputStream(conn.getInputStream());
-            StringBuilder sb = new StringBuilder();
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(reader);
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-                return sb.toString();
-            } finally {
-                br.close();
-                reader.close();
-                conn.disconnect();
-            }
-        }
+		else {
+			in = new BufferedInputStream(conn.getInputStream());
+			StringBuilder sb = new StringBuilder();
+			InputStreamReader reader = new InputStreamReader(in);
+			BufferedReader br = new BufferedReader(reader);
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+
+			br.close();
+			reader.close();
+			conn.disconnect();
+			return sb.toString();
+		}
 	}
 
 	protected HttpURLConnection initializeConnection(URL url)
@@ -210,7 +209,8 @@ public class BaseClient {
  
         HttpURLConnection conn = initializePOSTConnectionForAttachments(url, boundary);
         OutputStreamWriter writer = new OutputStreamWriter(
-                conn.getOutputStream());
+				conn.getOutputStream(), "UTF-8");
+
         try {
             writer.append("--" + boundary).append(LINE_FEED);
             writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
@@ -223,7 +223,7 @@ public class BaseClient {
                 writer.append("Content-Type:" + contentType).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
                 writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
-                writer.append(Arrays.toString(ba)).append(LINE_FEED);
+                writer.append(new String(ba)).append(LINE_FEED);
                 writer.append("--" + boundary + "--");
             }
             writer.flush();
@@ -341,39 +341,37 @@ public class BaseClient {
 		String fixedPath = checkPath(path);
 		URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(),
 				this._host.getPath() + fixedPath);
-//TODO: non hard coded boundary.
-		String boundary = "======ADL_LRS======";
 
-		HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
+		HttpURLConnection conn = initializeConnection(url);
 		InputStream in = new BufferedInputStream(conn.getInputStream());
-		StringBuilder sb = new StringBuilder();
-		InputStreamReader reader = new InputStreamReader(in);
-		BufferedReader br = new BufferedReader(reader);
 
 		String line;
+		String response;
 
 		if (conn.getResponseCode() >= ERROR_RESPONSE) {
 			String server = conn.getURL().toString();
 			int statusCode = conn.getResponseCode();
 			in = new BufferedInputStream(conn.getErrorStream());
-
+			StringBuilder sb = new StringBuilder();
+			InputStreamReader reader = new InputStreamReader(in);
+			BufferedReader br = new BufferedReader(reader);
+			
 			while ((line = br.readLine()) != null) {
 				sb.append(line);
 
 			}
+			br.close();
+			reader.close();
 			throw new IOException(
 					String.format("Server (%s) Responded with %d: %s", server, statusCode, sb.toString()));
 
 		} else {
 			// Create parsable multipart/mixed string.
-			while ((line = br.readLine()) != null) {
-				sb.append(line + LINE_FEED);
-			}
+			 response = IOUtils.toString(in, "UTF-8"); 
 		}
-		br.close();
-		reader.close();
+		
 		conn.disconnect();
-		return sb.toString();
+		return response;
 	}
     
     // When retrieving 'more' statements, LRS will return full path..the client will have part in the URI already so cut that off
