@@ -1,9 +1,7 @@
 package gov.adlnet.xapi;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,7 +22,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import org.apache.commons.io.FileUtils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Before;
@@ -60,6 +57,7 @@ public class StatementClientTest extends TestCase {
 	private static final String USERNAME = "jXAPI";
 	private static final String PASSWORD = "password";
 	private static final String MBOX = "mailto:test@example.com";
+
 	private String lrs_uri = null;
 	private String username = null;
 	private String password = null;
@@ -97,7 +95,7 @@ public class StatementClientTest extends TestCase {
 		if (mbox == null || mbox.length() == 0) {
 			mbox = MBOX;
 		}
-
+		
 		sc = new StatementClient(lrs_uri, username, password);
 
 		a = new Agent();
@@ -129,6 +127,14 @@ public class StatementClientTest extends TestCase {
 		Activity act = new Activity(activity_id);
 		st = new Statement(a, v, act);
 		String publishedId = validArgs.postStatement(st);
+		assertTrue(publishedId.length() > 0);
+		
+		// With a trailing slash
+		validArgs = new StatementClient(lrs_uri + "/", username, password);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		publishedId = validArgs.postStatement(st);
 		assertTrue(publishedId.length() > 0);
 
 		// Incorrect username
@@ -172,7 +178,7 @@ public class StatementClientTest extends TestCase {
 		st = new Statement(a, v, act);
 		String publishedId = validArgs.postStatement(st);
 		assertTrue(publishedId.length() > 0);
-
+				
 		// Incorrect username
 		StatementClient incorrectUser = new StatementClient(lrs_url, "username", password);
 		try {
@@ -201,11 +207,20 @@ public class StatementClientTest extends TestCase {
 		String encodedCreds = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
 
 		// Happy path
-		StatementClient sc = new StatementClient(lrs_uri, encodedCreds);
+		StatementClient validArgs = new StatementClient(lrs_uri, encodedCreds);
 		activity_id = "http://example.com/" + UUID.randomUUID().toString();
 		Activity act = new Activity(activity_id);
 		st = new Statement(a, v, act);
-		sc.postStatement(st);
+		String publishedId = validArgs.postStatement(st);
+		assertTrue(publishedId.length() > 0);
+		
+		// With a trailing slash
+		validArgs = new StatementClient(lrs_uri+"/", encodedCreds);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		publishedId = validArgs.postStatement(st);
+		assertTrue(publishedId.length() > 0);
 
 		// Incorrect username
 		encodedCreds = Base64.encodeToString(("username" + ":" + password).getBytes(), Base64.NO_WRAP);
@@ -221,12 +236,12 @@ public class StatementClientTest extends TestCase {
 
 		// Incorrect password
 		encodedCreds = Base64.encodeToString((username + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
-		sc = new StatementClient(lrs_uri, encodedCreds);
+		StatementClient incorrectPassword = new StatementClient(lrs_uri, encodedCreds);
 		try {
 			activity_id = "http://example.com/" + UUID.randomUUID().toString();
 			act = new Activity(activity_id);
 			st = new Statement(a, v, act);
-			sc.postStatement(st);
+			incorrectPassword.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
@@ -246,11 +261,11 @@ public class StatementClientTest extends TestCase {
 		String encodedCreds = Base64.encodeToString((username + ":" + password).getBytes(), Base64.NO_WRAP);
 
 		// Happy path
-		StatementClient sc = new StatementClient(lrs_url, encodedCreds);
+		StatementClient validArgs = new StatementClient(lrs_url, encodedCreds);
 		activity_id = "http://example.com/" + UUID.randomUUID().toString();
 		Activity act = new Activity(activity_id);
 		st = new Statement(a, v, act);
-		sc.postStatement(st);
+		validArgs.postStatement(st);
 
 		// Incorrect username
 		encodedCreds = Base64.encodeToString(("username" + ":" + password).getBytes(), Base64.NO_WRAP);
@@ -266,12 +281,12 @@ public class StatementClientTest extends TestCase {
 
 		// Incorrect password
 		encodedCreds = Base64.encodeToString((username + ":" + "passw0rd").getBytes(), Base64.NO_WRAP);
-		sc = new StatementClient(lrs_url, encodedCreds);
+		StatementClient incorrectPassword = new StatementClient(lrs_url, encodedCreds);
 		try {
 			activity_id = "http://example.com/" + UUID.randomUUID().toString();
 			act = new Activity(activity_id);
 			st = new Statement(a, v, act);
-			sc.postStatement(st);
+			incorrectPassword.postStatement(st);
 		} catch (Exception e) {
 			assertTrue(true);
 		}
@@ -342,7 +357,7 @@ public class StatementClientTest extends TestCase {
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		byte[] arr = "This is text/plain testing.".getBytes("UTF-8");
+		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
 		att.setContentType(contentType);
 		att.setLength(arr.length);
@@ -355,9 +370,7 @@ public class StatementClientTest extends TestCase {
 
 		ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
 		attachedData.add(arr);
-
 		String publishedId = sc.postStatementWithAttachment(statement, contentType, attachedData);
-System.out.println(publishedId);
 		assertTrue(publishedId.length() > 0);
 	}
 
@@ -387,6 +400,7 @@ System.out.println(publishedId);
 		Agent a = new Agent();
 		a.setMbox(MBOX);
 		Verb v = new Verb("http://example.com/tested");
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
 		Activity act = new Activity(activity_id);
 		Statement statement = new Statement(a, v, act);
 
@@ -412,25 +426,16 @@ System.out.println(publishedId);
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		// File testFile = testFolder.newFile("testatt.txt");
-		// BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
-		// out.write("This is the first line\n");
-		// out.write("This is the second line!!!\n");
-		// out.write(UUID.randomUUID().toString());
-		// out.close();
-
-		File testFile = new File("/home/randy/Downloads/tomcat.jpg");
-		// String contentType = "image/gif";
-		String contentType = "image/jpeg";
-		// String contentType = "text/plain";
+		// Test plain text
+		byte[] expectedArray = "This is a text/plain test.".getBytes("UTF-8");
+		String contentType = "text/plain";
 		att.setContentType(contentType);
-		att.setLength((int) testFile.length());
-		byte[] arr = Files.readAllBytes(testFile.toPath());
-		// System.out.println(new String(arr));
-		att.setSha2(generateSha2(arr));
+		att.setLength((int) expectedArray.length);
+		att.setSha2(generateSha2(expectedArray));
+		String expectedHash = att.getSha2();
 
-		File file1 = new File("/home/randy/Downloads/bueno.bin");
-		FileUtils.writeByteArrayToFile(file1, arr);
+		// File file1 = new File("/home/randy/Downloads/bueno.bin");
+		// FileUtils.writeByteArrayToFile(file1, arr);
 		// BufferedImage bf = ImageIO.read( new ByteArrayInputStream(arr));
 		// ImageIO.write(bf, "jpeg", file1);
 		// bf.flush();
@@ -440,24 +445,49 @@ System.out.println(publishedId);
 		statement.setAttachments(attList);
 
 		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
-		realAtts.add(arr);
+		realAtts.add(expectedArray);
 
-		// String publishedId = sc.postStatementWithAttachment(statement,
-		// contentType, realAtts);
-		// System.out.println(publishedId);
-		// assertTrue(publishedId.length() > 0);
-		// attachmntResult = sc.getStatementsWithAttachments();
-		// Statement s =
-		// attachmntResult.getXapiStatements().getStatements().get(0);
-		// assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
+		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
+		assertTrue(publishedId.length() > 0);
+		AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
+		Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
+		assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
 
-		AttachmentResult attachmntResult = sc.addFilter("statementId", "f60effee-5ba4-409b-a5d9-a2be31003e9f")
-				.getStatementsWithAttachments();
-		// attachmntResult = sc.getStatementsWithAttachments();
-		String id = attachmntResult.getXapiStatement().getId();
-		// assertTrue(id.contains((publishedId)));
+		byte[] actualArray = attachmntResult.getAttachment().get(expectedHash).getAttachment().get(0);
+		assertEquals(new String(expectedArray), new String(actualArray));
 
-		// testFile.deleteOnExit();
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		act = new Activity(activity_id);
+		statement = new Statement(a, v, act);
+
+		// Test image/binary
+		File testFile = new File("/home/randy/Downloads/example.png");
+		contentType = "image/png";
+		att.setContentType(contentType);
+		att.setLength((int) testFile.length());
+		expectedArray = Files.readAllBytes(testFile.toPath());
+		att.setSha2(generateSha2(expectedArray));
+		expectedHash = att.getSha2();
+
+		attList = null;
+		attList = new ArrayList<Attachment>();
+		attList.add(att);
+		statement.setAttachments(attList);
+
+		realAtts = null;
+		realAtts = new ArrayList<byte[]>();
+		realAtts.add(expectedArray);
+
+		publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
+		assertTrue(publishedId.length() > 0);
+		attachmntResult = sc.getStatementsWithAttachments();
+		s = attachmntResult.getXapiStatements().getStatements().get(0);
+		assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
+
+		attachmntResult = sc.addFilter("statementId", publishedId).getStatementsWithAttachments();
+		actualArray = attachmntResult.getAttachment().get(expectedHash).getAttachment().get(0);
+		assertEquals(attachmntResult.getXapiStatement().getAttachments().get(0).getSha2(), expectedHash);
+		assertEquals(new String(expectedArray), new String(actualArray));
 	}
 
 	@Test
@@ -492,25 +522,20 @@ System.out.println(publishedId);
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		File testFile = testFolder.newFile("testatt.txt");
-		BufferedWriter out = new BufferedWriter(new FileWriter(testFile));
-		out.write("This is the first line\n");
-		out.write("This is the second line!!!\n");
-		out.write(UUID.randomUUID().toString());
-		out.close();
-
+		// Test plain text
+		byte[] expectedArray = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
 		att.setContentType(contentType);
-		att.setLength((int) testFile.length());
-		byte[] arr = Files.readAllBytes(testFile.toPath());
-		att.setSha2(generateSha2(arr));
+		att.setLength((int) expectedArray.length);
+		att.setSha2(generateSha2(expectedArray));
+		String expectedHash = att.getSha2();
 
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
 		attList.add(att);
 		statement.setAttachments(attList);
 
 		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
-		realAtts.add(arr);
+		realAtts.add(expectedArray);
 
 		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
 
@@ -519,8 +544,10 @@ System.out.println(publishedId);
 		AttachmentResult attachmntResult = sc.getStatementWithAttachments(publishedId);
 		String id = attachmntResult.getXapiStatement().getId();
 		assertTrue(id.contains((publishedId)));
+		byte[] actualArray = attachmntResult.getAttachment().get(expectedHash).getAttachment().get(0);
+		assertEquals(attachmntResult.getXapiStatement().getAttachments().get(0).getSha2(), expectedHash);
+		assertEquals(new String(expectedArray), new String(actualArray));
 
-		testFile.deleteOnExit();
 	}
 
 	@Test
