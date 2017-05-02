@@ -21,7 +21,7 @@ public class AgentClient extends BaseClient {
 
     protected String issueProfilePost(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath()+path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializePOSTConnection(url);
 
         // Agent Profile requires either of these headers being sent
@@ -64,7 +64,8 @@ public class AgentClient extends BaseClient {
 
     protected String issueProfilePut(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath()+path);
+    	URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
+
         HttpURLConnection conn = initializePOSTConnection(url);
 
         // Agent Profile requires either of these headers being sent
@@ -108,7 +109,7 @@ public class AgentClient extends BaseClient {
 
     protected String issueProfileDelete(String path, String ifMatchEtagValue)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath()+path);
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializeConnection(url);
         //Agent profile requires If-Match header - exception will get caught when making
         conn.addRequestProperty("If-Match", ifMatchEtagValue);
@@ -158,7 +159,7 @@ public class AgentClient extends BaseClient {
 
     public Person getPerson(Agent a)
             throws IOException {
-        String path = "/agents?agent=" + getDecoder().toJson(a.serialize());
+        String path = "/agents?agent=" + getDecoder().toJson(a.serialize()); 
         String result = issueGet(path);
         return getDecoder().fromJson(result, Person.class);
     }

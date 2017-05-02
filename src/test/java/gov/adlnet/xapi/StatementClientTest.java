@@ -434,12 +434,6 @@ public class StatementClientTest extends TestCase {
 		att.setSha2(generateSha2(expectedArray));
 		String expectedHash = att.getSha2();
 
-		// File file1 = new File("/home/randy/Downloads/bueno.bin");
-		// FileUtils.writeByteArrayToFile(file1, arr);
-		// BufferedImage bf = ImageIO.read( new ByteArrayInputStream(arr));
-		// ImageIO.write(bf, "jpeg", file1);
-		// bf.flush();
-
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
 		attList.add(att);
 		statement.setAttachments(attList);

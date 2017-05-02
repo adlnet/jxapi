@@ -1,8 +1,10 @@
 package gov.adlnet.xapi.model;
 
-import com.google.gson.*;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class InteractionComponent {
     private String id;

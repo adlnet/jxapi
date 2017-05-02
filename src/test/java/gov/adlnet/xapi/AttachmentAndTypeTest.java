@@ -24,10 +24,7 @@ public class AttachmentAndTypeTest {
 	@Before
 	public void setUp() throws Exception {
 		type = "text/plain";
-		bytes = new byte[] { 84, 104, 105, 115, 32, 105, 115, 32, 116, 104, 101, 32, 102, 105, 114, 115, 116, 32, 108,
-				105, 110, 101, 10, 84, 104, 105, 115, 32, 105, 115, 32, 116, 104, 101, 32, 115, 101, 99, 111, 110, 100,
-				32, 108, 105, 110, 101, 33, 33, 33, 10, 53, 57, 56, 52, 57, 52, 98, 99, 45, 52, 48, 49, 102, 45, 52, 57,
-				102, 53, 45, 98, 50, 102, 101, 45, 97, 49, 98, 99, 53, 48, 102, 50, 100, 50, 100, 49 };
+		bytes = "This is a text/plain test.".getBytes("UTF-8");
 		attachment = new ArrayList<byte[]>();
 	}
 

@@ -19,8 +19,7 @@ public abstract class Actor implements IStatementObject {
 	public void setMbox(String mbox) {
 		if (mbox != null) {
 			if (this.inverseFunctionalPropertySet) {
-				throw new IllegalArgumentException(
-						"Only one Inverse Functional Property can be set");
+				throw new IllegalArgumentException("Only one Inverse Functional Property can be set");
 			}
 			inverseFunctionalPropertySet = true;
 		} else {
@@ -36,8 +35,7 @@ public abstract class Actor implements IStatementObject {
 	public void setMbox_sha1sum(String mbox_sha1sum) {
 		if (mbox_sha1sum != null) {
 			if (this.inverseFunctionalPropertySet) {
-				throw new IllegalArgumentException(
-						"Only one Inverse Functional Property can be set");
+				throw new IllegalArgumentException("Only one Inverse Functional Property can be set");
 			}
 			inverseFunctionalPropertySet = true;
 		} else {
@@ -53,13 +51,12 @@ public abstract class Actor implements IStatementObject {
 	public void setOpenid(URI openid) {
 		if (openid != null) {
 			if (this.inverseFunctionalPropertySet) {
-				throw new IllegalArgumentException(
-						"Only one Inverse Functional Property can be set");
+				throw new IllegalArgumentException("Only one Inverse Functional Property can be set");
 			}
 			inverseFunctionalPropertySet = true;
 		} else {
 			inverseFunctionalPropertySet = false;
-		}		
+		}
 		this.openid = openid;
 	}
 
@@ -70,13 +67,12 @@ public abstract class Actor implements IStatementObject {
 	public void setAccount(Account account) {
 		if (account != null) {
 			if (this.inverseFunctionalPropertySet) {
-				throw new IllegalArgumentException(
-						"Only one Inverse Functional Property can be set");
+				throw new IllegalArgumentException("Only one Inverse Functional Property can be set");
 			}
 			inverseFunctionalPropertySet = true;
 		} else {
 			inverseFunctionalPropertySet = false;
-		}		
+		}
 		this.account = account;
 	}
 
@@ -108,17 +104,21 @@ public abstract class Actor implements IStatementObject {
 			obj.add("account", this.account.serialize());
 		}
 		obj.addProperty("objectType", this.getObjectType());
-        return obj;
+		return obj;
 	}
-	
+
 	public String toString() {
-	   if (name != null && ! name.isEmpty()) return name;
-	   
-	   String ret = "Anonymous";
-	   if (mbox != null && ! mbox.isEmpty()) ret = mbox;
-	   else if (mbox_sha1sum != null && ! mbox_sha1sum.isEmpty()) ret = mbox_sha1sum;
-	   else if (openid != null && ! openid.toString().isEmpty()) ret = openid.toString();
-	   else if (account != null) ret = account.toString();
-	   return ret;
+		String ret = "Anonymous ";
+		if (name != null && !name.isEmpty())
+			ret = name + " ";
+		if (mbox != null && !mbox.isEmpty())
+			ret += mbox + " ";
+		else if (mbox_sha1sum != null && !mbox_sha1sum.isEmpty())
+			ret += mbox_sha1sum + " ";
+		else if (openid != null && !openid.toString().isEmpty())
+			ret += openid.toString() + " ";
+		else if (account != null)
+			ret += account.toString() + " ";
+		return ret;
 	}
 }

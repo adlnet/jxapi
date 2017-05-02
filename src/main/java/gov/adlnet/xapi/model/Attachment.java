@@ -8,13 +8,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Attachment {
-	private URI usageType;
-	private HashMap<String, String> display;
-	private HashMap<String, String> description;
-	private String contentType;
-	private int length;
-	private String sha2;
-	private URI fileUrl;
+	private URI usageType;							//required
+	private HashMap<String, String> display;		//required
+	private HashMap<String, String> description;	//optional
+	private String contentType;						//required
+	private int length;								//required
+	private String sha2;							//required
+	private URI fileUrl;							//optional
 
 	public URI getUsageType() {
 		return usageType;
@@ -79,15 +79,24 @@ public class Attachment {
         }
         return obj;
     }
+    
     public JsonElement serialize(){
         JsonObject obj = new JsonObject();
-        obj.addProperty("usageType", this.usageType.toString());
-        obj.add("display", this.serializeHash(this.display));
-        obj.add("description", this.serializeHash(this.description));
-        obj.addProperty("contentType", this.contentType);
+        if(usageType != null){
+        	obj.addProperty("usageType", this.usageType.toString());
+        } else {
+        	throw new NullPointerException("Attachment usageType can't be null");
+        }        
+        
         obj.addProperty("length", this.length);
         obj.addProperty("sha2", this.sha2);
-        obj.addProperty("fileUrl", this.fileUrl.toString());
+        
+        if(description != null){
+        	obj.add("description", this.serializeHash(this.description));
+        }
+        if(fileUrl != null){
+        	obj.addProperty("fileUrl", this.fileUrl.toString());        
+        }
         return obj;
     }
 }

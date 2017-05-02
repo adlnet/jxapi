@@ -316,6 +316,7 @@ public class BaseClient {
         String fixedPath = checkPath(path);
 		URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+fixedPath);
         HttpURLConnection conn = initializeConnection(url);
+        
         try {
 			return readFromConnection(conn);
 		} catch (IOException ex) {
@@ -327,7 +328,6 @@ public class BaseClient {
 				while((line = br.readLine()) != null){
 					System.out.print(line);
 				}
-				System.out.println();
 			} finally {
 				s.close();
 			}
