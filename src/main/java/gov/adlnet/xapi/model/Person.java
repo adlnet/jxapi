@@ -1,5 +1,8 @@
 package gov.adlnet.xapi.model;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * Created by lou on 12/15/14.
  */
@@ -19,7 +22,7 @@ public class Person {
 	public String[] getName() {
 		return this.name;
 	}
-	
+
 	public void setName(String[] name) {
 		this.name = name;
 	}
@@ -27,7 +30,7 @@ public class Person {
 	public String[] getMbox() {
 		return this.mbox;
 	}
-	
+
 	public void setMbox(String[] mbox) {
 		if (mbox != null) {
 			if (this.inverseFunctionalPropertySet) {
@@ -43,7 +46,7 @@ public class Person {
 	public String[] getMbox_sha1sum() {
 		return this.mbox_sha1sum;
 	}
-	
+
 	public void setMbox_sha1sum(String[] mbox_sha1sum) {
 		if (mbox_sha1sum != null) {
 			if (this.inverseFunctionalPropertySet) {
@@ -59,7 +62,7 @@ public class Person {
 	public String[] getOpenid() {
 		return this.openid;
 	}
-	
+
 	public void setOpenid(String[] openid) {
 		if (openid != null) {
 			if (this.inverseFunctionalPropertySet) {
@@ -75,22 +78,25 @@ public class Person {
 	public Account[] getAccount() {
 		return this.account;
 	}
-	
+
 	public void setAccount(Account[] account) {
 		if (account != null) {
 			if (this.inverseFunctionalPropertySet) {
 				throw new IllegalArgumentException("Only one Inverse Functional Property can be set");
 			}
 			inverseFunctionalPropertySet = true;
+			for (int i = 0; i < account.length; i++) {
+				this.account = account;
+			}
 		} else {
 			inverseFunctionalPropertySet = false;
+
 		}
-		this.account = account;
 	}
 
 	public String toString() {
 		String ret = getObjectType() + " ; ";
-		
+
 		if (name != null && name.length != 0) {
 			for (int i = 0; i < name.length; i++) {
 				ret += "name: " + name[i].toString() + " ; ";
@@ -124,5 +130,39 @@ public class Person {
 			ret += accts + " ; ";
 		}
 		return ret;
+	}
+
+	public JsonElement serialize() {
+		JsonObject obj = new JsonObject();
+
+		if (name != null && name.length != 0) {
+			obj.addProperty("name", toString(name));
+		}
+		if (mbox != null && mbox.length != 0) {
+			obj.addProperty("mbox", toString(mbox));
+		}
+		if (mbox_sha1sum != null && mbox_sha1sum.length != 0) {
+			obj.addProperty("mbox_sha1sum", toString(mbox_sha1sum));
+		}
+		if (openid != null && openid.length != 0) {
+			obj.addProperty("openid", toString(openid));
+		}
+		if (account != null && account.length != 0) {
+			for (int i = 0; i < account.length; i++) {
+				obj.add("account", account[i].serialize());
+			}
+
+		}
+
+		obj.addProperty("objectType", this.getObjectType());
+		return obj;
+	}
+
+	private String toString(String[] input) {
+		StringBuilder strBuilder = new StringBuilder();
+		for (int i = 0; i < input.length; i++) {
+			strBuilder.append(input[i]);
+		}
+		return strBuilder.toString();
 	}
 }

@@ -4,9 +4,14 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.net.URISyntaxException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import gov.adlnet.xapi.model.Account;
 import gov.adlnet.xapi.model.Person;
@@ -209,6 +214,50 @@ public class PersonTest {
 		assert (actual.contains(name));
 		person.setAccount(null);
 		
+	}
+	
+	@Test
+	public void testSerialize() throws URISyntaxException {
+		String expected = toString(MBOX);
+		JsonElement actual = person.serialize();
+		assertNotNull(actual);
+		assert (actual.isJsonObject());
+		JsonObject obj = (JsonObject) actual;
+		assert (obj.get("mbox").toString().contains(expected));
+		person.setMbox(null);
+
+		String[] strArray = MBOX_SHA1SUM;
+		expected = toString(MBOX_SHA1SUM);
+		person.setMbox_sha1sum(strArray);
+		actual = person.serialize();
+		assertNotNull(actual);
+		assert (actual.isJsonObject());
+		obj = (JsonObject) actual;
+		assert (obj.get("mbox_sha1sum").toString().contains(expected));
+		person.setMbox_sha1sum(null);
+
+		strArray = TEST_IRI;
+		expected = toString(TEST_IRI);
+		person.setOpenid(strArray);
+		actual = person.serialize();
+		assertNotNull(actual);
+		assert (actual.isJsonObject());
+		obj = (JsonObject) actual;
+		assert (obj.get("openid").toString().contains(expected.toString()));
+		person.setOpenid(null);
+
+		String name = toString(NAME);
+		String iri = toString(TEST_IRI);	
+		Account account = new Account(name, iri);
+		Account[] expectedAccount = {account};
+		person.setAccount(expectedAccount);
+		actual = person.serialize();
+		assertNotNull(actual);
+		assert (actual.isJsonObject());
+		obj = (JsonObject) actual;
+		assert (obj.get("account").toString().contains(expectedAccount[0].getName()));
+		person.setAccount(null);
+
 	}
 
 }
