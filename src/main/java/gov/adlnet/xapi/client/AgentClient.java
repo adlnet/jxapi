@@ -22,7 +22,8 @@ public class AgentClient extends BaseClient {
     protected String issueProfilePost(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
         URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
-        HttpURLConnection conn = initializePOSTConnection(url);
+        HttpURLConnection conn = initializeConnection(url);
+        conn.setRequestMethod("POST");
 
         // Agent Profile requires either of these headers being sent
         // If neither are sent it will set If-None-Match to null and exception
@@ -66,7 +67,8 @@ public class AgentClient extends BaseClient {
             throws java.io.IOException {
     	URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
 
-        HttpURLConnection conn = initializePOSTConnection(url);
+        HttpURLConnection conn = initializeConnection(url);
+        conn.setRequestMethod("POST");
 
         // Agent Profile requires either of these headers being sent
         // If neither are sent it will set If-None-Match to null and exception

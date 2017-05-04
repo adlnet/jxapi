@@ -22,10 +22,6 @@ import gov.adlnet.xapi.util.Base64;
 import junit.framework.TestCase;
 
 public class AgentClientTest extends TestCase {
-	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI";
-	private static final String USERNAME = "jXAPI";
-	private static final String PASSWORD = "password";
-	private static final String MBOX = "mailto:test@example.com";
 	private String PUT_PROFILE_ID;
 	private String POST_PROFILE_ID;
 	
@@ -42,23 +38,6 @@ public class AgentClientTest extends TestCase {
 		username = props.getProperty("username");
 		password = props.getProperty("password");
 		mbox = props.getProperty("mbox");
-
-
-		if (lrs_uri == null || lrs_uri.length() == 0) {
-			lrs_uri = LRS_URI;
-		}
-
-		if (username == null || username.length() == 0) {
-			username = USERNAME;
-		}
-
-		if (password == null || password.length() == 0) {
-			password = PASSWORD;
-		}
-
-		if (mbox == null || mbox.length() == 0) {
-			mbox = MBOX;
-		}
 		
 		PUT_PROFILE_ID = UUID.randomUUID().toString();
 		POST_PROFILE_ID = UUID.randomUUID().toString();
@@ -67,7 +46,7 @@ public class AgentClientTest extends TestCase {
 		
 		Agent a = new Agent();
 		a.setMbox(mbox);
-		Person peep = client.getPerson(a);
+
 		client.getAgentProfiles(a, "2014-05-02T17:28:47.00Z");
 		JsonObject puobj = new JsonObject();
 		puobj.addProperty("puttest", "puttest");

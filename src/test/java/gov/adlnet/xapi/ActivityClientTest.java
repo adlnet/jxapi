@@ -31,10 +31,6 @@ public class ActivityClientTest extends TestCase {
 	private String PUT_STATE_ID;
 	private String POST_STATE_ID;
 	private String ACTIVITY_ID;
-	private static final String LRS_URI = "https://lrs.adlnet.gov/xAPI";
-	private static final String USERNAME = "jXAPI";
-	private static final String PASSWORD = "password";
-	private static final String MBOX = "mailto:test@example.com";
 	private static final UUID REGISTRATION = UUID.randomUUID();
 
 	private String lrs_uri = null;
@@ -52,22 +48,6 @@ public class ActivityClientTest extends TestCase {
 		username = p.getProperty("username");
 		password = p.getProperty("password");
 		mbox = p.getProperty("mbox");
-
-		if (lrs_uri == null || lrs_uri.length() == 0) {
-			lrs_uri = LRS_URI;
-		}
-
-		if (username == null || username.length() == 0) {
-			username = USERNAME;
-		}
-
-		if (password == null || password.length() == 0) {
-			password = PASSWORD;
-		}
-
-		if (mbox == null || mbox.length() == 0) {
-			mbox = MBOX;
-		}
 
 		PUT_PROFILE_ID = UUID.randomUUID().toString();
 		POST_PROFILE_ID = UUID.randomUUID().toString();

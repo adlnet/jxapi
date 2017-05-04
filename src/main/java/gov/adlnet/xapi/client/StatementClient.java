@@ -77,6 +77,14 @@ public class StatementClient extends BaseClient {
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		return jsonResult.get(0).getAsString();
 	}
+	
+	public Boolean putStatementWithAttachment(Statement statement, String stmtId, String contentType, ArrayList<byte[]> attachmentData)
+			throws IOException, NoSuchAlgorithmException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePutWithFileAttachment("/statements?statementId=" + stmtId, json, contentType, attachmentData);
+		return result.isEmpty();
+	}
 
 	public StatementResult getStatements(String more) throws java.io.IOException {
 		String result = this.issueGet(more);
