@@ -4,7 +4,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import gov.adlnet.xapi.model.StatementReference;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AboutTest.class, AboutClientTest.class, AccountTest.class, ActivityTest.class, 
