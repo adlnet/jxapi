@@ -208,9 +208,6 @@ public class BaseClient {
             writer.append(data).append(LINE_FEED);
             writer.append("--" + boundary).append(LINE_FEED);
             for(byte[] ba: attachmentData){
-//                MessageDigest md = MessageDigest.getInstance("SHA-256");
-//                md.update(ba);
-//                String sha256String = new String(Hex.encode(md.digest()));
                 writer.append("Content-Type:" + contentType).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
                 writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(ba)).append(LINE_FEED).append(LINE_FEED);

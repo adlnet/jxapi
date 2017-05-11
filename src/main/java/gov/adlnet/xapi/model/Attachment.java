@@ -14,7 +14,6 @@ import org.bouncycastle.util.encoders.Hex;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import gov.adlnet.xapi.util.AttachmentAndType;
 
 public class Attachment {
 	private URI usageType;							//required
@@ -88,25 +87,13 @@ public class Attachment {
 		return contentType;
 	}
 
-//	public void setContentType(String contentType) {
-//		this.contentType = contentType;
-//	}
-
 	public int getLength() {
 		return length;
 	}
 
-//	public void setLength(int length) {
-//		this.length = length;
-//	}
-
 	public String getSha2() {
 		return sha2;
 	}
-
-//	public void setSha2(String sha2) {
-//		this.sha2 = sha2;
-//	}
 
 	public URI getFileUrl() {
 		return fileUrl;

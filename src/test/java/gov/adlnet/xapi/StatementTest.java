@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -42,10 +43,10 @@ public class StatementTest {
 		statement.setId(ID);
 		
 		Attachment attachment = new Attachment();
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		Attachment expected = new Attachment();
+		String att = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		attachment.setContentType(contentType);
-//		attachment.setLength(arr.length);
+		expected.addAttachment(att, contentType);
 		attachment.setUsageType(new URI("http://test.com"));
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
@@ -160,12 +161,11 @@ public class StatementTest {
 	}
 
 	@Test
-	public void testGetAttachments() throws IOException {
+	public void testGetAttachments() throws IOException, NoSuchAlgorithmException {
 		Attachment expected = new Attachment();
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String att = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		expected.setContentType(contentType);
-//		expected.setLength(arr.length);
+		expected.addAttachment(att, contentType);
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
 		expectedList.add(expected);
@@ -178,12 +178,11 @@ public class StatementTest {
 	}
 
 	@Test
-	public void testSetAttachments()  throws IOException  {
+	public void testSetAttachments()  throws IOException, NoSuchAlgorithmException  {
 		Attachment expected = new Attachment();
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String att = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		expected.setContentType(contentType);
-//		expected.setLength(arr.length);
+		expected.addAttachment(att, contentType);
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
 		expectedList.add(expected);

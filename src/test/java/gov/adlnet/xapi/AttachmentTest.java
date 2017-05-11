@@ -3,8 +3,10 @@ package gov.adlnet.xapi;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 import org.junit.After;
@@ -17,15 +19,28 @@ import gov.adlnet.xapi.model.Attachment;
 
 public class AttachmentTest {
 	private Attachment attachment = null;
+	private byte[] expectedArray = null;
 
 	@Before
 	public void setUp() throws Exception {
+		String att = "This is a text/plain test.";
+		String contentType = "text/plain";
 		attachment = new Attachment();
+		expectedArray = attachment.addAttachment(att, contentType);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		attachment = null;
+		expectedArray = null;
+	}
+	
+	@Test
+	public void testAddAttachment() throws NoSuchAlgorithmException, IOException {
+		String att = "../jxapi/src/test/java/config/example.png";
+		String contentType = "image/png";
+		byte[] actual = attachment.addAttachment(att, contentType);	
+		assertNotNull(actual);
 	}
 
 	@Test
@@ -93,16 +108,6 @@ public class AttachmentTest {
 	@Test
 	public void testGetContentType() {
 		String expected = "text/plain";
-//		attachment.setContentType(expected);
-		String actual = attachment.getContentType();
-		assertNotNull(actual);
-		assertEquals(expected, actual);
-	}
-
-	@Test
-	public void testSetContentType() {
-		String expected = "text/plain";
-//		attachment.setContentType(expected);
 		String actual = attachment.getContentType();
 		assertNotNull(actual);
 		assertEquals(expected, actual);
@@ -110,35 +115,15 @@ public class AttachmentTest {
 
 	@Test
 	public void testGetLength() {
-		int expected = 10;
-//		attachment.setLength(expected);
+		int expected = expectedArray.length;
 		int actual = attachment.getLength();
 		assertNotNull(actual);
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testSetLength() {
-		int expected = 10;
-//		attachment.setLength(expected);
-		int actual = attachment.getLength();
-		assertNotNull(actual);
-		assertEquals(expected, actual);
-	}
-
-	@Test
-	public void testGetSha2() {
-		String expected = "sha2test";
-//		attachment.setSha2(expected);
-		String actual = attachment.getSha2();
-		assertNotNull(actual);
-		assertEquals(expected, actual);
-	}
-
-	@Test
-	public void testSetSha2() {
-		String expected = "sha2test";
-//		attachment.setSha2(expected);
+	public void testGetSha2() throws NoSuchAlgorithmException {
+		String expected = Attachment.generateSha2(expectedArray);
 		String actual = attachment.getSha2();
 		assertNotNull(actual);
 		assertEquals(expected, actual);
@@ -164,10 +149,7 @@ public class AttachmentTest {
 
 	@Test
 	public void testSerialize() throws URISyntaxException {
-		String contentType = "text/plain";
 		Attachment expected = new Attachment();
-//		expected.setContentType(contentType);
-//		expected.setLength(10);
 		expected.setUsageType(new URI("http://test.com"));
 
 		String key = "en-US";

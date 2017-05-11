@@ -3,9 +3,10 @@ package gov.adlnet.xapi;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -76,10 +77,9 @@ public class SubStatementTest {
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String attach = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		att.setContentType(contentType);
-//		att.setLength(arr.length);
+		att.addAttachment(attach, contentType);
 
 		attachments.add(att);
 		substatement.setAttachments(attachments);
@@ -121,7 +121,7 @@ public class SubStatementTest {
 	}
 
 	@Test
-	public void testSetAttachments() throws UnsupportedEncodingException, URISyntaxException {
+	public void testSetAttachments() throws URISyntaxException, NoSuchAlgorithmException, IOException {
 		ArrayList<Attachment> expected = attachments;
 		expected.remove(0);
 
@@ -138,10 +138,9 @@ public class SubStatementTest {
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		byte[] arr = "This is a new text/plain test.".getBytes("UTF-8");
+		String attach = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		att.setContentType(contentType);
-//		att.setLength(arr.length);
+		att.addAttachment(attach, contentType);
 
 		expected.add(att);
 
@@ -255,17 +254,16 @@ public class SubStatementTest {
 	}
 
 	@Test
-	public void testSerialize() throws UnsupportedEncodingException, URISyntaxException {
+	public void testSerialize() throws URISyntaxException, NoSuchAlgorithmException, IOException {
 		SubStatement expected = new SubStatement();
 		expected.setActor(actor);
 		expected.setVerb(verb);
 		expected.setObject(activity);
 
 		Attachment attachment = new Attachment();
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String attach = "This is a text/plain test.";
 		String contentType = "text/plain";
-//		attachment.setContentType(contentType);
-//		attachment.setLength(arr.length);
+		attachment.addAttachment(attach, contentType);
 		attachment.setUsageType(new URI("http://test.com"));
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
