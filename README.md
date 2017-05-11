@@ -214,7 +214,8 @@ includeAttachments
 
 To bring back only statement ids from the LRS, include the ```ids``` method call when chaining filters/include methods
 
-Contributing to the Project
+### Note: Before testing, please change the config properties in test/config to your own endpoint and credentials.
+
 ## Contributing to the project
 We welcome contributions to this project. Fork this repository, make changes, and submit pull requests. If you're not comfortable with editing the code, please [submit an issue](https://github.com/adlnet/jxapi/issues) and we'll be happy to address it. 
 
