@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -22,7 +20,6 @@ import java.util.UUID;
 
 import javax.mail.MessagingException;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -293,11 +290,7 @@ public class StatementClientTest extends TestCase {
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	private String generateSha2(byte[] bytes) throws NoSuchAlgorithmException {
-		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		md.update(bytes);
-		return new String(Hex.encode(md.digest()));
-	}
+	
 
 	@Test
 	public void testPostStatementWithAttachment() throws IOException, URISyntaxException, NoSuchAlgorithmException {
@@ -336,13 +329,10 @@ public class StatementClientTest extends TestCase {
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String attachment = "This is a text/plain test.";
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength(arr.length);
-
-		att.setSha2(generateSha2(arr));
-
+		byte[] arr = att.addAttachment(attachment, contentType);
+		
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
 		attList.add(att);
 		statement.setAttachments(attList);
@@ -390,12 +380,9 @@ public class StatementClientTest extends TestCase {
 		URI usageType = new URI("http://example.com/test/usage");
 		att.setUsageType(usageType);
 
-		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
+		String attachment = "This is a text/plain test.";
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength(arr.length);
-
-		att.setSha2(generateSha2(arr));
+		byte[] arr = att.addAttachment(attachment, contentType);
 
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
 		attList.add(att);
@@ -460,11 +447,9 @@ public class StatementClientTest extends TestCase {
 		att.setUsageType(usageType);
 
 		// Test plain text
-		byte[] expectedArray = "This is a text/plain test.".getBytes("UTF-8");
+		String attachment = "This is a text/plain test.";
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength((int) expectedArray.length);
-		att.setSha2(generateSha2(expectedArray));
+		byte[] expectedArray = att.addAttachment(attachment, contentType);
 		String expectedHash = att.getSha2();
 
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
@@ -488,12 +473,9 @@ public class StatementClientTest extends TestCase {
 		statement = new Statement(a, v, act);
 
 		// Test image/binary
-		File testFile = new File("../jxapi/src/test/java/config/example.png");
+		attachment = "../jxapi/src/test/java/config/example.png";
 		contentType = "image/png";
-		att.setContentType(contentType);
-		att.setLength((int) testFile.length());
-		expectedArray = Files.readAllBytes(testFile.toPath());
-		att.setSha2(generateSha2(expectedArray));
+		expectedArray = att.addAttachment(attachment, contentType);
 		expectedHash = att.getSha2();
 
 		attList = null;
@@ -550,11 +532,9 @@ public class StatementClientTest extends TestCase {
 		att.setUsageType(usageType);
 
 		// Test plain text
-		byte[] expectedArray = "This is a text/plain test.".getBytes("UTF-8");
+		String attachment = "This is a text/plain test.";
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength((int) expectedArray.length);
-		att.setSha2(generateSha2(expectedArray));
+		byte[] expectedArray = att.addAttachment(attachment, contentType);
 		String expectedHash = att.getSha2();
 
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();

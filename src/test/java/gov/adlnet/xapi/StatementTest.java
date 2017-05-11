@@ -44,8 +44,8 @@ public class StatementTest {
 		Attachment attachment = new Attachment();
 		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		attachment.setContentType(contentType);
-		attachment.setLength(arr.length);
+//		attachment.setContentType(contentType);
+//		attachment.setLength(arr.length);
 		attachment.setUsageType(new URI("http://test.com"));
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
@@ -164,8 +164,8 @@ public class StatementTest {
 		Attachment expected = new Attachment();
 		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		expected.setContentType(contentType);
-		expected.setLength(arr.length);
+//		expected.setContentType(contentType);
+//		expected.setLength(arr.length);
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
 		expectedList.add(expected);
@@ -182,8 +182,8 @@ public class StatementTest {
 		Attachment expected = new Attachment();
 		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		expected.setContentType(contentType);
-		expected.setLength(arr.length);
+//		expected.setContentType(contentType);
+//		expected.setLength(arr.length);
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
 		expectedList.add(expected);

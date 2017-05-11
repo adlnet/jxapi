@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.Attachment;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
@@ -189,7 +190,8 @@ public class BaseClient {
 			conn.disconnect();
 		}
 	}
-
+	
+	
     protected String issuePostWithFileAttachment(String path, String data, String contentType, ArrayList<byte[]> attachmentData)
             throws java.io.IOException, NoSuchAlgorithmException {
         String boundary = "===" + System.currentTimeMillis() + "===";
@@ -206,15 +208,16 @@ public class BaseClient {
             writer.append(data).append(LINE_FEED);
             writer.append("--" + boundary).append(LINE_FEED);
             for(byte[] ba: attachmentData){
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                md.update(ba);
-                String sha256String = new String(Hex.encode(md.digest()));
+//                MessageDigest md = MessageDigest.getInstance("SHA-256");
+//                md.update(ba);
+//                String sha256String = new String(Hex.encode(md.digest()));
                 writer.append("Content-Type:" + contentType).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
+                writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(ba)).append(LINE_FEED).append(LINE_FEED);
                 writer.append(new String(ba)).append(LINE_FEED);
                 writer.append("--" + boundary + "--");
             }
+            
             writer.flush();
         } catch (IOException ex) {
             InputStream s = conn.getErrorStream();

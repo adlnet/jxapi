@@ -78,8 +78,8 @@ public class SubStatementTest {
 
 		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength(arr.length);
+//		att.setContentType(contentType);
+//		att.setLength(arr.length);
 
 		attachments.add(att);
 		substatement.setAttachments(attachments);
@@ -140,8 +140,8 @@ public class SubStatementTest {
 
 		byte[] arr = "This is a new text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		att.setContentType(contentType);
-		att.setLength(arr.length);
+//		att.setContentType(contentType);
+//		att.setLength(arr.length);
 
 		expected.add(att);
 
@@ -264,8 +264,8 @@ public class SubStatementTest {
 		Attachment attachment = new Attachment();
 		byte[] arr = "This is a text/plain test.".getBytes("UTF-8");
 		String contentType = "text/plain";
-		attachment.setContentType(contentType);
-		attachment.setLength(arr.length);
+//		attachment.setContentType(contentType);
+//		attachment.setLength(arr.length);
 		attachment.setUsageType(new URI("http://test.com"));
 
 		ArrayList<Attachment> expectedList = new ArrayList<Attachment>();
