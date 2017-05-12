@@ -276,6 +276,22 @@ public class StatementClientTest extends TestCase {
 		String publishedId = sc.postStatement(st);
 		assertTrue(publishedId.length() > 0);
 	}
+	
+	@Test
+	public void testPostStatements() throws IOException {
+		ArrayList<Statement> statements = new ArrayList<Statement>();
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		statements.add(st);
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		statements.add(st);
+		
+		String publishedId = sc.postStatements(statements);
+		assertTrue(publishedId.length() > 0);
+	}
 
 	@Test
 	public void testPutStatement() throws IOException {
@@ -285,15 +301,10 @@ public class StatementClientTest extends TestCase {
 		String stmntID = st.getId();
 		assertTrue(stmntID.length() > 0);
 		assertTrue(sc.putStatement(st, stmntID));
-	}
-
-	@Rule
-	public TemporaryFolder testFolder = new TemporaryFolder();
-
-	
+	}	
 
 	@Test
-	public void testPostStatementWithAttachment() throws IOException, URISyntaxException, NoSuchAlgorithmException {
+	public void testPostStatementWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
 
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -339,12 +350,75 @@ public class StatementClientTest extends TestCase {
 
 		ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
 		attachedData.add(arr);
-		String publishedId = sc.postStatementWithAttachment(statement, contentType, attachedData);
+		String publishedId = sc.postStatementWithAttachments(statement, contentType, attachedData);
 		assertTrue(publishedId.length() > 0);
 	}
 	
 	@Test
-	public void testPutStatementWithAttachment() throws IOException, URISyntaxException, NoSuchAlgorithmException {
+	public void testPostStatementsWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
+
+		Agent a = new Agent();
+		a.setMbox(mbox);
+		Verb v = new Verb("http://example.com/tested");
+		ArrayList<Statement> statements = new ArrayList<Statement>();
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		Activity act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		statements.add(st);
+
+		ActivityDefinition ad = new ActivityDefinition();
+		ad.setChoices(new ArrayList<InteractionComponent>());
+		InteractionComponent ic = new InteractionComponent();
+		ic.setId("http://example.com");
+		ic.setDescription(new HashMap<String, String>());
+		ic.getDescription().put("en-US", "test");
+		ad.getChoices().add(ic);
+		ad.setInteractionType("choice");
+
+		ArrayList<String> crp = new ArrayList<String>();
+		crp.add("http://example.com");
+		ad.setCorrectResponsesPattern(crp);
+		ad.setMoreInfo("http://example.com");
+		act.setDefinition(ad);
+
+		Attachment att = new Attachment();
+
+		HashMap<String, String> display = new HashMap<String, String>();
+		display.put("en-US", "Test Display.");
+		att.setDisplay(display);
+
+		HashMap<String, String> description = new HashMap<String, String>();
+		description.put("en-US", "Test Description.");
+		att.setDescription(description);
+
+		URI usageType = new URI("http://example.com/test/usage");
+		att.setUsageType(usageType);
+
+		String attachment = "This is a text/plain test.";
+		String contentType = "text/plain";
+		byte[] arr = att.addAttachment(attachment, contentType);
+		
+		ArrayList<Attachment> attList = new ArrayList<Attachment>();
+		attList.add(att);
+		st.setAttachments(attList);
+		
+		activity_id = "http://example.com/" + UUID.randomUUID().toString();
+		act = new Activity(activity_id);
+		st = new Statement(a, v, act);
+		statements.add(st);
+		
+		attList = new ArrayList<Attachment>();
+		attList.add(att);
+		st.setAttachments(attList);
+
+		ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
+		attachedData.add(arr);
+		String publishedId = sc.postStatementsWithAttachments(statements, contentType, attachedData);
+		assertTrue(publishedId.length() > 0);
+	}
+	
+	@Test
+	public void testPutStatementWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
 
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -390,7 +464,7 @@ public class StatementClientTest extends TestCase {
 
 		ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
 		attachedData.add(arr);
-		assertTrue(sc.putStatementWithAttachment(statement, statement.getId(), contentType, attachedData));
+		assertTrue(sc.putStatementWithAttachments(statement, statement.getId(), contentType, attachedData));
 	}
 
 
@@ -459,7 +533,7 @@ public class StatementClientTest extends TestCase {
 		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
 		realAtts.add(expectedArray);
 
-		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
+		String publishedId = sc.postStatementWithAttachments(statement, contentType, realAtts);
 		assertTrue(publishedId.length() > 0);
 		AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
 		Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
@@ -487,7 +561,7 @@ public class StatementClientTest extends TestCase {
 		realAtts = new ArrayList<byte[]>();
 		realAtts.add(expectedArray);
 
-		publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
+		publishedId = sc.postStatementWithAttachments(statement, contentType, realAtts);
 		assertTrue(publishedId.length() > 0);
 		attachmntResult = sc.getStatementsWithAttachments();
 		s = attachmntResult.getXapiStatements().getStatements().get(0);
@@ -544,7 +618,7 @@ public class StatementClientTest extends TestCase {
 		ArrayList<byte[]> realAtts = new ArrayList<byte[]>();
 		realAtts.add(expectedArray);
 
-		String publishedId = sc.postStatementWithAttachment(statement, contentType, realAtts);
+		String publishedId = sc.postStatementWithAttachments(statement, contentType, realAtts);
 
 		assertTrue(publishedId.length() > 0);
 

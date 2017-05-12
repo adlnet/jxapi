@@ -53,10 +53,18 @@ public class StatementClient extends BaseClient {
 	public StatementClient(URL uri, String encodedUsernamePassword) throws MalformedURLException {
 		super(uri, encodedUsernamePassword);
 	}
-
+	
 	public String postStatement(Statement statement) throws java.io.IOException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
+		String result = this.issuePost("/statements", json);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		return jsonResult.get(0).getAsString();
+	}
+
+	public String postStatements(ArrayList<Statement> statements) throws java.io.IOException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statements);
 		String result = this.issuePost("/statements", json);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		return jsonResult.get(0).getAsString();
@@ -69,7 +77,7 @@ public class StatementClient extends BaseClient {
 		return result.isEmpty();
 	}
 
-	public String postStatementWithAttachment(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
+	public String postStatementWithAttachments(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
 			throws IOException, NoSuchAlgorithmException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
@@ -78,7 +86,16 @@ public class StatementClient extends BaseClient {
 		return jsonResult.get(0).getAsString();
 	}
 	
-	public Boolean putStatementWithAttachment(Statement statement, String stmtId, String contentType, ArrayList<byte[]> attachmentData)
+	public String postStatementsWithAttachments(ArrayList<Statement> statements, String contentType, ArrayList<byte[]> attachmentData)
+			throws IOException, NoSuchAlgorithmException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statements);
+		String result = this.issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		return jsonResult.get(0).getAsString();
+	}
+	
+	public Boolean putStatementWithAttachments(Statement statement, String stmtId, String contentType, ArrayList<byte[]> attachmentData)
 			throws IOException, NoSuchAlgorithmException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
