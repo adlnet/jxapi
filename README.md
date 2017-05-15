@@ -238,20 +238,6 @@ This will return a ```StatementResult``` object, which will have a list of all r
 ```java
 StatementResult results = client.getStatements()
 ```
-
-Getting statements with attachments.
-```java
-AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
-Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
-
-//Get the attached file.
-byte[] actualArray = attachmntResult.getAttachment().get(sha2).getAttachment().get(i);
-```
-
-Getting a statement with a statement ID.
-```
-AttachmentResult attachmntResult = sc.getStatementWithAttachments(statementId);
-```
 To get the next page of results call ```getStatements``` with the value returned from ```getMore```
 
 ```java
@@ -297,6 +283,20 @@ includeAttachments
 ```
 
 To bring back only statement ids from the LRS, include the ```ids``` method call when chaining filters/include methods
+
+Getting statements with attachments.
+```java
+AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
+Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
+
+//Get the attached file.
+byte[] actualArray = attachmntResult.getAttachment().get(sha2).getAttachment().get(i);
+```
+
+Getting a statement with a statement ID.
+```
+AttachmentResult attachmntResult = sc.getStatementWithAttachments(statementId);
+```
 
 ### Note: Before testing, please change the config properties in test/config to your own endpoint and credentials.
 
