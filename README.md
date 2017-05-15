@@ -129,7 +129,7 @@ System.out.println("\t" + new Statement(new Agent("tom", "mailto:tom@example.com
 
 ### Publishing a Statement
 
-To publish a statement you'll need a Verb (There is a predefined list of ADL verbs available in ```gov.adlnet.xapi.model.Verbs``` class), an Actor who compled the activity the statment describes, and the Statement object, which can be an Activity, a SubStatement, or a StatementRef
+To publish a statement you'll need a Verb (There is a predefined list of ADL verbs available in ```gov.adlnet.xapi.model.Verbs``` class), an Actor who completed the activity the statement describes, and the Statement object, which can be an Activity, a SubStatement, or a StatementRef
 
 ```java
 StatementClient client = new StatementClient(LRS_URI, USERNAME,
@@ -158,6 +158,77 @@ a.setDefinition(ad);
 String publishedId = client.postStatement(statement);
 ```
 
+### Publishing a Statement with an Attachment
+
+Publishing a statement with an attachment follows the steps for publishing a statement seen above with the addition of adding an attachment. An attachment require a content type, URI usage type, and display. A file URL and a description can optionally be added.
+```
+Agent a = new Agent();
+a.setMbox(mbox);
+Verb v = new Verb("http://example.com/tested");
+Activity act = new Activity(activity_id);
+Statement statement = new Statement(a, v, act);
+
+ActivityDefinition ad = new ActivityDefinition();
+ad.setChoices(new ArrayList<InteractionComponent>());
+InteractionComponent ic = new InteractionComponent();
+ic.setId("http://example.com");
+ic.setDescription(new HashMap<String, String>());
+ic.getDescription().put("en-US", "test");
+ad.getChoices().add(ic);
+ad.setInteractionType("choice");
+ArrayList<String> crp = new ArrayList<String>();
+crp.add("http://example.com");
+ad.setCorrectResponsesPattern(crp);
+ad.setMoreInfo("http://example.com");
+act.setDefinition(ad);
+
+Attachment att = new Attachment();
+HashMap<String, String> display = new HashMap<String, String>();
+display.put("en-US", "Test Display.");
+att.setDisplay(display);
+
+HashMap<String, String> description = new HashMap<String, String>();
+description.put("en-US", "Test Description.");
+att.setDescription(description);
+
+URI usageType = new URI("http://example.com/test/usage");
+att.setUsageType(usageType);
+
+String attachment = "This is a text/plain test.";
+String contentType = "text/plain";
+byte[] arr = att.addAttachment(attachment, contentType);
+		
+ArrayList<Attachment> attList = new ArrayList<Attachment>();
+attList.add(att);
+statement.setAttachments(attList);
+
+ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
+attachedData.add(arr);
+String publishedId = sc.postStatementWithAttachments(statement, contentType, attachedData);
+```
+
+A non text/plain example of an attachment.
+
+```
+Attachment att = new Attachment();
+HashMap<String, String> display = new HashMap<String, String>();
+display.put("en-US", "Test Display.");
+att.setDisplay(display);
+
+String attachment = "../jxapi/src/test/java/config/example.png";
+String contentType = "image/png";
+byte[] arr = att.addAttachment(attachment, contentType);
+
+ArrayList<Attachment> attList = new ArrayList<Attachment>();
+attList = new ArrayList<Attachment>();
+attList.add(att);
+statement.setAttachments(attList);
+
+ArrayList<byte[]> attachedData = new ArrayList<byte[]>();
+attachedData.add(arr);
+String publishedId = sc.postStatementWithAttachments(statement, contentType, attachedData);
+```
+
 ### Querying an LRS
 
 You can get all the statements from an LRS by calling the ```getStatements``` method on the client
@@ -168,6 +239,19 @@ This will return a ```StatementResult``` object, which will have a list of all r
 StatementResult results = client.getStatements()
 ```
 
+Getting statements with attachments.
+```java
+AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
+Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
+
+//Get the attached file.
+byte[] actualArray = attachmntResult.getAttachment().get(sha2).getAttachment().get(i);
+```
+
+Getting a statement with a statement ID.
+```
+AttachmentResult attachmntResult = sc.getStatementWithAttachments(statementId);
+```
 To get the next page of results call ```getStatements``` with the value returned from ```getMore```
 
 ```java
