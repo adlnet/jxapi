@@ -34,7 +34,7 @@ public class AttachmentResultTest {
 			+ "This is a text/plain test." + " --======ADL_LRS======--";
 	private Statement statement;
 	private StatementResult statements;
-	private byte[] bytes;
+	private byte[] attachment;
 	private String type;
 	private Map<String, AttachmentAndType> attachments;
 
@@ -59,9 +59,8 @@ public class AttachmentResultTest {
 		statements.setStatements(statementList);
 
 		type = "text/plain";
-		bytes = "This is a text/plain test.".getBytes("UTF-8");
-		ArrayList<byte[]> attachment = new ArrayList<byte[]>();
-		attachment.add(bytes);
+		attachment = "This is a text/plain test.".getBytes("UTF-8");
+
 		AttachmentAndType att = new AttachmentAndType(attachment, type);
 		attachments = new HashMap<String, AttachmentAndType>();
 		attachments.put(HASH, att);
@@ -157,9 +156,8 @@ public class AttachmentResultTest {
 
 		String testHash = "abc6743b9e031244a015";
 		String type = "test/plain";
-		byte[] bytes = "This is a new text/plain test.".getBytes("UTF-8");
-		ArrayList<byte[]> attachment = new ArrayList<byte[]>();
-		attachment.add(bytes);
+		byte[] attachment = "This is a new text/plain test.".getBytes("UTF-8");
+		
 		AttachmentAndType att = new AttachmentAndType(attachment, type);
 		Map<String, AttachmentAndType> inputAttachments = new HashMap<String, AttachmentAndType>();
 		inputAttachments.put(testHash, att);
@@ -193,7 +191,7 @@ public class AttachmentResultTest {
 	public void testGetAttachment() {
 		AttachmentResult a = new AttachmentResult(RESPONSE_MESSAGE, statements, attachments);
 		assertNotNull(a);
-		assertEquals(Arrays.toString(bytes), Arrays.toString(a.getAttachment().get(HASH).getAttachment().get(0)));
+		assertEquals(Arrays.toString(attachment), Arrays.toString(a.getAttachment().get(HASH).getAttachment()));
 		assertEquals(type, a.getAttachment().get(HASH).getType());
 	}
 

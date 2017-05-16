@@ -1,14 +1,12 @@
 package gov.adlnet.xapi.util;
 
-import java.util.ArrayList;
-
 /**
  * 
  * @author 
  *
  */
 public class AttachmentAndType {
-	private ArrayList<byte[]> attachment;
+	private byte[] attachment;
 	private String contentType;
 	
 	/**
@@ -16,7 +14,7 @@ public class AttachmentAndType {
 	 * @param attachmentInput
 	 * @param typeInput
 	 */
-	public AttachmentAndType(ArrayList<byte[]> attachmentInput, String typeInput) {
+	public AttachmentAndType(byte[] attachmentInput, String typeInput) {
 		if(attachmentInput == null){
 			throw new IllegalArgumentException("Attachment cannot be null.");
 		} else {
@@ -35,8 +33,20 @@ public class AttachmentAndType {
 	 * 
 	 * @return
 	 */
-	public ArrayList<byte[]> getAttachment() {
+	public byte[] getAttachment() {
 		return attachment;
+	}
+	
+	/**
+	 * 
+	 * @param attachmentInput
+	 */
+	public void setAttachments(byte[] attachmentInput){
+		if(attachmentInput == null){
+			throw new IllegalArgumentException("Attachment cannot be null.");
+		} else {
+			attachment = attachmentInput;
+		}
 	}
 	
 	/**
@@ -45,5 +55,17 @@ public class AttachmentAndType {
 	 */
 	public String getType() {
 		return contentType;
+	}
+	
+	/**
+	 * 
+	 * @param typeInput
+	 */
+	public void setType(String typeInput){
+		if(typeInput == null){
+			throw new IllegalArgumentException("Content type cannot be null.");
+		} else {
+			contentType = typeInput;
+		}
 	}
 }

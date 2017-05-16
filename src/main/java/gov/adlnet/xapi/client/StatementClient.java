@@ -62,12 +62,16 @@ public class StatementClient extends BaseClient {
 		return jsonResult.get(0).getAsString();
 	}
 
-	public String postStatements(ArrayList<Statement> statements) throws java.io.IOException {
+	public ArrayList<String> postStatements(ArrayList<Statement> statements) throws java.io.IOException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statements);
 		String result = this.issuePost("/statements", json);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-		return jsonResult.get(0).getAsString();
+		ArrayList<String> IDs = new ArrayList<>();
+		for (int i = 0; i < jsonResult.size(); i++) {
+			IDs.add(jsonResult.get(i).getAsString());
+		}
+		return IDs;
 	}
 
 	public Boolean putStatement(Statement statement, String stmtId) throws java.io.IOException {
@@ -77,29 +81,34 @@ public class StatementClient extends BaseClient {
 		return result.isEmpty();
 	}
 
-	public String postStatementWithAttachments(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
+	public ArrayList<String> postStatementWithAttachments(Statement statement, ArrayList<AttachmentAndType> attachments)
 			throws IOException, NoSuchAlgorithmException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
-		String result = this.issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
+		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-		return jsonResult.get(0).getAsString();
+		ArrayList<String> IDs = new ArrayList<>();
+		for (int i = 0; i < jsonResult.size(); i++) {
+			IDs.add(jsonResult.get(i).getAsString());
+		}
+		return IDs;
 	}
 	
-	public String postStatementsWithAttachments(ArrayList<Statement> statements, String contentType, ArrayList<byte[]> attachmentData)
+	public String postStatementsWithAttachments(ArrayList<Statement> statements, ArrayList<AttachmentAndType> attachments)
 			throws IOException, NoSuchAlgorithmException {
+		
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statements);
-		String result = this.issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
+		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-		return jsonResult.get(0).getAsString();
+		return jsonResult.getAsString();
 	}
 	
-	public Boolean putStatementWithAttachments(Statement statement, String stmtId, String contentType, ArrayList<byte[]> attachmentData)
+	public Boolean putStatementWithAttachments(Statement statement, String stmtId, ArrayList<AttachmentAndType> attachments)
 			throws IOException, NoSuchAlgorithmException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
-		String result = this.issuePutWithFileAttachment("/statements?statementId=" + stmtId, json, contentType, attachmentData);
+		String result = this.issuePutWithFileAttachment("/statements?statementId=" + stmtId, json, attachments);
 		return result.isEmpty();
 	}
 
@@ -170,7 +179,6 @@ public class StatementClient extends BaseClient {
 
 		StatementResult statements = null;
 		Statement statement = null;
-		ArrayList<byte[]> attachment = new ArrayList<byte[]>();
 
 		// Storage for hash, byte[], and content type.
 		Map<String, AttachmentAndType> attachments = new HashMap<String, AttachmentAndType>();
@@ -216,21 +224,20 @@ public class StatementClient extends BaseClient {
 				}
 
 				// Get attachment
-				byte[] bytes = bodypart.getContent().toString().getBytes("UTF-8");
+				byte[] attachment = bodypart.getContent().toString().getBytes("UTF-8");
 
-				attachment.add(bytes);
 				attachments.put(hash, new AttachmentAndType(attachment, type));
 			} else {
 				// Get binary attachment
 
 				// Get content type
 				String type = bodypart.getContentType();
-				byte[] bytes = null;
+				byte[] attachment = null;
 
 				if (bodypart.getContent() instanceof InputStream) {
 
 					InputStream in = (InputStream) bodypart.getInputStream();
-					bytes = IOUtils.toByteArray(in);
+					attachment = IOUtils.toByteArray(in);
 
 					// get hash of attachment
 					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
@@ -238,7 +245,6 @@ public class StatementClient extends BaseClient {
 					if (e != null && e.hasMoreElements()) {
 						hash = e.nextElement().getValue();
 					}
-					attachment.add(bytes);
 					attachments.put(hash, new AttachmentAndType(attachment, type));
 				}
 			}

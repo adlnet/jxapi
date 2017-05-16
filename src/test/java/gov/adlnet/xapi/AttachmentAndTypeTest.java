@@ -7,8 +7,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,28 +16,25 @@ import gov.adlnet.xapi.util.AttachmentAndType;
 public class AttachmentAndTypeTest {
 
 	private String type;
-	private byte[] bytes;
-	private ArrayList<byte[]> attachment;
+	private byte[] attachment;
 
 	@Before
 	public void setUp() throws Exception {
 		type = "text/plain";
-		bytes = "This is a text/plain test.".getBytes("UTF-8");
-		attachment = new ArrayList<byte[]>();
+		attachment = "This is a text/plain test.".getBytes("UTF-8");
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		bytes = null;
 		attachment = null;
-		assertNull(bytes);
+		attachment = null;
+		assertNull(attachment);
 		assertNull(attachment);
 	}
 
 	@Test
 	public void testAttachmentAndType() {
 		AttachmentAndType a;
-		attachment.add(bytes);
 
 		try {
 			a = new AttachmentAndType(attachment, type);
@@ -71,13 +66,12 @@ public class AttachmentAndTypeTest {
 	@Test
 	public void testGetAttachment() {
 		AttachmentAndType a;
-		attachment.add(bytes);
 
 		try {
 			a = new AttachmentAndType(attachment, type);
 			assertNotNull(a);
 			assertNotNull(a.getAttachment());
-			assertArrayEquals(bytes, a.getAttachment().get(0));
+			assertArrayEquals(attachment, a.getAttachment());
 		} catch (IllegalArgumentException e) {
 			fail("Exception thrown");
 		}
@@ -86,7 +80,6 @@ public class AttachmentAndTypeTest {
 	@Test
 	public void testGetType() {
 		AttachmentAndType a;
-		attachment.add(bytes);
 
 		try {
 			a = new AttachmentAndType(attachment, type);

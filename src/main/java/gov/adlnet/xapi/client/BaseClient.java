@@ -9,12 +9,10 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Hex;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -24,6 +22,7 @@ import gov.adlnet.xapi.model.Attachment;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
+import gov.adlnet.xapi.util.AttachmentAndType;
 import gov.adlnet.xapi.util.Base64;
 
 public class BaseClient {
@@ -157,12 +156,8 @@ public class BaseClient {
         conn.setUseCaches(false);
         return conn;
     }
-
-	protected String issuePost(String path, String data)
-			throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
-		HttpURLConnection conn = initializeConnection(url);
-		conn.setRequestMethod("POST");
+	
+	private String sendStatement(HttpURLConnection conn, String data) throws java.io.IOException {
 		OutputStreamWriter writer = new OutputStreamWriter(
 				conn.getOutputStream());
 		try {
@@ -191,15 +186,9 @@ public class BaseClient {
 		}
 	}
 	
-	
-    protected String issuePostWithFileAttachment(String path, String data, String contentType, ArrayList<byte[]> attachmentData)
-            throws java.io.IOException, NoSuchAlgorithmException {
-        String boundary = "===" + System.currentTimeMillis() + "===";
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
- 
-        HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
-        conn.setRequestMethod("POST");
-        OutputStreamWriter writer = new OutputStreamWriter(
+	private String sendStatementWithAttachment(HttpURLConnection conn, String data, String boundary, ArrayList<AttachmentAndType> attachmentData)  throws java.io.IOException, NoSuchAlgorithmException {
+		
+		OutputStreamWriter writer = new OutputStreamWriter(
 				conn.getOutputStream(), "UTF-8");
 
         try {
@@ -207,13 +196,14 @@ public class BaseClient {
             writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
             writer.append(data).append(LINE_FEED);
             writer.append("--" + boundary).append(LINE_FEED);
-            for(byte[] ba: attachmentData){
-                writer.append("Content-Type:" + contentType).append(LINE_FEED);
+            for (AttachmentAndType attachmentAndType : attachmentData) {
+            	writer.append("Content-Type:" + attachmentAndType.getType()).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(ba)).append(LINE_FEED).append(LINE_FEED);
-                writer.append(new String(ba)).append(LINE_FEED);
+                System.out.println("base "+Attachment.generateSha2(attachmentAndType.getAttachment()));
+                writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(attachmentAndType.getAttachment())).append(LINE_FEED).append(LINE_FEED);
+                writer.append(new String(attachmentAndType.getAttachment())).append(LINE_FEED);
                 writer.append("--" + boundary + "--");
-            }
+			}
             
             writer.flush();
         } catch (IOException ex) {
@@ -238,6 +228,25 @@ public class BaseClient {
         } finally {
             conn.disconnect();
         }
+	}
+
+	protected String issuePost(String path, String data)
+			throws java.io.IOException {
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
+		HttpURLConnection conn = initializeConnection(url);
+		conn.setRequestMethod("POST");
+		return sendStatement(conn, data);
+	}
+	
+	
+    protected String issuePostWithFileAttachment(String path, String data, ArrayList<AttachmentAndType> attachmentData)
+            throws java.io.IOException, NoSuchAlgorithmException {
+    	String boundary = "===" + System.currentTimeMillis() + "===";
+        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
+ 
+        HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
+        conn.setRequestMethod("POST");
+        return sendStatementWithAttachment(conn, data, boundary, attachmentData);
     }
 
     protected String issuePut(String path, String data)
@@ -245,83 +254,17 @@ public class BaseClient {
         URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializeConnection(url);
         conn.setRequestMethod("PUT");
-        OutputStreamWriter writer = new OutputStreamWriter(
-                conn.getOutputStream());
-        try {
-            writer.write(data);
-        } catch (IOException ex) {
-            InputStream s = conn.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(s);
-            BufferedReader br = new BufferedReader(isr);
-            try {
-                String line;
-                while((line = br.readLine()) != null){
-                    System.out.print(line);
-                }
-                System.out.println();
-            } finally {
-                s.close();
-            }
-            throw ex;
-        } finally {
-            writer.close();
-        }
-        try {
-            return readFromConnection(conn);
-        } finally {
-            conn.disconnect();
-        }
+        return sendStatement(conn, data);
     }
     
-    protected String issuePutWithFileAttachment(String path, String data, String contentType, ArrayList<byte[]> attachmentData)
+    protected String issuePutWithFileAttachment(String path, String data, ArrayList<AttachmentAndType> attachmentData)
             throws java.io.IOException, NoSuchAlgorithmException {
         String boundary = "===" + System.currentTimeMillis() + "===";
         URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
  
         HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
         conn.setRequestMethod("PUT");
-        OutputStreamWriter writer = new OutputStreamWriter(
-				conn.getOutputStream(), "UTF-8");
-
-        try {
-            writer.append("--" + boundary).append(LINE_FEED);
-            writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
-            writer.append(data).append(LINE_FEED);
-            writer.append("--" + boundary).append(LINE_FEED);
-            for(byte[] ba: attachmentData){
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                md.update(ba);
-                String sha256String = new String(Hex.encode(md.digest()));
-                writer.append("Content-Type:" + contentType).append(LINE_FEED);
-                writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
-                writer.append(new String(ba)).append(LINE_FEED);
-                writer.append("--" + boundary + "--");
-            }
-            writer.flush();
-        } catch (IOException ex) {
-            InputStream s = conn.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(s);
-            BufferedReader br = new BufferedReader(isr);
-            try {
-                String line;
-                while((line = br.readLine()) != null){
-                    System.out.print(line);
-                }
-                System.out.println();
-            } finally {
-                s.close();
-            }
-            throw ex;
-        } finally {
-            writer.close();
-        }
-        try {
-//        	System.out.println(readFromConnection(conn));
-            return readFromConnection(conn);
-        } finally {
-            conn.disconnect();
-        }
+        return sendStatementWithAttachment(conn, data, boundary, attachmentData);
     }
 
     protected String issueDelete(String path)
