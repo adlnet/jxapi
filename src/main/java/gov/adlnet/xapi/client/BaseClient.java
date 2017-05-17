@@ -196,18 +196,14 @@ public class BaseClient {
             writer.append("--" + boundary).append(LINE_FEED);
             writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
             writer.append(data).append(LINE_FEED);
-            System.out.println("base "+data);
-            System.out.println(attachmentData.size());
-            writer.append("--" + boundary).append(LINE_FEED);
             for (AttachmentAndType attachmentAndType : attachmentData) {
+            	writer.append("--" + boundary).append(LINE_FEED);
             	writer.append("Content-Type:" + attachmentAndType.getType()).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                System.out.println(Arrays.toString(attachmentAndType.getAttachment()));
                 writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(attachmentAndType.getAttachment())).append(LINE_FEED).append(LINE_FEED);
-                writer.append(new String(attachmentAndType.getAttachment())).append(LINE_FEED);
-                writer.append("--" + boundary + "--");
+                writer.append(new String(attachmentAndType.getAttachment())).append(LINE_FEED);     
 			}
-            
+            writer.append("--" + boundary + "--");
             writer.flush();
         } catch (IOException ex) {
             InputStream s = conn.getErrorStream();

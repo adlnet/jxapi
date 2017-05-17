@@ -438,13 +438,7 @@ public class StatementClientTest extends TestCase {
 		
 		//Add actual attachment
 		attachments.add(new AttachmentAndType(arr, contentType));		
-		
-		
-		System.out.println(attachments.size());
-		for (Statement statement : statements) {
-			System.out.println(statement.serialize());
-		}
-		
+
 		//Publish statement
 		ArrayList<String> publishedId = sc.postStatementsWithAttachments(statements, attachments);
 		assertTrue(publishedId.size() > 0);
