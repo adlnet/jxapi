@@ -27,7 +27,7 @@ import gov.adlnet.xapi.util.AttachmentAndType;
 import gov.adlnet.xapi.util.Base64;
 
 public class BaseClient {
-	private static final String XAPI_VERSION = "1.0.0";
+	private static final String XAPI_VERSION = "1.0.3";
 	private static final String LINE_FEED = "\r\n";
 	private static final int ERROR_RESPONSE = 400;
 	protected URL _host;
