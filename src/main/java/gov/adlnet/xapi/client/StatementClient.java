@@ -81,10 +81,20 @@ public class StatementClient extends BaseClient {
 		return result.isEmpty();
 	}
 
-	public ArrayList<String> postStatementWithAttachments(Statement statement, ArrayList<AttachmentAndType> attachments)
+	public String postStatementWithAttachments(Statement statement, ArrayList<AttachmentAndType> attachments)
 			throws IOException, NoSuchAlgorithmException {
 		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
+		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		return jsonResult.get(0).getAsString();
+	}
+	
+	public ArrayList<String> postStatementsWithAttachments(ArrayList<Statement> statements, ArrayList<AttachmentAndType> attachments)
+			throws IOException, NoSuchAlgorithmException {
+		
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statements);
 		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		ArrayList<String> IDs = new ArrayList<>();
@@ -92,16 +102,6 @@ public class StatementClient extends BaseClient {
 			IDs.add(jsonResult.get(i).getAsString());
 		}
 		return IDs;
-	}
-	
-	public String postStatementsWithAttachments(ArrayList<Statement> statements, ArrayList<AttachmentAndType> attachments)
-			throws IOException, NoSuchAlgorithmException {
-		
-		Gson gson = this.getDecoder();
-		String json = gson.toJson(statements);
-		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
-		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-		return jsonResult.getAsString();
 	}
 	
 	public Boolean putStatementWithAttachments(Statement statement, String stmtId, ArrayList<AttachmentAndType> attachments)

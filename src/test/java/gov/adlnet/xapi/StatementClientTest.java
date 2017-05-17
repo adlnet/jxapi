@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -303,7 +304,7 @@ public class StatementClientTest extends TestCase {
 
 	@Test
 	public void testPostStatementWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
-		ArrayList<AttachmentAndType> attachments = new ArrayList<>();
+		ArrayList<AttachmentAndType> attachments = new ArrayList<AttachmentAndType>();
 		
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -348,14 +349,15 @@ public class StatementClientTest extends TestCase {
 		statement.setAttachments(attList);
 		attachments.add(new AttachmentAndType(arr, contentType));		
 		
-		ArrayList<String> publishedId = sc.postStatementWithAttachments(statement, attachments);
-		assertTrue(publishedId.size() > 0);
+		String publishedId = sc.postStatementWithAttachments(statement, attachments);
+		assertTrue(publishedId.length() > 0);
 	}
 	
 	@Test
 	public void testPostStatementsWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
-		ArrayList<AttachmentAndType> attachments = new ArrayList<>();
-
+		ArrayList<AttachmentAndType> attachments = new ArrayList<AttachmentAndType>();
+		
+		//Basic statement
 		Agent a = new Agent();
 		a.setMbox(mbox);
 		Verb v = new Verb("http://example.com/tested");
@@ -363,8 +365,8 @@ public class StatementClientTest extends TestCase {
 		activity_id = "http://example.com/" + UUID.randomUUID().toString();
 		Activity act = new Activity(activity_id);
 		st = new Statement(a, v, act);
-		statements.add(st);
 
+		//Activity definition
 		ActivityDefinition ad = new ActivityDefinition();
 		ad.setChoices(new ArrayList<InteractionComponent>());
 		InteractionComponent ic = new InteractionComponent();
@@ -374,12 +376,14 @@ public class StatementClientTest extends TestCase {
 		ad.getChoices().add(ic);
 		ad.setInteractionType("choice");
 
+		//Correct response pattern
 		ArrayList<String> crp = new ArrayList<String>();
 		crp.add("http://example.com");
 		ad.setCorrectResponsesPattern(crp);
 		ad.setMoreInfo("http://example.com");
 		act.setDefinition(ad);
 
+		//Create attachment
 		Attachment att = new Attachment();
 
 		HashMap<String, String> display = new HashMap<String, String>();
@@ -396,34 +400,59 @@ public class StatementClientTest extends TestCase {
 		String attachment = "This is a text/plain test.";
 		String contentType = "text/plain";
 		byte[] arr = att.addAttachment(attachment, contentType);
-		System.out.println("1st "+att.getSha2());
+
+		//Add attachment info to statement
 		ArrayList<Attachment> attList = new ArrayList<Attachment>();
 		attList.add(att);
+		att = null;
 		st.setAttachments(attList);
+		statements.add(st);
+		st = null;
 		
+		//Add first actual attachment
 		attachments.add(new AttachmentAndType(arr, contentType));
 		
+		//Create the second statement
 		activity_id = "http://example.com/" + UUID.randomUUID().toString();
 		act = new Activity(activity_id);
 		st = new Statement(a, v, act);
+		
+		//Create second attachment
+		att = new Attachment();
+		att.setDisplay(display);
+		description = new HashMap<String, String>();
+		description.put("en-US", "Test Description 2.");
+		att.setDescription(description);
+		att.setUsageType(usageType);
+		act.setDefinition(ad);
+			
+		attachment = "This is a 2nd text/plain test.";
+		arr = null;
+		arr = att.addAttachment(attachment, contentType);
+		
+		//Add 2nd attachment info to statement
+		attList = new ArrayList<Attachment>();
+		attList.add(att);		
+		st.setAttachments(attList);
 		statements.add(st);
 		
-		attachment = "This is a 2nd text/plain test.";
-		arr = att.addAttachment(attachment, contentType);
-		System.out.println("2nd "+att.getSha2());
-		attList = new ArrayList<Attachment>();
-		attList.add(att);
-		st.setAttachments(attList);
-
+		//Add actual attachment
 		attachments.add(new AttachmentAndType(arr, contentType));		
 		
-		String publishedId = sc.postStatementsWithAttachments(statements, attachments);
-		assertTrue(publishedId.length() > 0);
+		
+		System.out.println(attachments.size());
+		for (Statement statement : statements) {
+			System.out.println(statement.serialize());
+		}
+		
+		//Publish statement
+		ArrayList<String> publishedId = sc.postStatementsWithAttachments(statements, attachments);
+		assertTrue(publishedId.size() > 0);
 	}
 	
 	@Test
 	public void testPutStatementWithAttachments() throws IOException, URISyntaxException, NoSuchAlgorithmException {
-		ArrayList<AttachmentAndType> attachments = new ArrayList<>();
+		ArrayList<AttachmentAndType> attachments = new ArrayList<AttachmentAndType>();
 		
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -495,7 +524,7 @@ public class StatementClientTest extends TestCase {
 	public void testGetStatementsWithAttachments() throws NoSuchAlgorithmException, IOException, URISyntaxException,
 			JsonSyntaxException, NumberFormatException, MessagingException {
 
-		ArrayList<AttachmentAndType> attachments = new ArrayList<>();
+		ArrayList<AttachmentAndType> attachments = new ArrayList<AttachmentAndType>();
 		
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -538,8 +567,8 @@ public class StatementClientTest extends TestCase {
 
 		attachments.add(new AttachmentAndType(expectedArray, contentType));	
 
-		ArrayList<String> publishedId = sc.postStatementWithAttachments(statement, attachments);
-		assertTrue(publishedId.size() > 0);
+		String publishedId = sc.postStatementWithAttachments(statement, attachments);
+		assertTrue(publishedId.length() > 0);
 		AttachmentResult attachmntResult = sc.getStatementsWithAttachments();
 		Statement s = attachmntResult.getXapiStatements().getStatements().get(0);
 		assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
@@ -567,12 +596,12 @@ public class StatementClientTest extends TestCase {
 		attachments.add(new AttachmentAndType(expectedArray, contentType));
 
 		publishedId = sc.postStatementWithAttachments(statement, attachments);
-		assertTrue(publishedId.size() > 0);
+		assertTrue(publishedId.length() > 0);
 		attachmntResult = sc.getStatementsWithAttachments();
 		s = attachmntResult.getXapiStatements().getStatements().get(0);
 		assertTrue(s.getAttachments().get(0).getSha2().contains(att.getSha2()));
 
-		attachmntResult = sc.addFilter("statementId", publishedId.get(0)).getStatementsWithAttachments();
+		attachmntResult = sc.addFilter("statementId", publishedId).getStatementsWithAttachments();
 		actualArray = attachmntResult.getAttachment().get(expectedHash).getAttachment();
 		assertEquals(attachmntResult.getXapiStatement().getAttachments().get(0).getSha2(), expectedHash);
 		assertEquals(new String(expectedArray), new String(actualArray));
@@ -581,7 +610,7 @@ public class StatementClientTest extends TestCase {
 	@Test
 	public void testGetStatementsWithAttachmentsString() throws NoSuchAlgorithmException, IOException,
 			URISyntaxException, JsonSyntaxException, NumberFormatException, MessagingException {
-		ArrayList<AttachmentAndType> attachments = new ArrayList<>();
+		ArrayList<AttachmentAndType> attachments = new ArrayList<AttachmentAndType>();
 		
 		Agent a = new Agent();
 		a.setMbox(mbox);
@@ -624,13 +653,12 @@ public class StatementClientTest extends TestCase {
 		attachments.add(new AttachmentAndType(expectedArray, contentType));	
 	
 
-		ArrayList<String> publishedId = sc.postStatementWithAttachments(statement, attachments);
+		String publishedId = sc.postStatementWithAttachments(statement, attachments);
+		assertTrue(publishedId.length() > 0);
 
-		assertTrue(publishedId.size() > 0);
-
-		AttachmentResult attachmntResult = sc.getStatementWithAttachments(publishedId.get(0));
+		AttachmentResult attachmntResult = sc.getStatementWithAttachments(publishedId);
 		String id = attachmntResult.getXapiStatement().getId();
-		assertTrue(id.contains((publishedId.get(0))));
+		assertTrue(id.contains((publishedId)));
 		byte[] actualArray = attachmntResult.getAttachment().get(expectedHash).getAttachment();
 		assertEquals(attachmntResult.getXapiStatement().getAttachments().get(0).getSha2(), expectedHash);
 		assertEquals(new String(expectedArray), new String(actualArray));

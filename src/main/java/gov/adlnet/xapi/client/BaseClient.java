@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
@@ -195,11 +196,13 @@ public class BaseClient {
             writer.append("--" + boundary).append(LINE_FEED);
             writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
             writer.append(data).append(LINE_FEED);
+            System.out.println("base "+data);
+            System.out.println(attachmentData.size());
             writer.append("--" + boundary).append(LINE_FEED);
             for (AttachmentAndType attachmentAndType : attachmentData) {
             	writer.append("Content-Type:" + attachmentAndType.getType()).append(LINE_FEED);
                 writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                System.out.println("base "+Attachment.generateSha2(attachmentAndType.getAttachment()));
+                System.out.println(Arrays.toString(attachmentAndType.getAttachment()));
                 writer.append("X-Experience-API-Hash:" + Attachment.generateSha2(attachmentAndType.getAttachment())).append(LINE_FEED).append(LINE_FEED);
                 writer.append(new String(attachmentAndType.getAttachment())).append(LINE_FEED);
                 writer.append("--" + boundary + "--");

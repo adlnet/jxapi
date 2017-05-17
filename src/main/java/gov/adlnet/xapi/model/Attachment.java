@@ -48,7 +48,6 @@ public class Attachment {
 		length = attachmentInput.length();
 		if (contentType.equals("text/plain")) {
 			byteArray = attachmentInput.getBytes("UTF-8");
-
 		} else {
 			File testFile = new File(attachmentInput);
 			byteArray = Files.readAllBytes(testFile.toPath());
