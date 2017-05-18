@@ -198,8 +198,9 @@ public class ActivityDefinition {
 	}
 	
 	public String toString() {
-		if (name != null)
+		if (name != null){
 			return name.get("en-US");
+		}
 		return "";
 	}
     public String toString(String langMap) {

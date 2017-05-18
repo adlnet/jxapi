@@ -1,140 +1,118 @@
 package gov.adlnet.xapi.client;
 
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.Statement;
-import gov.adlnet.xapi.model.StatementResult;
-import gov.adlnet.xapi.model.Verb;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.mail.BodyPart;
+import javax.mail.Header;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
+
+import org.apache.commons.io.IOUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonSyntaxException;
 
-import org.bouncycastle.util.encoders.Hex;
+import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.Statement;
+import gov.adlnet.xapi.model.StatementResult;
+import gov.adlnet.xapi.model.Verb;
+import gov.adlnet.xapi.util.AttachmentAndType;
+import gov.adlnet.xapi.util.AttachmentResult;
 
 public class StatementClient extends BaseClient {
 	private TreeMap<String, String> filters;
-    private static final String LINE_FEED = "\r\n";
 
-	public StatementClient(String uri, String user, String password)
-			throws java.net.MalformedURLException {
-		super(new URL(uri), user, password);
-	}
-
-	public StatementClient(URL uri, String user, String password)
-			throws MalformedURLException {
+	public StatementClient(String uri, String user, String password) throws java.net.MalformedURLException {
 		super(uri, user, password);
 	}
 
-    protected HttpURLConnection initializeConnectionForAttachments(URL url, String boundary)
-            throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setDoInput(true);
-        conn.addRequestProperty("X-Experience-API-Version", "1.0.0");
-        conn.setRequestProperty("Content-Type", "multipart/mixed; boundary=" + boundary);
-        conn.setRequestProperty("Authorization", this.authString);
-        conn.setUseCaches(false);
-        return conn;
-    }
+	public StatementClient(URL uri, String user, String password) throws MalformedURLException {
+		super(uri, user, password);
+	}
 
-    protected HttpURLConnection initializePOSTConnectionForAttachments(URL url, String boundary)
-            throws IOException {
-        HttpURLConnection conn = initializeConnectionForAttachments(url, boundary);
-        conn.setDoOutput(true);
-        conn.setRequestMethod("POST");
-        return conn;
-    }
+	public StatementClient(String uri, String encodedUsernamePassword) throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
-    protected String issuePostWithFileAttachment(String path, String data, String contentType, ArrayList<byte[]> attachmentData)
-            throws java.io.IOException, NoSuchAlgorithmException {
-        String boundary = "===" + System.currentTimeMillis() + "===";
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
-        HttpURLConnection conn = initializePOSTConnectionForAttachments(url, boundary);
-        OutputStreamWriter writer = new OutputStreamWriter(
-                conn.getOutputStream());
-        try {
-            writer.append("--" + boundary).append(LINE_FEED);
-            writer.append("Content-Type:application/json").append(LINE_FEED).append(LINE_FEED);
-            writer.append(data).append(LINE_FEED);
-            writer.append("--" + boundary).append(LINE_FEED);
-            for(byte[] ba: attachmentData){
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                md.update(ba);
-                String sha256String = new String(Hex.encode(md.digest()));
-                writer.append("Content-Type:" + contentType).append(LINE_FEED);
-                writer.append("Content-Transfer-Encoding:binary").append(LINE_FEED);
-                writer.append("X-Experience-API-Hash:" + sha256String).append(LINE_FEED).append(LINE_FEED);
-                writer.append(ba.toString()).append(LINE_FEED);
-                writer.append("--" + boundary + "--");
-            }
-            writer.flush();
-        } catch (IOException ex) {
-            InputStream s = conn.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(s);
-            BufferedReader br = new BufferedReader(isr);
-            try {
-                String line;
-                while((line = br.readLine()) != null){
-                    System.out.print(line);
-                }
-                System.out.println();
-            } finally {
-                s.close();
-            }
-            throw ex;
-        } finally {
-            writer.close();
-        }
-        try {
-            return readFromConnection(conn);
-        } finally {
-            conn.disconnect();
-        }
-    }
-
-	public String postStatement(Statement statement)
-			throws java.io.IOException {
-		Gson gson = getDecoder();
+	public StatementClient(URL uri, String encodedUsernamePassword) throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public String postStatement(Statement statement) throws java.io.IOException {
+		Gson gson = this.getDecoder();
 		String json = gson.toJson(statement);
-		String result = issuePost("/statements", json);
+		String result = this.issuePost("/statements", json);
 		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
 		return jsonResult.get(0).getAsString();
 	}
 
-    public Boolean putStatement(Statement statement, String stmtId)
-            throws java.io.IOException {
-        Gson gson = getDecoder();
-        String json = gson.toJson(statement);
-        String result = issuePut("/statements?statementId=" + stmtId, json);
-        return result.isEmpty();
-    }
+	public ArrayList<String> postStatements(ArrayList<Statement> statements) throws java.io.IOException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statements);
+		String result = this.issuePost("/statements", json);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		ArrayList<String> IDs = new ArrayList<>();
+		for (int i = 0; i < jsonResult.size(); i++) {
+			IDs.add(jsonResult.get(i).getAsString());
+		}
+		return IDs;
+	}
 
-    public String postStatementWithAttachment(Statement statement, String contentType, ArrayList<byte[]> attachmentData)
-            throws IOException, NoSuchAlgorithmException{
-        Gson gson = getDecoder();
-        String json = gson.toJson(statement);
-        String result = issuePostWithFileAttachment("/statements", json, contentType, attachmentData);
-        JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
-        return jsonResult.get(0).getAsString();
-    }
+	public Boolean putStatement(Statement statement, String stmtId) throws java.io.IOException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePut("/statements?statementId=" + stmtId, json);
+		return result.isEmpty();
+	}
 
+	public String postStatementWithAttachments(Statement statement, ArrayList<AttachmentAndType> attachments)
+			throws IOException, NoSuchAlgorithmException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		return jsonResult.get(0).getAsString();
+	}
+	
+	public ArrayList<String> postStatementsWithAttachments(ArrayList<Statement> statements, ArrayList<AttachmentAndType> attachments)
+			throws IOException, NoSuchAlgorithmException {
+		
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statements);
+		String result = this.issuePostWithFileAttachment("/statements", json, attachments);
+		JsonArray jsonResult = gson.fromJson(result, JsonArray.class);
+		ArrayList<String> IDs = new ArrayList<>();
+		for (int i = 0; i < jsonResult.size(); i++) {
+			IDs.add(jsonResult.get(i).getAsString());
+		}
+		return IDs;
+	}
+	
+	public Boolean putStatementWithAttachments(Statement statement, String stmtId, ArrayList<AttachmentAndType> attachments)
+			throws IOException, NoSuchAlgorithmException {
+		Gson gson = this.getDecoder();
+		String json = gson.toJson(statement);
+		String result = this.issuePutWithFileAttachment("/statements?statementId=" + stmtId, json, attachments);
+		return result.isEmpty();
+	}
 
-	public StatementResult getStatements(String more)
-			throws java.io.IOException {
+	public StatementResult getStatements(String more) throws java.io.IOException {
 		String result = this.issueGet(more);
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
@@ -157,45 +135,143 @@ public class StatementClient extends BaseClient {
 		return this.getDecoder().fromJson(result, StatementResult.class);
 	}
 
-    public String getStatementsWithAttachments() throws java.io.IOException {
-        StringBuilder query = new StringBuilder();
-        query.append("/statements");
-        if (this.filters != null && !this.filters.isEmpty()) {
-            query.append("?");
-            for (Entry<String, String> item : this.filters.entrySet()) {
-                query.append(item.getKey());
-                query.append("=");
-                query.append(item.getValue());
-                query.append("&");
-            }
-            query.deleteCharAt(query.length() - 1);
-            this.filters.clear();
-        }
-        if (query.toString().contains("?")){
-            query.append("&attachments=true");
-        }
-        else{
-            query.append("?attachments=true");
-        }
-        return this.issueGet(query.toString());
-    }
+	public AttachmentResult getStatementsWithAttachments()
+			throws IOException, JsonSyntaxException, NumberFormatException, MessagingException {
 
-    public Statement get(String statementId) throws java.io.IOException {
-		String result = this.issueGet("/statements?statementId="
-				+ statementId);
+		StringBuilder query = new StringBuilder();
+		query.append("/statements");
+		if (this.filters != null && !this.filters.isEmpty()) {
+			query.append("?");
+			for (Entry<String, String> item : this.filters.entrySet()) {
+				query.append(item.getKey());
+				query.append("=");
+				query.append(item.getValue());
+				query.append("&");
+			}
+			query.deleteCharAt(query.length() - 1);
+			this.filters.clear();
+		}
+		if (query.toString().contains("?")) {
+			query.append("&attachments=true");
+		} else {
+			query.append("?attachments=true");
+		}
+		String result = this.issueGetWithAttachments(query.toString());
+		return parseMultipartString(result);
+	}
+
+	public AttachmentResult getStatementWithAttachments(String statementId)
+			throws IOException, JsonSyntaxException, NumberFormatException, MessagingException {
+
+		StringBuilder query = new StringBuilder();
+		query.append("/statements?statementId=" + statementId);
+		query.append("&attachments=true");
+
+		String result = this.issueGetWithAttachments(query.toString());
+		return parseMultipartString(result);
+	}
+
+	private AttachmentResult parseMultipartString(String responseMessage)
+			throws IOException, JsonSyntaxException, NumberFormatException, MessagingException {
+
+		final String STMNTS = "{\"statements\": [";
+		final String[] NAME = { "X-Experience-API-Hash" };
+
+		StatementResult statements = null;
+		Statement statement = null;
+
+		// Storage for hash, byte[], and content type.
+		Map<String, AttachmentAndType> attachments = new HashMap<String, AttachmentAndType>();
+		AttachmentResult results = null;
+
+		ByteArrayDataSource ds;
+		ds = new ByteArrayDataSource(responseMessage, "multipart/mixed;");
+
+		MimeMultipart multipart = new MimeMultipart(ds);
+		BodyPart bodypart = null;
+
+		for (int i = 0; i < multipart.getCount(); i++) {
+			bodypart = multipart.getBodyPart(i);
+
+			if (bodypart.isMimeType("application/json")) {
+				// Get xAPI JSON statement
+				if (bodypart.getContent() instanceof InputStream) {
+					InputStream r = (InputStream) bodypart.getContent();
+					BufferedReader read = new BufferedReader(new InputStreamReader(r));
+					String xapiStmnt = read.readLine();
+
+					if (xapiStmnt.contains(STMNTS)) {
+						// multiple statements
+						statements = this.getDecoder().fromJson(xapiStmnt, StatementResult.class);
+					} else {
+						// single statement
+						statement = this.getDecoder().fromJson(xapiStmnt, Statement.class);
+					}
+				} else {
+					throw new IOException(String.format("Failed to store JSON."));
+				}
+			} else if (bodypart.isMimeType("text/plain")) {
+				// Handle plain text
+
+				// Get content type
+				String type = bodypart.getContentType();
+
+				// get hash of attachment
+				Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
+				String hash = null;
+				if (e != null && e.hasMoreElements()) {
+					hash = e.nextElement().getValue();
+				}
+
+				// Get attachment
+				byte[] attachment = bodypart.getContent().toString().getBytes("UTF-8");
+
+				attachments.put(hash, new AttachmentAndType(attachment, type));
+			} else {
+				// Get binary attachment
+
+				// Get content type
+				String type = bodypart.getContentType();
+				byte[] attachment = null;
+
+				if (bodypart.getContent() instanceof InputStream) {
+
+					InputStream in = (InputStream) bodypart.getInputStream();
+					attachment = IOUtils.toByteArray(in);
+
+					// get hash of attachment
+					Enumeration<Header> e = bodypart.getMatchingHeaders(NAME);
+					String hash = null;
+					if (e != null && e.hasMoreElements()) {
+						hash = e.nextElement().getValue();
+					}
+					attachments.put(hash, new AttachmentAndType(attachment, type));
+				}
+			}
+		} // end loop
+
+		if (statements == null) {
+			results = new AttachmentResult(responseMessage, statement, attachments);
+		} else {
+			results = new AttachmentResult(responseMessage, statements, attachments);
+		}
+
+		return results;
+	}
+
+	public Statement getStatement(String statementId) throws java.io.IOException {
+		String result = this.issueGet("/statements?statementId=" + statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
 	public Statement getVoided(String statementId) throws java.io.IOException {
-		String result = this.issueGet("/statements?voidedStatementId="
-				+ statementId);
+		String result = this.issueGet("/statements?voidedStatementId=" + statementId);
 		return this.getDecoder().fromJson(result, Statement.class);
 	}
 
 	public StatementClient addFilter(String key, String value) {
 		try {
-			StatementClient client = new StatementClient(this._host,
-					this.username, this.password);
+			StatementClient client = new StatementClient(this._host, this.username, this.password);
 			if (client.filters == null) {
 				client.filters = new TreeMap<String, String>();
 			}
@@ -219,7 +295,7 @@ public class StatementClient extends BaseClient {
 		return addFilter("verb", verbId);
 	}
 
-	public StatementClient filterByActor(Actor a) throws UnsupportedEncodingException{
+	public StatementClient filterByActor(Actor a) throws UnsupportedEncodingException {
 		return addFilter("agent", URLEncoder.encode(getDecoder().toJson(a.serialize()), "UTF-8"));
 	}
 
@@ -249,9 +325,9 @@ public class StatementClient extends BaseClient {
 		return addFilter("since", timestamp);
 	}
 
-    public StatementClient limitResults(int limit){
-        return addFilter("limit", Integer.toString(limit));
-    }
+	public StatementClient limitResults(int limit) {
+		return addFilter("limit", Integer.toString(limit));
+	}
 
 	public StatementClient filterByUntil(String timestamp) {
 		return addFilter("until", timestamp);

@@ -20,6 +20,16 @@ public class AboutClient extends BaseClient {
             throws MalformedURLException {
         super(uri, username, password);
     }
+    
+    public AboutClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public AboutClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
 
     public About getAbout()
             throws IOException {

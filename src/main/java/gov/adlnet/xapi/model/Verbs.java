@@ -2,8 +2,8 @@ package gov.adlnet.xapi.model;
 
 import java.util.HashMap;
 
-public class Verbs {
-	private static String BASE_VERB_URI ="http://adlnet.gov/expapi/verbs/"; 
+public final class Verbs {
+	private final static String BASE_VERB_URI ="http://adlnet.gov/expapi/verbs/"; 
 	private static Verb createVerb(String description){
 		Verb v = new Verb();
 		HashMap<String, String> descriptions = new HashMap<String, String>();
@@ -12,6 +12,7 @@ public class Verbs {
 		v.setDisplay(descriptions);
 		return v;
 	}
+
 	public static Verb answered(){
 		return createVerb("answered");
 	}	

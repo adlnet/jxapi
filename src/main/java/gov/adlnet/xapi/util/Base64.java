@@ -58,7 +58,7 @@ public class Base64 {
     public static final int URL_SAFE = 8;
 
     /**
-     * Flag to pass to {@link Base64OutputStream} to indicate that it
+     * Flag to pass to Base64OutputStream to indicate that it
      * should not close the output stream it is wrapping when it
      * itself is closed.
      */
@@ -99,21 +99,26 @@ public class Base64 {
     //  decoding
     //  --------------------------------------------------------
 
-    /**
-     * Decode the Base64-encoded data in input and return the data in
-     * a new byte array.
-     *
-     * <p>The padding '=' characters at the end are considered optional, but
-     * if any are present, there must be the correct number of them.
-     *
-     * @param str    the input String to decode, which is converted to
-     *               bytes using the default charset
-     * @param flags  controls certain features of the decoded output.
-     *               Pass {@code DEFAULT} to decode standard Base64.
-     *
-     * @throws IllegalArgumentException if the input contains
-     * incorrect padding
-     */
+	/**
+	 * Decode the Base64-encoded data in input and return the data in a new byte
+	 * array.
+	 *
+	 * <p>
+	 * The padding '=' characters at the end are considered optional, but if any
+	 * are present, there must be the correct number of them.
+	 *
+	 * @param str
+	 *            the input String to decode, which is converted to bytes using
+	 *            the default charset
+	 * @param flags
+	 *            controls certain features of the decoded output. Pass
+	 *            {@code DEFAULT} to decode standard Base64.
+	 *
+	 * @return The byte array.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the input contains incorrect padding
+	 */
     public static byte[] decode(String str, int flags) {
         return decode(str.getBytes(), flags);
     }
@@ -128,6 +133,8 @@ public class Base64 {
      * @param input the input array to decode
      * @param flags  controls certain features of the decoded output.
      *               Pass {@code DEFAULT} to decode standard Base64.
+     *
+     * @return The byte array.
      *
      * @throws IllegalArgumentException if the input contains
      * incorrect padding
@@ -149,6 +156,8 @@ public class Base64 {
      * @param flags  controls certain features of the decoded output.
      *               Pass {@code DEFAULT} to decode standard Base64.
      *
+     * @return The byte array.
+     * 
      * @throws IllegalArgumentException if the input contains
      * incorrect padding
      */
@@ -450,6 +459,8 @@ public class Base64 {
      * @param flags  controls certain features of the encoded output.
      *               Passing {@code DEFAULT} results in output that
      *               adheres to RFC 2045.
+     *               
+     * @return The string.              
      */
     public static String encodeToString(byte[] input, int flags) {
         try {
@@ -471,6 +482,7 @@ public class Base64 {
      * @param flags  controls certain features of the encoded output.
      *               Passing {@code DEFAULT} results in output that
      *               adheres to RFC 2045.
+     * @return The string.
      */
     public static String encodeToString(byte[] input, int offset, int len, int flags) {
         try {
@@ -489,6 +501,8 @@ public class Base64 {
      * @param flags  controls certain features of the encoded output.
      *               Passing {@code DEFAULT} results in output that
      *               adheres to RFC 2045.
+     * @return The byte array.
+     * 
      */
     public static byte[] encode(byte[] input, int flags) {
         return encode(input, 0, input.length, flags);
@@ -505,6 +519,9 @@ public class Base64 {
      * @param flags  controls certain features of the encoded output.
      *               Passing {@code DEFAULT} results in output that
      *               adheres to RFC 2045.
+     *               
+     * @return The byte array.
+     * 
      */
     public static byte[] encode(byte[] input, int offset, int len, int flags) {
         Encoder encoder = new Encoder(flags, null);

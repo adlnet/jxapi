@@ -17,4 +17,12 @@ public class About {
     public JsonObject getExtensions() {
         return extensions;
     }
+    
+    public void setVersion(ArrayList<String> versionInput){
+    	version = versionInput;
+    }
+    
+    public void setExtensions(JsonObject extensionsInput){
+    	extensions = extensionsInput;
+    }
 }

@@ -17,10 +17,11 @@ import com.google.gson.JsonObject;
 
 public class ActivityClient extends BaseClient {
 
-    protected String issueProfilePost(String path, String data, HashMap<String, String> etag)
+    private String issueProfilePost(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
-        HttpURLConnection conn = initializePOSTConnection(url);
+    	URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
+        HttpURLConnection conn = initializeConnection(url);
+        conn.setRequestMethod("POST");
 
         // Agent Profile requires either of these headers being sent
         // If neither are sent it will set If-None-Match to null and exception
@@ -60,10 +61,11 @@ public class ActivityClient extends BaseClient {
         }
     }
 
-    protected String issueProfilePut(String path, String data, HashMap<String, String> etag)
+    private String issueProfilePut(String path, String data, HashMap<String, String> etag)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
-        HttpURLConnection conn = initializePOSTConnection(url);
+    	URL url = new URL(this._host.getProtocol(), this._host.getHost(),this._host.getPort(), this._host.getPath()+path);
+        HttpURLConnection conn = initializeConnection(url);
+        conn.setRequestMethod("POST");
 
         // Agent Profile requires either of these headers being sent
         // If neither are sent it will set If-None-Match to null and exception
@@ -104,9 +106,9 @@ public class ActivityClient extends BaseClient {
         }
     }
 
-    protected String issueProfileDelete(String path, String ifMatchEtagValue)
+    private String issueProfileDelete(String path, String ifMatchEtagValue)
             throws java.io.IOException {
-        URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPath() + path);
+    	URL url = new URL(this._host.getProtocol(), this._host.getHost(), this._host.getPort(), this._host.getPath()+path);
         HttpURLConnection conn = initializeConnection(url);
         //Agent profile requires If-Match header - exception will get caught when making
         conn.addRequestProperty("If-Match", ifMatchEtagValue);
@@ -142,6 +144,16 @@ public class ActivityClient extends BaseClient {
 	public ActivityClient(URL uri, String username, String password)
 			throws MalformedURLException {
 		super(uri, username, password);
+	}
+	
+	public ActivityClient(String uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
+	}
+	
+	public ActivityClient(URL uri, String encodedUsernamePassword)
+			throws MalformedURLException {
+		super(uri, encodedUsernamePassword);
 	}
 
 	public Activity getActivity(String activityId)

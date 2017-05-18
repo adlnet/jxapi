@@ -1,15 +1,12 @@
 package gov.adlnet.xapi;
 
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.Agent;
-import gov.adlnet.xapi.model.Group;
-import gov.adlnet.xapi.model.IStatementObject;
-import gov.adlnet.xapi.model.adapters.ActorAdapter;
-import gov.adlnet.xapi.model.adapters.StatementObjectAdapter;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.Agent;
+import gov.adlnet.xapi.model.Group;
+import gov.adlnet.xapi.model.adapters.ActorAdapter;
 import junit.framework.TestCase;
 
 public class ActorAdapterTest extends TestCase {
