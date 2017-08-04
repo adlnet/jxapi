@@ -27,11 +27,6 @@
             <version>1.46</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0.0.v201112011016</version>
-        </dependency>
-        <dependency>
             <groupId>com.liferay.org.apache.commons.fileupload</groupId>
             <artifactId>com.liferay.org.apache.commons.fileupload</artifactId>
             <version>6.2.0.1</version>
